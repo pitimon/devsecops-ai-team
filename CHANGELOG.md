@@ -5,6 +5,20 @@ All notable changes to the DevSecOps AI Team plugin will be documented in this f
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.2.1] - 2026-03-02
+
+### Added
+
+- **NCSA Website Security Standard v1.0 mapping** — new `mappings/cwe-to-ncsa.json` with 52 CWE mappings across 7 categories (HTTP Security, Transport Security, Authentication, Session Management, Input Validation, Error Handling, Access Control). Thai national web security standard จาก สพธอ.
+- **MCP `ncsa` framework support** — `devsecops_compliance` tool now accepts `ncsa` in frameworks enum; default framework list includes NCSA
+- **NCSA section in compliance reference** — `skills/references/compliance-frameworks.md` expanded with categories, key requirements, and NCSA→OWASP→NIST cross-walk table
+- **2 new MCP handler tests** — NCSA mapping validation + Zod schema acceptance (handlers 23→25, total 354)
+- **NCSA entry in `frameworks.json`** — 16 frameworks tracked (was 15)
+
+### Fixed
+
+- **Stale README counts** (Issue #13): test badge 334→354, CWE counts 86/78/68→96/90/83, test breakdown updated to 6 current suites
+
 ## [2.2.0] - 2026-03-02
 
 ### Fixed

@@ -37,7 +37,14 @@
 
 ## What's New
 
-> ดู [CHANGELOG.md](CHANGELOG.md) สำหรับรายละเอียดทั้งหมด (v1.0.0 → v2.2.0)
+> ดู [CHANGELOG.md](CHANGELOG.md) สำหรับรายละเอียดทั้งหมด (v1.0.0 → v2.2.1)
+
+### v2.2.1 — NCSA Compliance Mapping
+
+- **NCSA Website Security Standard v1.0** — 52 CWE mappings across 7 categories (มาตรฐานความมั่นคงปลอดภัยเว็บไซต์ สพธอ.)
+- **MCP `ncsa` framework support** — `devsecops_compliance` รองรับ NCSA framework
+- **Issue #13 fixes** — แก้ไขตัวเลขเก่าใน README (test count, CWE counts)
+- **354 tests** across 6 suites (was 352)
 
 ### v2.2.0 — Framework Remediation + Test Hardening
 
@@ -610,7 +617,7 @@ devsecops-ai-team/
 | [FRAMEWORK-UPDATE-RUNBOOK.md](docs/FRAMEWORK-UPDATE-RUNBOOK.md) | ขั้นตอนอัพเดท framework versions                   |
 | [MANDAY-ESTIMATION.md](docs/MANDAY-ESTIMATION.md)               | ROI analysis + cost comparison (10,222% ROI)       |
 | [CLAUDE.md](CLAUDE.md)                                          | Architecture + contributing guidelines             |
-| [CHANGELOG.md](CHANGELOG.md)                                    | Version history (v1.0.0 → v2.2.0)                  |
+| [CHANGELOG.md](CHANGELOG.md)                                    | Version history (v1.0.0 → v2.2.1)                  |
 | [SECURITY.md](SECURITY.md)                                      | Vulnerability reporting policy                     |
 
 ---
