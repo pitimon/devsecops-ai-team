@@ -40,7 +40,7 @@ claude plugin install devsecops-ai-team@pitimon-devsecops
 3. แตกไฟล์และติดตั้ง:
 
 ```bash
-tar xzf devsecops-ai-team-v1.0.0.tar.gz
+tar xzf devsecops-ai-team-v2.0.0.tar.gz
 claude plugin marketplace add ./devsecops-ai-team
 claude plugin install devsecops-ai-team@pitimon-devsecops
 ```
@@ -135,8 +135,37 @@ bash tests/test-runner.sh
 # ทดสอบ formatters
 bash tests/test-formatters.sh
 
-# ตรวจสอบ plugin structure (207 checks)
+# ตรวจสอบ normalizer (v2.0)
+bash tests/test-normalizer.sh
+
+# ตรวจสอบ MCP server (v2.0)
+bash tests/test-mcp-server.sh
+
+# ตรวจสอบ plugin structure (223 checks)
 bash tests/validate-plugin.sh
+```
+
+## MCP Server Setup (v2.0)
+
+MCP server ช่วยให้ MCP-compatible clients เรียกใช้ security scanning ได้โดยตรง:
+
+```bash
+# ติดตั้ง dependencies
+cd mcp && npm install
+
+# MCP server จะถูก load อัตโนมัติผ่าน .mcp.json เมื่อเปิด Claude Code
+```
+
+MCP tools ที่พร้อมใช้: `devsecops_scan`, `devsecops_results`, `devsecops_gate`, `devsecops_compliance`, `devsecops_status`
+
+### ตรวจสอบ MCP
+
+```bash
+# ตรวจสอบ syntax
+node --check mcp/server.mjs
+
+# รัน MCP tests
+bash tests/test-mcp-server.sh
 ```
 
 ## Installing Rules (Optional)

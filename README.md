@@ -3,6 +3,8 @@
   <img src="https://img.shields.io/badge/Agents-18-blue?style=for-the-badge" alt="18 Agents">
   <img src="https://img.shields.io/badge/Skills-12-green?style=for-the-badge" alt="12 Skills">
   <img src="https://img.shields.io/badge/Tools-7-orange?style=for-the-badge" alt="7 Tools">
+  <img src="https://img.shields.io/badge/Version-2.0.0-brightgreen?style=for-the-badge" alt="v2.0.0">
+  <img src="https://img.shields.io/badge/MCP-5_Tools-purple?style=for-the-badge" alt="MCP">
   <img src="https://img.shields.io/badge/License-MIT-yellow?style=for-the-badge" alt="MIT License">
 </p>
 
@@ -206,6 +208,27 @@ bash scripts/check-prerequisites.sh
 
 ---
 
+## MCP Server Integration (v2.0)
+
+Plugin includes an MCP server that exposes security scanning as MCP tools — ใช้ได้จาก MCP-compatible clients:
+
+```bash
+# ติดตั้ง MCP dependencies
+cd mcp && npm install
+
+# MCP server จะถูก load อัตโนมัติผ่าน .mcp.json
+```
+
+| MCP Tool               | ทำอะไร                                      |
+| ---------------------- | ------------------------------------------- |
+| `devsecops_scan`       | รัน security scan (เลือก tool ได้)          |
+| `devsecops_results`    | ดึงผลลัพธ์ scan ในรูปแบบที่ต้องการ          |
+| `devsecops_gate`       | ประเมิน pass/fail ตาม severity policy       |
+| `devsecops_compliance` | Map findings ไปยัง OWASP/NIST/MITRE         |
+| `devsecops_status`     | ตรวจสอบ Docker + tool images ที่พร้อมใช้งาน |
+
+---
+
 ## Output Formats
 
 ผลลัพธ์จากทุก scan สามารถ export ได้ 4 รูปแบบ:
@@ -316,13 +339,14 @@ devsecops-ai-team/
 ├── skills/                  # 12 skill definitions (SKILL.md)
 │   └── references/          # 10 domain knowledge files (~500-800 lines each)
 ├── runner/                  # Sidecar Runner (Dockerfile, compose, scripts)
-├── formatters/              # SARIF, Markdown, HTML, JSON normalizer
+├── formatters/              # SARIF, Markdown, HTML, JSON normalizer, dedup
+├── mcp/                     # MCP server (5 tools — scan, results, gate, compliance, status)
 ├── mappings/                # CWE→OWASP, CWE→NIST, CWE→MITRE, severity policy
 ├── templates/               # Report templates (HTML, Markdown)
 ├── hooks/                   # 3 hooks (session-start, scan-on-write, pre-commit-gate)
 ├── examples/                # Rules, policies, DOMAIN.md, Semgrep rules
 ├── scripts/                 # install-runner, install-rules, check-prerequisites
-├── tests/                   # validate-plugin (207 checks), test-runner, test-formatters
+├── tests/                   # validate-plugin (223 checks), normalizer, MCP, runner, formatters
 ├── docs/                    # INSTALL, TROUBLESHOOTING, AGENT-CATALOG, etc.
 └── frameworks.json          # 15 tracked security frameworks with version info
 ```
@@ -346,20 +370,24 @@ devsecops-ai-team/
 ## Testing & Quality
 
 ```
-Validation:  207/207 structural checks passed
+Validation:  223/223 structural checks passed (incl. MCP + normalizer sections)
 Runner:       28/28  normalizer + integration tests passed
 Formatters:   11/11  SARIF + Markdown + HTML tests passed
+Normalizer:   34/34  severity mapping + multi-array + null safety tests passed
+MCP Server:   23/23  config + syntax + tool definitions tests passed
 Frameworks:   15/15  staleness checks OK
 ──────────────────────────────────────────────────
-Total:       261/261 checks passed
+Total:       334/334 checks passed
 ```
 
 ### Run Tests Locally
 
 ```bash
-bash tests/validate-plugin.sh          # 207 structural checks
+bash tests/validate-plugin.sh          # 223 structural checks
 bash tests/test-runner.sh              # Runner + normalizer tests
 bash tests/test-formatters.sh          # Formatter tests
+bash tests/test-normalizer.sh          # Normalizer unit tests (v2.0)
+bash tests/test-mcp-server.sh          # MCP server tests (v2.0)
 bash tests/check-framework-updates.sh  # Framework staleness check
 ```
 
