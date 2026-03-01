@@ -672,6 +672,12 @@ MIT License — see [LICENSE](LICENSE)
 
 ---
 
+## Stargazers over time
+
+[![Stargazers over time](https://starchart.cc/pitimon/devsecops-ai-team.svg?variant=adaptive)](https://starchart.cc/pitimon/devsecops-ai-team)
+
+---
+
 <p align="center">
   <sub>Built with Claude Code | Powered by Open Source Security Tools</sub>
 </p>
