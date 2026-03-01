@@ -8,8 +8,8 @@ ROOT_DIR="$(cd "$SCRIPT_DIR/.." && pwd)"
 PASS=0
 FAIL=0
 
-pass() { ((PASS++)); echo "  [PASS] $1"; }
-fail() { ((FAIL++)); echo "  [FAIL] $1"; }
+pass() { PASS=$((PASS + 1)); echo "  [PASS] $1"; }
+fail() { FAIL=$((FAIL + 1)); echo "  [FAIL] $1"; }
 
 echo "============================================"
 echo "DevSecOps AI Team — Formatter Tests"

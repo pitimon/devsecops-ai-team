@@ -12,9 +12,9 @@ FAIL=0
 WARN=0
 SKIP_INSTALL=${1:-""}
 
-pass() { ((PASS++)); echo "  [PASS] $1"; }
-fail() { ((FAIL++)); echo "  [FAIL] $1"; }
-warn() { ((WARN++)); echo "  [WARN] $1"; }
+pass() { PASS=$((PASS + 1)); echo "  [PASS] $1"; }
+fail() { FAIL=$((FAIL + 1)); echo "  [FAIL] $1"; }
+warn() { WARN=$((WARN + 1)); echo "  [WARN] $1"; }
 
 echo "============================================"
 echo "DevSecOps AI Team — Plugin Validation"

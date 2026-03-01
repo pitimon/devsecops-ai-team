@@ -9,8 +9,8 @@ TOOL="${2:-}"
 PASS=0
 FAIL=0
 
-pass() { ((PASS++)); echo "  [OK] $1"; }
-fail() { ((FAIL++)); echo "  [FAIL] $1"; }
+pass() { PASS=$((PASS + 1)); echo "  [OK] $1"; }
+fail() { FAIL=$((FAIL + 1)); echo "  [FAIL] $1"; }
 
 echo "DevSecOps AI Team — Prerequisites Check"
 echo "========================================="
