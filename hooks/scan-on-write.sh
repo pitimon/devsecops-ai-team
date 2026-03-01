@@ -5,6 +5,12 @@
 # Runs as PreToolUse hook on Edit|Write|MultiEdit
 # Exit 0 = allow, Exit 2 = block
 
+# Require python3 for JSON parsing
+if ! command -v python3 &>/dev/null; then
+  echo "ERROR: python3 required but not found. Install Python 3.8+" >&2
+  exit 1
+fi
+
 # Read tool input from stdin
 INPUT=$(cat)
 

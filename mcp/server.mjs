@@ -18,10 +18,11 @@ import {
   CallToolRequestSchema,
   ListToolsRequestSchema,
 } from "@modelcontextprotocol/sdk/types.js";
-import { execSync } from "node:child_process";
+import { execSync, execFileSync } from "node:child_process";
 import { readFileSync, existsSync, readdirSync } from "node:fs";
 import { resolve, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
+import { z } from "zod";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const ROOT_DIR = resolve(__dirname, "..");
@@ -31,7 +32,28 @@ const MAPPINGS_DIR = resolve(ROOT_DIR, "mappings");
 
 // ─── Helpers ───
 
-function runCommand(cmd, options = {}) {
+function runCommand(file, args = [], options = {}) {
+  const timeout = options.timeout || 120_000;
+  try {
+    const result = execFileSync(file, args, {
+      encoding: "utf-8",
+      timeout,
+      cwd: options.cwd || ROOT_DIR,
+      env: { ...process.env, ...options.env },
+      stdio: ["pipe", "pipe", "pipe"],
+    });
+    return { success: true, output: result.trim() };
+  } catch (err) {
+    return {
+      success: false,
+      output: err.stdout?.trim() || "",
+      error: err.stderr?.trim() || err.message,
+      exitCode: err.status,
+    };
+  }
+}
+
+function runShellCommand(cmd, options = {}) {
   const timeout = options.timeout || 120_000;
   try {
     const result = execSync(cmd, {
@@ -124,13 +146,19 @@ const TOOLS = [
   {
     name: "devsecops_gate",
     description:
-      "Evaluate scan results against severity policy. Returns PASS/FAIL with violation details.",
+      "Evaluate scan results against RBAC severity policy. Returns PASS/FAIL with violation details based on role.",
     inputSchema: {
       type: "object",
       properties: {
         results_file: {
           type: "string",
           description: "Path to normalized JSON results file",
+        },
+        role: {
+          type: "string",
+          enum: ["developer", "security-lead", "release-manager"],
+          description:
+            "RBAC role determining gate strictness (default: developer)",
         },
         policy_file: {
           type: "string",
@@ -191,12 +219,12 @@ async function handleScan({ tool, target, rules, format }) {
     };
   }
 
-  let cmd = `bash "${dispatcher}" --tool "${tool}"`;
-  if (target) cmd += ` --target "${target}"`;
-  if (rules) cmd += ` --rules "${rules}"`;
-  if (format) cmd += ` --format "${format}"`;
+  const args = [dispatcher, "--tool", tool];
+  if (target) args.push("--target", target);
+  if (rules) args.push("--rules", rules);
+  if (format) args.push("--format", format);
 
-  const result = runCommand(cmd, { timeout: 120_000 });
+  const result = runCommand("bash", args, { timeout: 120_000 });
 
   // Extract job_id from output
   const jobMatch = result.output.match(/Job:\s*(job-[\w-]+)/);
@@ -246,8 +274,11 @@ async function handleResults({ job_id, format }) {
   }
 
   const fmt = format || "json";
-  let cmd = `bash "${collector}" --job-id "${job_id}" --format "${fmt}"`;
-  const result = runCommand(cmd, { timeout: 30_000 });
+  const result = runCommand(
+    "bash",
+    [collector, "--job-id", job_id, "--format", fmt],
+    { timeout: 30_000 },
+  );
 
   // Try to read the formatted output
   const resultsDir = `/results/${job_id}`;
@@ -276,7 +307,7 @@ async function handleResults({ job_id, format }) {
   };
 }
 
-async function handleGate({ results_file, policy_file }) {
+async function handleGate({ results_file, role, policy_file }) {
   const policyPath =
     policy_file || resolve(MAPPINGS_DIR, "severity-policy.json");
   const policy = readJsonFile(policyPath);
@@ -297,19 +328,33 @@ async function handleGate({ results_file, policy_file }) {
     };
   }
 
+  // RBAC: resolve role from policy
+  const roleName = role || policy.default_role || "developer";
+  const roleConfig = policy.roles?.[roleName];
+  if (!roleConfig) {
+    return {
+      isError: true,
+      content: [
+        {
+          type: "text",
+          text: `Unknown role: ${roleName}. Available roles: ${Object.keys(policy.roles || {}).join(", ")}`,
+        },
+      ],
+    };
+  }
+
   const findings = results.findings || [];
   const summary = results.summary || {};
-  const thresholds = policy.thresholds || policy;
+  const failOn = roleConfig.fail_on || ["CRITICAL"];
   const violations = [];
 
-  for (const [severity, maxAllowed] of Object.entries(thresholds)) {
+  for (const severity of failOn) {
     const key = severity.toLowerCase();
-    const actual = summary[key] || 0;
-    if (typeof maxAllowed === "number" && actual > maxAllowed) {
+    const count = summary[key] || 0;
+    if (count > 0) {
       violations.push({
         severity: severity.toUpperCase(),
-        allowed: maxAllowed,
-        found: actual,
+        found: count,
       });
     }
   }
@@ -323,6 +368,8 @@ async function handleGate({ results_file, policy_file }) {
         text: JSON.stringify(
           {
             gate,
+            role: roleName,
+            fail_on: failOn,
             violations,
             summary,
             total_findings: findings.length,
@@ -396,9 +443,13 @@ async function handleCompliance({ findings_file, frameworks }) {
 
 async function handleStatus() {
   // Check Docker
-  const dockerResult = runCommand("docker info --format '{{.ServerVersion}}'", {
-    timeout: 5_000,
-  });
+  const dockerResult = runCommand(
+    "docker",
+    ["info", "--format", "{{.ServerVersion}}"],
+    {
+      timeout: 5_000,
+    },
+  );
   const dockerAvailable = dockerResult.success;
   const dockerVersion = dockerAvailable ? dockerResult.output : null;
 
@@ -416,7 +467,8 @@ async function handleStatus() {
   const availableTools = {};
   if (dockerAvailable) {
     const imagesResult = runCommand(
-      "docker images --format '{{.Repository}}:{{.Tag}}'",
+      "docker",
+      ["images", "--format", "{{.Repository}}:{{.Tag}}"],
       { timeout: 5_000 },
     );
     const installedImages = imagesResult.success
@@ -473,10 +525,67 @@ async function handleStatus() {
   };
 }
 
+// ─── Zod Schemas ───
+
+const ScanSchema = z.object({
+  tool: z.enum([
+    "semgrep",
+    "gitleaks",
+    "grype",
+    "trivy",
+    "checkov",
+    "zap",
+    "syft",
+  ]),
+  target: z.string().optional(),
+  rules: z.string().optional(),
+  format: z.enum(["json", "sarif", "markdown", "html"]).optional(),
+});
+
+const ResultsSchema = z.object({
+  job_id: z.string().min(1),
+  format: z.enum(["json", "sarif", "markdown", "html"]).optional(),
+});
+
+const GateSchema = z.object({
+  results_file: z.string().min(1),
+  role: z.enum(["developer", "security-lead", "release-manager"]).optional(),
+  policy_file: z.string().optional(),
+});
+
+const ComplianceSchema = z.object({
+  findings_file: z.string().min(1),
+  frameworks: z.array(z.enum(["owasp", "nist", "mitre"])).optional(),
+});
+
+const StatusSchema = z.object({}).passthrough();
+
+function validateInput(schema, args) {
+  const result = schema.safeParse(args || {});
+  if (!result.success) {
+    const issues = result.error.issues.map(
+      (i) => `${i.path.join(".")}: ${i.message}`,
+    );
+    return {
+      valid: false,
+      error: {
+        isError: true,
+        content: [
+          {
+            type: "text",
+            text: `Input validation failed:\n${issues.join("\n")}`,
+          },
+        ],
+      },
+    };
+  }
+  return { valid: true, data: result.data };
+}
+
 // ─── Server Setup ───
 
 const server = new Server(
-  { name: "devsecops-mcp-server", version: "2.0.0" },
+  { name: "devsecops-mcp-server", version: "2.1.0" },
   { capabilities: { tools: {} } },
 );
 
@@ -488,16 +597,30 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
   const { name, arguments: args } = request.params;
 
   switch (name) {
-    case "devsecops_scan":
-      return handleScan(args);
-    case "devsecops_results":
-      return handleResults(args);
-    case "devsecops_gate":
-      return handleGate(args);
-    case "devsecops_compliance":
-      return handleCompliance(args);
-    case "devsecops_status":
+    case "devsecops_scan": {
+      const v = validateInput(ScanSchema, args);
+      if (!v.valid) return v.error;
+      return handleScan(v.data);
+    }
+    case "devsecops_results": {
+      const v = validateInput(ResultsSchema, args);
+      if (!v.valid) return v.error;
+      return handleResults(v.data);
+    }
+    case "devsecops_gate": {
+      const v = validateInput(GateSchema, args);
+      if (!v.valid) return v.error;
+      return handleGate(v.data);
+    }
+    case "devsecops_compliance": {
+      const v = validateInput(ComplianceSchema, args);
+      if (!v.valid) return v.error;
+      return handleCompliance(v.data);
+    }
+    case "devsecops_status": {
+      validateInput(StatusSchema, args);
       return handleStatus();
+    }
     default:
       return {
         isError: true,

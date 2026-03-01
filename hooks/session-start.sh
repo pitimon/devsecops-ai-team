@@ -20,6 +20,15 @@ fi
 if ls *.tf 2>/dev/null | head -1 >/dev/null 2>&1 || [ -d "k8s" ] || [ -d "kubernetes" ] || ls *.yaml 2>/dev/null | head -1 | xargs grep -l "apiVersion" 2>/dev/null | head -1 >/dev/null 2>&1; then
   RECOMMENDATIONS="${RECOMMENDATIONS}\n- IaC files detected → recommend \`/iac-scan\`"
 fi
+if [ -f "Cargo.toml" ]; then
+  RECOMMENDATIONS="${RECOMMENDATIONS}\n- Rust project detected → recommend \`/sast-scan\` with Semgrep Rust rules"
+fi
+if ls *.csproj 2>/dev/null | head -1 >/dev/null 2>&1 || [ -f "*.sln" ]; then
+  RECOMMENDATIONS="${RECOMMENDATIONS}\n- C# project detected → recommend \`/sast-scan\` with Semgrep C# rules"
+fi
+if [ -f "composer.json" ]; then
+  RECOMMENDATIONS="${RECOMMENDATIONS}\n- PHP project detected → recommend \`/sast-scan\` with Semgrep PHP rules"
+fi
 if [ -d ".git" ]; then
   RECOMMENDATIONS="${RECOMMENDATIONS}\n- Git repo detected → recommend \`/secret-scan\`"
 fi

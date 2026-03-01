@@ -5,6 +5,30 @@ All notable changes to the DevSecOps AI Team plugin will be documented in this f
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.1.0] - 2026-03-01
+
+### Security
+
+- **Python3 dependency guard** — `hooks/scan-on-write.sh`, `hooks/pre-commit-gate.sh`, `formatters/json-normalizer.sh` now fail-fast with clear error if `python3` is not installed, preventing silent security bypass
+- **MCP command injection fix** — `mcp/server.mjs` replaced `execSync(cmd)` string interpolation with `execFileSync(file, args)` array arguments to prevent command injection via user-supplied tool parameters
+- **ZAP memory limits** — `runner/docker-compose.yml` adds `mem_limit: 2g` and `memswap_limit: 2g` to ZAP service to prevent OOM kills
+
+### Added
+
+- **15 CWEs** added to compliance mappings (closes #8):
+  - `cwe-to-owasp.json`: 86 → 96 CWEs (+10: CWE-95, CWE-489, CWE-524, CWE-539, CWE-665, CWE-668, CWE-669, CWE-670, CWE-680, CWE-704)
+  - `cwe-to-nist.json`: 78 → 90 CWEs (+12: above 10 + CWE-693, CWE-732)
+  - `cwe-to-mitre.json`: 68 → 83 CWEs (+15: above 10 + CWE-120, CWE-400, CWE-601, CWE-693, CWE-732)
+- **RBAC in `devsecops_gate`** — reads role-based policy from `severity-policy.json`, accepts `role` parameter (developer/security-lead/release-manager), defaults to `developer`
+- **Zod input validation** — all 5 MCP tools validate inputs with Zod schemas, returning structured validation errors
+- **Language detection** — `session-start.sh` now detects Rust (`Cargo.toml`), C# (`*.csproj`), PHP (`composer.json`)
+- **ZAP OOM troubleshooting** — new section in `docs/TROUBLESHOOTING.md` for exit code 137 diagnosis and workarounds
+
+### Fixed
+
+- **`dedup-findings.sh`** — added missing execute permission (`chmod +x`)
+- **Error suppression** — `job-dispatcher.sh` now logs tool stderr to `${RESULTS_DIR}/dispatcher.log` instead of `/dev/null`
+
 ## [2.0.2] - 2026-03-01
 
 ### Added

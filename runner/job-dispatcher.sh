@@ -49,6 +49,7 @@ echo "[dispatcher] Format: $FORMAT"
 
 run_tool() {
   local EXIT_CODE=0
+  local LOG="${RESULTS_DIR}/dispatcher.log"
 
   case "$TOOL" in
     semgrep)
@@ -57,14 +58,14 @@ run_tool() {
         docker exec devsecops-semgrep semgrep \
           --config "$RULE_ARG" \
           --json --output "/results/${JOB_ID}/semgrep-results.json" \
-          "$TARGET" 2>/dev/null || EXIT_CODE=$?
+          "$TARGET" 2>>"$LOG" || EXIT_CODE=$?
       else
         docker run --rm \
           -v "$(pwd):/workspace:ro" \
           -v "${RESULTS_DIR}:/results" \
           returntocorp/semgrep:latest \
           semgrep --config "$RULE_ARG" --json --output "/results/semgrep-results.json" \
-          /workspace 2>/dev/null || EXIT_CODE=$?
+          /workspace 2>>"$LOG" || EXIT_CODE=$?
       fi
       ;;
 
@@ -74,7 +75,7 @@ run_tool() {
           --source "$TARGET" \
           --report-path "/results/${JOB_ID}/gitleaks-results.json" \
           --report-format json \
-          --no-banner 2>/dev/null || EXIT_CODE=$?
+          --no-banner 2>>"$LOG" || EXIT_CODE=$?
       else
         docker run --rm \
           -v "$(pwd):/workspace:ro" \
@@ -83,7 +84,7 @@ run_tool() {
           --source /workspace \
           --report-path /results/gitleaks-results.json \
           --report-format json \
-          --no-banner 2>/dev/null || EXIT_CODE=$?
+          --no-banner 2>>"$LOG" || EXIT_CODE=$?
       fi
       ;;
 
@@ -92,14 +93,14 @@ run_tool() {
       if [ "$RUNNER_MODE" = "full" ]; then
         docker exec devsecops-grype grype \
           "dir:${GRYPE_TARGET}" \
-          -o json --file "/results/${JOB_ID}/grype-results.json" 2>/dev/null || EXIT_CODE=$?
+          -o json --file "/results/${JOB_ID}/grype-results.json" 2>>"$LOG" || EXIT_CODE=$?
       else
         docker run --rm \
           -v "$(pwd):/workspace:ro" \
           -v "${RESULTS_DIR}:/results" \
           -v "${HOME}/.cache/grype:/cache" \
           anchore/grype:latest \
-          dir:/workspace -o json --file /results/grype-results.json 2>/dev/null || EXIT_CODE=$?
+          dir:/workspace -o json --file /results/grype-results.json 2>>"$LOG" || EXIT_CODE=$?
       fi
       ;;
 
@@ -110,7 +111,7 @@ run_tool() {
       if [ "$RUNNER_MODE" = "full" ]; then
         docker exec devsecops-trivy trivy "$TRIVY_CMD" \
           --format json --output "/results/${JOB_ID}/trivy-results.json" \
-          "$TRIVY_TARGET" 2>/dev/null || EXIT_CODE=$?
+          "$TRIVY_TARGET" 2>>"$LOG" || EXIT_CODE=$?
       else
         docker run --rm \
           -v "$(pwd):/workspace:ro" \
@@ -119,7 +120,7 @@ run_tool() {
           -v "${HOME}/.cache/trivy:/root/.cache/" \
           aquasec/trivy:latest "$TRIVY_CMD" \
           --format json --output /results/trivy-results.json \
-          "$TRIVY_TARGET" 2>/dev/null || EXIT_CODE=$?
+          "$TRIVY_TARGET" 2>>"$LOG" || EXIT_CODE=$?
       fi
       ;;
 
@@ -128,14 +129,14 @@ run_tool() {
         docker exec devsecops-checkov checkov \
           -d "$TARGET" \
           --output json \
-          --output-file-path "/results/${JOB_ID}/" 2>/dev/null || EXIT_CODE=$?
+          --output-file-path "/results/${JOB_ID}/" 2>>"$LOG" || EXIT_CODE=$?
       else
         docker run --rm \
           -v "$(pwd):/workspace:ro" \
           -v "${RESULTS_DIR}:/results" \
           bridgecrew/checkov:latest \
           -d /workspace --output json \
-          --output-file-path /results/ 2>/dev/null || EXIT_CODE=$?
+          --output-file-path /results/ 2>>"$LOG" || EXIT_CODE=$?
       fi
       ;;
 
@@ -145,14 +146,14 @@ run_tool() {
         docker exec devsecops-zap zap-baseline.py \
           -t "$ZAP_TARGET" \
           -J "/results/${JOB_ID}/zap-results.json" \
-          -r "/results/${JOB_ID}/zap-report.html" 2>/dev/null || EXIT_CODE=$?
+          -r "/results/${JOB_ID}/zap-report.html" 2>>"$LOG" || EXIT_CODE=$?
       else
         docker run --rm \
           -v "${RESULTS_DIR}:/results" \
           --network host \
           ghcr.io/zaproxy/zaproxy:stable zap-baseline.py \
           -t "$ZAP_TARGET" \
-          -J /results/zap-results.json 2>/dev/null || EXIT_CODE=$?
+          -J /results/zap-results.json 2>>"$LOG" || EXIT_CODE=$?
       fi
       ;;
 
@@ -161,13 +162,13 @@ run_tool() {
       local SYFT_FORMAT="${FORMAT:-cyclonedx-json}"
       if [ "$RUNNER_MODE" = "full" ]; then
         docker exec devsecops-syft syft "$SYFT_TARGET" \
-          -o "$SYFT_FORMAT" --file "/results/${JOB_ID}/sbom.json" 2>/dev/null || EXIT_CODE=$?
+          -o "$SYFT_FORMAT" --file "/results/${JOB_ID}/sbom.json" 2>>"$LOG" || EXIT_CODE=$?
       else
         docker run --rm \
           -v "$(pwd):/workspace:ro" \
           -v "${RESULTS_DIR}:/results" \
           anchore/syft:latest "dir:/workspace" \
-          -o "$SYFT_FORMAT" --file /results/sbom.json 2>/dev/null || EXIT_CODE=$?
+          -o "$SYFT_FORMAT" --file /results/sbom.json 2>>"$LOG" || EXIT_CODE=$?
       fi
       ;;
 

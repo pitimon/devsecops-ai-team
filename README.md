@@ -3,7 +3,7 @@
   <img src="https://img.shields.io/badge/Agents-18-blue?style=for-the-badge" alt="18 Agents">
   <img src="https://img.shields.io/badge/Skills-12-green?style=for-the-badge" alt="12 Skills">
   <img src="https://img.shields.io/badge/Tools-7-orange?style=for-the-badge" alt="7 Tools">
-  <img src="https://img.shields.io/badge/Version-2.0.2-brightgreen?style=for-the-badge" alt="v2.0.2">
+  <img src="https://img.shields.io/badge/Version-2.1.0-brightgreen?style=for-the-badge" alt="v2.1.0">
   <img src="https://img.shields.io/badge/Tests-334%2F334-success?style=for-the-badge" alt="Tests">
   <img src="https://img.shields.io/badge/MCP-5_Tools-purple?style=for-the-badge" alt="MCP">
   <img src="https://img.shields.io/badge/License-MIT-yellow?style=for-the-badge" alt="MIT License">
@@ -37,7 +37,15 @@
 
 ## What's New
 
-> ดู [CHANGELOG.md](CHANGELOG.md) สำหรับรายละเอียดทั้งหมด (v1.0.0 → v2.0.2)
+> ดู [CHANGELOG.md](CHANGELOG.md) สำหรับรายละเอียดทั้งหมด (v1.0.0 → v2.1.0)
+
+### v2.1.0 — Security Fixes + Coverage Gaps
+
+- **Security Fixes** — Python3 dependency guard ป้องกัน silent bypass, MCP command injection fix (execFile), ZAP OOM memory limits
+- **15 CWEs เพิ่มเติม** (Issue #8) — Coverage: OWASP 86→96, NIST 78→90, MITRE 68→83
+- **RBAC Gate** — `devsecops_gate` ใช้ role-based policy จาก severity-policy.json (developer/security-lead/release-manager)
+- **Zod Validation** — MCP inputs validated ด้วย Zod schemas ทั้ง 5 tools
+- **Language Detection** — เพิ่ม Rust, C#, PHP ใน session-start.sh
 
 ### v2.0.2 — Compliance Coverage
 
@@ -592,7 +600,7 @@ devsecops-ai-team/
 | [FRAMEWORK-UPDATE-RUNBOOK.md](docs/FRAMEWORK-UPDATE-RUNBOOK.md) | ขั้นตอนอัพเดท framework versions                   |
 | [MANDAY-ESTIMATION.md](docs/MANDAY-ESTIMATION.md)               | ROI analysis + cost comparison (10,222% ROI)       |
 | [CLAUDE.md](CLAUDE.md)                                          | Architecture + contributing guidelines             |
-| [CHANGELOG.md](CHANGELOG.md)                                    | Version history (v1.0.0 → v2.0.2)                  |
+| [CHANGELOG.md](CHANGELOG.md)                                    | Version history (v1.0.0 → v2.1.0)                  |
 | [SECURITY.md](SECURITY.md)                                      | Vulnerability reporting policy                     |
 
 ---
