@@ -41,7 +41,7 @@ for i, r in enumerate(data.get('results', []), 1):
         'scan_type': 'sast',
         'severity': {'ERROR': 'HIGH', 'WARNING': 'MEDIUM', 'INFO': 'INFO',
                      'CRITICAL': 'CRITICAL', 'HIGH': 'HIGH', 'MEDIUM': 'MEDIUM', 'LOW': 'LOW'
-                    }.get(r.get('extra', {}).get('severity', 'MEDIUM').upper(), 'MEDIUM'),
+                    }.get((r.get('extra', {}).get('severity') or 'MEDIUM').upper(), 'MEDIUM'),
         'confidence': r.get('extra', {}).get('metadata', {}).get('confidence', 'MEDIUM').upper(),
         'title': r.get('extra', {}).get('message', r.get('check_id', '')),
         'cwe_id': next((c for c in r.get('extra', {}).get('metadata', {}).get('cwe', []) if c.startswith('CWE-')), None),
@@ -143,7 +143,7 @@ findings = []
 severity_map = {'CRITICAL': 'CRITICAL', 'HIGH': 'HIGH', 'MEDIUM': 'MEDIUM', 'LOW': 'LOW', 'UNKNOWN': 'INFO'}
 idx = 1
 for result in data.get('Results', []):
-    for vuln in result.get('Vulnerabilities', []):
+    for vuln in (result.get('Vulnerabilities') or []):
         findings.append({
             'id': f'FINDING-${DATE_PREFIX}-{idx:03d}',
             'source_tool': 'trivy',
@@ -151,7 +151,7 @@ for result in data.get('Results', []):
             'severity': severity_map.get(vuln.get('Severity', ''), 'MEDIUM'),
             'confidence': 'HIGH',
             'title': f\"{vuln.get('VulnerabilityID', '')}: {vuln.get('PkgName', '')}@{vuln.get('InstalledVersion', '')}\",
-            'cwe_id': (vuln.get('CweIDs') or [None])[0],
+            'cwe_id': ((vuln.get('CweIDs') or [None])[0] or '').split(':')[0] or None,
             'cvss_score': vuln.get('CVSS', {}).get('nvd', {}).get('V3Score'),
             'location': {
                 'package': f\"{vuln.get('PkgName', '')}@{vuln.get('InstalledVersion', '')}\",
@@ -162,7 +162,7 @@ for result in data.get('Results', []):
             'fix_versions': [vuln.get('FixedVersion', '')] if vuln.get('FixedVersion') else []
         })
         idx += 1
-    for misconf in result.get('Misconfigurations', []):
+    for misconf in (result.get('Misconfigurations') or []):
         findings.append({
             'id': f'FINDING-${DATE_PREFIX}-{idx:03d}',
             'source_tool': 'trivy',

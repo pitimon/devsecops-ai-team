@@ -120,6 +120,131 @@
       "techniques": ["T1190"],
       "tactic": "Initial Access",
       "name": "Exploit Public-Facing Application"
+    },
+    "CWE-119": {
+      "techniques": ["T1203"],
+      "tactic": "Execution",
+      "name": "Exploitation for Client Execution"
+    },
+    "CWE-121": {
+      "techniques": ["T1203"],
+      "tactic": "Execution",
+      "name": "Exploitation for Client Execution"
+    },
+    "CWE-122": {
+      "techniques": ["T1203"],
+      "tactic": "Execution",
+      "name": "Exploitation for Client Execution"
+    },
+    "CWE-125": {
+      "techniques": ["T1005"],
+      "tactic": "Collection",
+      "name": "Data from Local System"
+    },
+    "CWE-129": {
+      "techniques": ["T1190"],
+      "tactic": "Initial Access",
+      "name": "Exploit Public-Facing Application"
+    },
+    "CWE-189": {
+      "techniques": ["T1203"],
+      "tactic": "Execution",
+      "name": "Exploitation for Client Execution"
+    },
+    "CWE-190": {
+      "techniques": ["T1203"],
+      "tactic": "Execution",
+      "name": "Exploitation for Client Execution"
+    },
+    "CWE-191": {
+      "techniques": ["T1203"],
+      "tactic": "Execution",
+      "name": "Exploitation for Client Execution"
+    },
+    "CWE-264": {
+      "techniques": ["T1068"],
+      "tactic": "Privilege Escalation",
+      "name": "Exploitation for Privilege Escalation"
+    },
+    "CWE-362": {
+      "techniques": ["T1068"],
+      "tactic": "Privilege Escalation",
+      "name": "Exploitation for Privilege Escalation"
+    },
+    "CWE-369": {
+      "techniques": ["T1499"],
+      "tactic": "Impact",
+      "name": "Endpoint Denial of Service"
+    },
+    "CWE-399": {
+      "techniques": ["T1499"],
+      "tactic": "Impact",
+      "name": "Endpoint Denial of Service"
+    },
+    "CWE-401": {
+      "techniques": ["T1499"],
+      "tactic": "Impact",
+      "name": "Endpoint Denial of Service"
+    },
+    "CWE-415": {
+      "techniques": ["T1203"],
+      "tactic": "Execution",
+      "name": "Exploitation for Client Execution"
+    },
+    "CWE-416": {
+      "techniques": ["T1203"],
+      "tactic": "Execution",
+      "name": "Exploitation for Client Execution"
+    },
+    "CWE-476": {
+      "techniques": ["T1499"],
+      "tactic": "Impact",
+      "name": "Endpoint Denial of Service"
+    },
+    "CWE-617": {
+      "techniques": ["T1499"],
+      "tactic": "Impact",
+      "name": "Endpoint Denial of Service"
+    },
+    "CWE-674": {
+      "techniques": ["T1499"],
+      "tactic": "Impact",
+      "name": "Endpoint Denial of Service"
+    },
+    "CWE-682": {
+      "techniques": ["T1203"],
+      "tactic": "Execution",
+      "name": "Exploitation for Client Execution"
+    },
+    "CWE-754": {
+      "techniques": ["T1499"],
+      "tactic": "Impact",
+      "name": "Endpoint Denial of Service"
+    },
+    "CWE-755": {
+      "techniques": ["T1499"],
+      "tactic": "Impact",
+      "name": "Endpoint Denial of Service"
+    },
+    "CWE-770": {
+      "techniques": ["T1499"],
+      "tactic": "Impact",
+      "name": "Endpoint Denial of Service"
+    },
+    "CWE-787": {
+      "techniques": ["T1203"],
+      "tactic": "Execution",
+      "name": "Exploitation for Client Execution"
+    },
+    "CWE-835": {
+      "techniques": ["T1499"],
+      "tactic": "Impact",
+      "name": "Endpoint Denial of Service"
+    },
+    "CWE-843": {
+      "techniques": ["T1203"],
+      "tactic": "Execution",
+      "name": "Exploitation for Client Execution"
     }
   }
 }

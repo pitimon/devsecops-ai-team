@@ -5,6 +5,21 @@ All notable changes to the DevSecOps AI Team plugin will be documented in this f
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.0.1] - 2026-03-01
+
+### Fixed
+
+- **BUG-6 (MEDIUM)**: Semgrep null severity crash — `severity` key with null value now coalesces to `'MEDIUM'` before `.upper()`
+- **BUG-7 (MEDIUM)**: Trivy null `Vulnerabilities`/`Misconfigurations` crash — null values now coalesce to empty list
+- **BUG-8 (LOW)**: Trivy CWE IDs like `"CWE-250: Execution with Unnecessary Privileges"` now extract `CWE-NNN` prefix only
+
+### Added
+
+- **25 memory-safety & numeric CWEs** added to all 3 compliance mapping files:
+  - `cwe-to-owasp.json`: 41 → 66 CWEs (buffer overflow, use-after-free, integer overflow, race condition, etc.)
+  - `cwe-to-nist.json`: 33 → 58 CWEs (mapped to SI-16, SC-5, SC-4 controls)
+  - `cwe-to-mitre.json`: 23 → 48 CWEs (mapped to T1203, T1499, T1068 techniques)
+
 ## [2.0.0] - 2026-03-01
 
 ### Fixed

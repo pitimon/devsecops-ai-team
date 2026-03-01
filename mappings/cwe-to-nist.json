@@ -116,6 +116,106 @@
     "CWE-918": {
       "controls": ["SC-7", "AC-4"],
       "family": "System and Communications Protection"
+    },
+    "CWE-119": {
+      "controls": ["SI-16"],
+      "family": "System and Information Integrity"
+    },
+    "CWE-121": {
+      "controls": ["SI-16"],
+      "family": "System and Information Integrity"
+    },
+    "CWE-122": {
+      "controls": ["SI-16"],
+      "family": "System and Information Integrity"
+    },
+    "CWE-125": {
+      "controls": ["SI-16"],
+      "family": "System and Information Integrity"
+    },
+    "CWE-129": {
+      "controls": ["SI-10", "SI-16"],
+      "family": "System and Information Integrity"
+    },
+    "CWE-189": {
+      "controls": ["SI-16"],
+      "family": "System and Information Integrity"
+    },
+    "CWE-190": {
+      "controls": ["SI-16"],
+      "family": "System and Information Integrity"
+    },
+    "CWE-191": {
+      "controls": ["SI-16"],
+      "family": "System and Information Integrity"
+    },
+    "CWE-264": {
+      "controls": ["AC-3", "AC-6"],
+      "family": "Access Control"
+    },
+    "CWE-362": {
+      "controls": ["SI-16", "SC-4"],
+      "family": "System and Information Integrity"
+    },
+    "CWE-369": {
+      "controls": ["SI-16"],
+      "family": "System and Information Integrity"
+    },
+    "CWE-399": {
+      "controls": ["SC-5", "SI-16"],
+      "family": "System and Communications Protection"
+    },
+    "CWE-401": {
+      "controls": ["SC-5", "SI-16"],
+      "family": "System and Communications Protection"
+    },
+    "CWE-415": {
+      "controls": ["SI-16"],
+      "family": "System and Information Integrity"
+    },
+    "CWE-416": {
+      "controls": ["SI-16"],
+      "family": "System and Information Integrity"
+    },
+    "CWE-476": {
+      "controls": ["SI-16"],
+      "family": "System and Information Integrity"
+    },
+    "CWE-617": {
+      "controls": ["SI-16", "SI-11"],
+      "family": "System and Information Integrity"
+    },
+    "CWE-674": {
+      "controls": ["SC-5", "SI-16"],
+      "family": "System and Communications Protection"
+    },
+    "CWE-682": {
+      "controls": ["SI-16"],
+      "family": "System and Information Integrity"
+    },
+    "CWE-754": {
+      "controls": ["SI-11", "SI-16"],
+      "family": "System and Information Integrity"
+    },
+    "CWE-755": {
+      "controls": ["SI-11", "SI-16"],
+      "family": "System and Information Integrity"
+    },
+    "CWE-770": {
+      "controls": ["SC-5", "SC-6"],
+      "family": "System and Communications Protection"
+    },
+    "CWE-787": {
+      "controls": ["SI-16"],
+      "family": "System and Information Integrity"
+    },
+    "CWE-835": {
+      "controls": ["SC-5", "SI-16"],
+      "family": "System and Communications Protection"
+    },
+    "CWE-843": {
+      "controls": ["SI-16"],
+      "family": "System and Information Integrity"
     }
   }
 }
