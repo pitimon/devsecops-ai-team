@@ -23,7 +23,7 @@ fi
 if [ -f "Cargo.toml" ]; then
   RECOMMENDATIONS="${RECOMMENDATIONS}\n- Rust project detected → recommend \`/sast-scan\` with Semgrep Rust rules"
 fi
-if ls *.csproj 2>/dev/null | head -1 >/dev/null 2>&1 || [ -f "*.sln" ]; then
+if compgen -G "*.csproj" >/dev/null 2>&1 || compgen -G "*.sln" >/dev/null 2>&1; then
   RECOMMENDATIONS="${RECOMMENDATIONS}\n- C# project detected → recommend \`/sast-scan\` with Semgrep C# rules"
 fi
 if [ -f "composer.json" ]; then

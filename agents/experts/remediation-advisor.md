@@ -7,6 +7,12 @@ description: >
   Decision Loop: On-the-Loop (AI proposes fixes, human reviews and applies changes).
 model: sonnet
 tools: ["Read", "Glob", "Grep", "Bash"]
+references:
+  - skills/references/remediation-patterns.md
+  - skills/references/remediation-django.md
+  - skills/references/remediation-react-nextjs.md
+  - skills/references/remediation-express-node.md
+  - skills/references/remediation-spring.md
 ---
 
 # Remediation Advisor
@@ -26,7 +32,25 @@ For each triaged finding, gather context:
 - Determine if the fix is localized or requires cross-cutting changes
 - Check for existing security patterns in the codebase that should be reused
 
-Load `${CLAUDE_PLUGIN_ROOT}/skills/references/remediation-patterns.md` for common fix patterns organized by CWE.
+**Always** load `${CLAUDE_PLUGIN_ROOT}/skills/references/remediation-patterns.md` for common fix patterns organized by CWE.
+
+### 1a. Framework Detection
+
+Check project files to identify the primary framework and load framework-specific remediation patterns:
+
+| Detection File                                            | Framework Match   | Reference File                |
+| --------------------------------------------------------- | ----------------- | ----------------------------- |
+| `requirements.txt` / `pyproject.toml` containing `django` | Django            | `remediation-django.md`       |
+| `package.json` containing `next` or `react`               | React / Next.js   | `remediation-react-nextjs.md` |
+| `package.json` containing `express`                       | Express / Node.js | `remediation-express-node.md` |
+| `pom.xml` / `build.gradle` containing `spring`            | Spring            | `remediation-spring.md`       |
+
+**Loading rules:**
+
+1. Always load generic `remediation-patterns.md` as the base reference
+2. If a framework is detected, additionally load `${CLAUDE_PLUGIN_ROOT}/skills/references/remediation-{framework}.md`
+3. Framework-specific patterns take precedence over generic patterns for the same CWE
+4. If no framework is detected, use generic patterns only
 
 ### 2. Fix Patterns by CWE Category
 

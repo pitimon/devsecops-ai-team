@@ -18,7 +18,7 @@ import {
   CallToolRequestSchema,
   ListToolsRequestSchema,
 } from "@modelcontextprotocol/sdk/types.js";
-import { execSync, execFileSync } from "node:child_process";
+import { execFileSync } from "node:child_process";
 import { readFileSync, existsSync, readdirSync } from "node:fs";
 import { resolve, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
@@ -36,27 +36,6 @@ function runCommand(file, args = [], options = {}) {
   const timeout = options.timeout || 120_000;
   try {
     const result = execFileSync(file, args, {
-      encoding: "utf-8",
-      timeout,
-      cwd: options.cwd || ROOT_DIR,
-      env: { ...process.env, ...options.env },
-      stdio: ["pipe", "pipe", "pipe"],
-    });
-    return { success: true, output: result.trim() };
-  } catch (err) {
-    return {
-      success: false,
-      output: err.stdout?.trim() || "",
-      error: err.stderr?.trim() || err.message,
-      exitCode: err.status,
-    };
-  }
-}
-
-function runShellCommand(cmd, options = {}) {
-  const timeout = options.timeout || 120_000;
-  try {
-    const result = execSync(cmd, {
       encoding: "utf-8",
       timeout,
       cwd: options.cwd || ROOT_DIR,
@@ -497,7 +476,7 @@ function validateInput(schema, args) {
 // ─── Server Setup ───
 
 const server = new Server(
-  { name: "devsecops-mcp-server", version: "2.1.0" },
+  { name: "devsecops-mcp-server", version: "2.2.0" },
   { capabilities: { tools: {} } },
 );
 
