@@ -138,6 +138,143 @@ zap-baseline.py -t https://target.com
 - Validate schema: `python3 -c "import json; json.load(open('results.sarif'))"`
 - Use `--max-results 1000` flag
 
+### MCP Server Connection Errors
+
+**Symptom**: MCP tools (`devsecops_scan`, `devsecops_gate`, etc.) not responding or showing connection errors
+
+**Cause**: Node.js version incompatible, server syntax error, or missing dependencies
+
+**Solution**:
+
+```bash
+# Check syntax
+node --check mcp/server.mjs
+
+# Check Node.js version (requires 18+)
+node --version
+
+# Reinstall dependencies
+cd mcp && npm install
+
+# Check stderr output
+node mcp/server.mjs 2>&1 | head -20
+```
+
+**Common issues**:
+
+- Node.js < 18 — MCP SDK requires ESM support
+- Missing `node_modules/` — run `npm install` in `mcp/` directory
+- Port conflict — MCP uses stdio transport, not ports
+
+### RBAC Policy Misconfiguration
+
+**Symptom**: `devsecops_gate` returns "Unknown role" or unexpected PASS/FAIL
+
+**Cause**: Missing or malformed severity policy file, or invalid role name
+
+**Solution**:
+
+```bash
+# Verify policy file exists and is valid JSON
+python3 -c "import json; json.load(open('mappings/severity-policy.json'))"
+
+# Check available roles
+python3 -c "
+import json
+p = json.load(open('mappings/severity-policy.json'))
+print('Roles:', list(p['roles'].keys()))
+print('Default:', p.get('default_role'))
+"
+```
+
+**Valid roles**: `developer`, `security-lead`, `release-manager`
+
+**Default behavior**: If no `role` parameter is provided, the gate uses `default_role` from the policy file (typically `developer`, which only blocks CRITICAL findings).
+
+### Zod Validation Errors
+
+**Symptom**: MCP tool returns "Input validation failed" with structured error details
+
+**Cause**: Invalid or missing required parameters in tool input
+
+**Solution**:
+
+Read the error message carefully — it shows exactly which field failed:
+
+```
+Input validation failed:
+tool: Invalid enum value. Expected 'semgrep' | 'gitleaks' | ..., received 'invalid'
+```
+
+**Common mistakes**:
+
+| Error                                         | Cause                      | Fix                        |
+| --------------------------------------------- | -------------------------- | -------------------------- |
+| `tool: Required`                              | Missing `tool` parameter   | Add `tool: "semgrep"`      |
+| `Invalid enum value`                          | Typo in tool/role name     | Check exact enum values    |
+| `String must contain at least 1 character(s)` | Empty string passed        | Provide non-empty value    |
+| `Expected array, received string`             | Single framework as string | Wrap in array: `["owasp"]` |
+
+### CI/CD Integration
+
+**Symptom**: GitHub Actions workflow fails or SARIF upload rejected
+
+**Cause**: Exit code handling, file path issues, or SARIF size limits
+
+**Solution**:
+
+```yaml
+# GitHub Actions example
+- name: Run DevSecOps scan
+  run: |
+    bash runner/job-dispatcher.sh --tool semgrep --target . --format sarif
+  continue-on-error: true # Don't fail pipeline on findings
+
+- name: Upload SARIF
+  uses: github/codeql-action/upload-sarif@v3
+  with:
+    sarif_file: results/results.sarif
+  if: always() # Upload even if scan found issues
+
+- name: Security gate check
+  run: |
+    # Gate returns exit code 0 (PASS) or 1 (FAIL)
+    node mcp/server.mjs gate --results results/normalized.json --role developer
+```
+
+**Gate exit codes**: `0` = PASS (no blocking findings), `1` = FAIL (violations found)
+
+**SARIF size limit**: GitHub accepts max 10MB. Use `--max-results 1000` to limit findings.
+
+### Dedup Script Failures
+
+**Symptom**: `dedup-findings.sh` produces empty output or permission error
+
+**Cause**: Missing execute permission, python3 not found, or malformed input files
+
+**Solution**:
+
+```bash
+# Ensure execute permission
+chmod +x formatters/dedup-findings.sh
+
+# Check python3 is available
+python3 --version
+
+# Test with valid input
+echo '{"findings": []}' > /tmp/test-input.json
+bash formatters/dedup-findings.sh --inputs /tmp/test-input.json --output /tmp/test-output.json
+
+# Check output
+cat /tmp/test-output.json
+```
+
+**Empty output symptoms**:
+
+- All input files malformed JSON — dedup skips them with warnings on stderr
+- Missing `findings` key in input — produces 0 findings (not an error)
+- Input file path not found — check comma-separated paths have no spaces
+
 ## Getting Help
 
 1. Check [docs/INSTALL.md](INSTALL.md) for setup requirements

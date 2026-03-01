@@ -5,6 +5,31 @@ All notable changes to the DevSecOps AI Team plugin will be documented in this f
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.2.0] - 2026-03-02
+
+### Fixed
+
+- **BUG-9 (MEDIUM)**: C# false positive detection in `session-start.sh` — `ls *.csproj | head -1` always returned 0 due to pipeline semantics; replaced with `compgen -G` glob check. Also fixed `[ -f "*.sln" ]` which tested literal filename instead of globbing (closes #10, #11)
+
+### Added
+
+- **Framework-aware remediation** (Issue #7 Phase 1):
+  - `skills/references/remediation-django.md` — Django 5.x/4.x patterns: `|safe` decision tree, `format_html()`, ORM vs raw SQL, CSRF, session security, DRF permissions
+  - `skills/references/remediation-react-nextjs.md` — React 18+/Next.js 14+ patterns: `dangerouslySetInnerHTML` alternatives, Server Components boundaries, CSP in `next.config.js`, Server Actions Zod validation
+  - `skills/references/remediation-express-node.md` — Express 4.x/5.x patterns: `helmet.js`, `express-validator`, prototype pollution, `csrf-csrf` migration, `execFileSync` over `execSync`
+  - `skills/references/remediation-spring.md` — Spring Boot 3.x/Security 6.x patterns: `SecurityFilterChain`, `@PreAuthorize`, JPA parameterized queries, `th:text` vs `th:utext`, BCrypt/Argon2
+  - `agents/experts/remediation-advisor.md` — framework detection + conditional reference loading
+- **Syft normalizer** — SBOM component inventory from CycloneDX-JSON format; OS components filtered, PURL preserved
+- **65 new functional tests**:
+  - `tests/test-hooks.sh` (27 tests) — session-start project detection, scan-on-write secret blocking, pre-commit gate logic
+  - `tests/test-dedup.sh` (15 tests) — file/package/URL dedup keys, severity promotion, source concatenation, re-indexing
+  - `tests/test-mcp-handlers.sh` (23 tests) — Zod validation, gate violations, compliance crosswalk, helper functions, policy file
+- **TROUBLESHOOTING.md** — 5 new sections: MCP Server Connection, RBAC Policy, Zod Validation, CI/CD Integration, Dedup Script
+
+### Removed
+
+- Dead `runShellCommand()` function from `mcp/server.mjs` — defined in v2.1.0 refactor but never called; also removed unused `execSync` import
+
 ## [2.1.0] - 2026-03-01
 
 ### Security

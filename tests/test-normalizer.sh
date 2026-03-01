@@ -214,6 +214,88 @@ print(d['summary']['total'])
   fi
 done
 
+# ─── Test 9: Syft SBOM normalization ───
+echo ""
+echo "--- Syft SBOM Normalization ---"
+
+SYFT_FIXTURE="$ROOT_DIR/tests/fixtures/sample-syft.json"
+SYFT_OUT="$TMPDIR/syft.json"
+
+if [ -f "$SYFT_FIXTURE" ]; then
+  bash "$NORMALIZER" --tool syft --input "$SYFT_FIXTURE" --output "$SYFT_OUT" 2>/dev/null
+
+  SYFT_COUNT=$(python3 -c "
+import json
+d = json.load(open('$SYFT_OUT'))
+print(len(d['findings']))
+" 2>/dev/null)
+  [ "$SYFT_COUNT" = "5" ] && pass "Syft: 5 library components normalized (OS excluded)" || fail "Syft: expected 5 findings, got $SYFT_COUNT"
+
+  SYFT_TYPE=$(python3 -c "
+import json
+d = json.load(open('$SYFT_OUT'))
+types = set(f['scan_type'] for f in d['findings'])
+print('PASS' if types == {'sbom'} else f'FAIL:{types}')
+" 2>/dev/null)
+  [ "$SYFT_TYPE" = "PASS" ] && pass "Syft: all findings have scan_type 'sbom'" || fail "Syft: wrong scan types: $SYFT_TYPE"
+
+  SYFT_SEV=$(python3 -c "
+import json
+d = json.load(open('$SYFT_OUT'))
+sevs = set(f['severity'] for f in d['findings'])
+print('PASS' if sevs == {'INFO'} else f'FAIL:{sevs}')
+" 2>/dev/null)
+  [ "$SYFT_SEV" = "PASS" ] && pass "Syft: all severities are INFO" || fail "Syft: wrong severities: $SYFT_SEV"
+
+  SYFT_PKG=$(python3 -c "
+import json
+d = json.load(open('$SYFT_OUT'))
+names = [f['location']['package'] for f in d['findings']]
+has_express = 'express' in names
+has_django = 'django' in names
+print('PASS' if has_express and has_django else f'FAIL:{names}')
+" 2>/dev/null)
+  [ "$SYFT_PKG" = "PASS" ] && pass "Syft: package names preserved (express, django)" || fail "Syft: missing packages: $SYFT_PKG"
+
+  SYFT_PURL=$(python3 -c "
+import json
+d = json.load(open('$SYFT_OUT'))
+purls = [f['location']['purl'] for f in d['findings']]
+has_purl = any('pkg:npm/express' in p for p in purls)
+print('PASS' if has_purl else f'FAIL:{purls}')
+" 2>/dev/null)
+  [ "$SYFT_PURL" = "PASS" ] && pass "Syft: PURL preserved in location" || fail "Syft: PURL missing: $SYFT_PURL"
+
+  SYFT_SUMMARY=$(python3 -c "
+import json
+d = json.load(open('$SYFT_OUT'))
+s = d['summary']
+print('PASS' if s['total'] == 5 and s['info'] == 5 and s['critical'] == 0 else f'FAIL:{s}')
+" 2>/dev/null)
+  [ "$SYFT_SUMMARY" = "PASS" ] && pass "Syft: summary counts correct" || fail "Syft: summary mismatch: $SYFT_SUMMARY"
+else
+  fail "Syft: fixture file not found at $SYFT_FIXTURE"
+fi
+
+# ─── Test 10: Syft empty input ───
+echo ""
+echo "--- Syft Empty Input ---"
+
+SYFT_EMPTY="$TMPDIR/empty-syft.json"
+SYFT_EMPTY_OUT="$TMPDIR/empty-out-syft.json"
+echo '{"components": []}' > "$SYFT_EMPTY"
+
+if bash "$NORMALIZER" --tool syft --input "$SYFT_EMPTY" --output "$SYFT_EMPTY_OUT" 2>/dev/null; then
+  SYFT_EMPTY_COUNT=$(python3 -c "
+import json
+d = json.load(open('$SYFT_EMPTY_OUT'))
+print(d['summary']['total'])
+" 2>/dev/null)
+  [ "$SYFT_EMPTY_COUNT" = "0" ] && pass "Syft: empty input produces 0 findings" || fail "Syft: empty input produced $SYFT_EMPTY_COUNT findings"
+else
+  fail "Syft: crashed on empty input"
+fi
+
 # ─── Summary ───
 echo ""
 echo "============================================"

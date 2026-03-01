@@ -278,6 +278,48 @@ json.dump({'findings': findings, 'summary': {
 " 2>/dev/null
     ;;
 
+  syft)
+    python3 -c "
+import json
+data = json.load(open('$INPUT'))
+findings = []
+idx = 1
+for comp in data.get('components', []):
+    if comp.get('type') == 'operating-system':
+        continue
+    licenses = []
+    for lic in comp.get('licenses', []):
+        lid = lic.get('license', {}).get('id', '')
+        if lid:
+            licenses.append(lid)
+    findings.append({
+        'id': f'FINDING-${DATE_PREFIX}-{idx:03d}',
+        'source_tool': 'syft',
+        'scan_type': 'sbom',
+        'severity': 'INFO',
+        'title': f\"{comp.get('name', '')}@{comp.get('version', '')}\",
+        'cwe_id': None,
+        'location': {
+            'package': comp.get('name', ''),
+            'version': comp.get('version', ''),
+            'purl': comp.get('purl', ''),
+        },
+        'rule_id': comp.get('purl', ''),
+        'description': f\"Component {comp.get('name', '')} version {comp.get('version', '')} ({', '.join(licenses) if licenses else 'unknown license'})\",
+        'status': 'open'
+    })
+    idx += 1
+json.dump({'findings': findings, 'summary': {
+    'total': len(findings),
+    'critical': 0,
+    'high': 0,
+    'medium': 0,
+    'low': 0,
+    'info': len(findings)
+}}, open('$OUTPUT', 'w'), indent=2)
+" 2>/dev/null
+    ;;
+
   *)
     echo "[normalizer] WARNING: Unknown tool '$TOOL', copying raw output"
     cp "$INPUT" "$OUTPUT"

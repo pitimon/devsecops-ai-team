@@ -3,7 +3,7 @@
   <img src="https://img.shields.io/badge/Agents-18-blue?style=for-the-badge" alt="18 Agents">
   <img src="https://img.shields.io/badge/Skills-12-green?style=for-the-badge" alt="12 Skills">
   <img src="https://img.shields.io/badge/Tools-7-orange?style=for-the-badge" alt="7 Tools">
-  <img src="https://img.shields.io/badge/Version-2.1.0-brightgreen?style=for-the-badge" alt="v2.1.0">
+  <img src="https://img.shields.io/badge/Version-2.2.0-brightgreen?style=for-the-badge" alt="v2.2.0">
   <img src="https://img.shields.io/badge/Tests-334%2F334-success?style=for-the-badge" alt="Tests">
   <img src="https://img.shields.io/badge/MCP-5_Tools-purple?style=for-the-badge" alt="MCP">
   <img src="https://img.shields.io/badge/License-MIT-yellow?style=for-the-badge" alt="MIT License">
@@ -37,7 +37,16 @@
 
 ## What's New
 
-> ดู [CHANGELOG.md](CHANGELOG.md) สำหรับรายละเอียดทั้งหมด (v1.0.0 → v2.1.0)
+> ดู [CHANGELOG.md](CHANGELOG.md) สำหรับรายละเอียดทั้งหมด (v1.0.0 → v2.2.0)
+
+### v2.2.0 — Framework Remediation + Test Hardening
+
+- **Framework-Aware Remediation** (Issue #7 Phase 1) — 4 reference files (Django, React/Next.js, Express/Node, Spring) + auto-detection routing in remediation-advisor
+- **BUG-9 Fix** (Issue #10) — C# false positive in session-start.sh (`compgen -G` replaces pipeline)
+- **Syft Normalizer** — SBOM component inventory from CycloneDX-JSON
+- **65 new functional tests** — hooks (27), dedup (15), MCP handlers (23)
+- **Docs** — TROUBLESHOOTING.md expanded with MCP, RBAC, Zod, CI/CD, dedup sections
+- **Cleanup** — removed dead `runShellCommand()` + unused `execSync` import
 
 ### v2.1.0 — Security Fixes + Coverage Gaps
 
@@ -600,7 +609,7 @@ devsecops-ai-team/
 | [FRAMEWORK-UPDATE-RUNBOOK.md](docs/FRAMEWORK-UPDATE-RUNBOOK.md) | ขั้นตอนอัพเดท framework versions                   |
 | [MANDAY-ESTIMATION.md](docs/MANDAY-ESTIMATION.md)               | ROI analysis + cost comparison (10,222% ROI)       |
 | [CLAUDE.md](CLAUDE.md)                                          | Architecture + contributing guidelines             |
-| [CHANGELOG.md](CHANGELOG.md)                                    | Version history (v1.0.0 → v2.1.0)                  |
+| [CHANGELOG.md](CHANGELOG.md)                                    | Version history (v1.0.0 → v2.2.0)                  |
 | [SECURITY.md](SECURITY.md)                                      | Vulnerability reporting policy                     |
 
 ---
