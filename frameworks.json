@@ -212,5 +212,20 @@
     ],
     "update_frequency": "stable",
     "notes": "Microsoft methodology, stable since 1999"
+  },
+  {
+    "id": "ncsa-web-security",
+    "name": "NCSA Website Security Standard",
+    "version": "1.0",
+    "released": "2024-01",
+    "source_url": "https://www.ncsa.or.th",
+    "last_checked": "2026-03-02",
+    "grep_patterns": ["NCSA", "ncsa", "สพธอ"],
+    "used_in": [
+      "mappings/cwe-to-ncsa.json",
+      "skills/references/compliance-frameworks.md"
+    ],
+    "update_frequency": "rare",
+    "notes": "Thai national web security standard (สพธอ.). 31 requirements across 7 categories"
   }
 ]
