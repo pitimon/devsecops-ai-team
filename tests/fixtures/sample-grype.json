@@ -1,0 +1,35 @@
+{
+  "matches": [
+    {
+      "vulnerability": {
+        "id": "CVE-2024-12345",
+        "severity": "Critical",
+        "description": "Remote code execution in example-lib",
+        "fix": { "versions": ["2.0.1"], "state": "fixed" },
+        "cvss": [{ "metrics": { "baseScore": 9.8 } }]
+      },
+      "artifact": {
+        "name": "example-lib",
+        "version": "1.2.3",
+        "type": "npm",
+        "locations": [{ "path": "package-lock.json" }]
+      }
+    },
+    {
+      "vulnerability": {
+        "id": "CVE-2024-67890",
+        "severity": "High",
+        "description": "XSS vulnerability in template-engine",
+        "fix": { "versions": ["3.1.0"], "state": "fixed" },
+        "cvss": [{ "metrics": { "baseScore": 7.5 } }]
+      },
+      "artifact": {
+        "name": "template-engine",
+        "version": "3.0.2",
+        "type": "npm",
+        "locations": [{ "path": "package-lock.json" }]
+      }
+    }
+  ],
+  "source": { "type": "directory", "target": "/workspace" }
+}

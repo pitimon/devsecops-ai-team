@@ -1,0 +1,125 @@
+{
+  "_meta": {
+    "description": "CWE to MITRE ATT&CK v16 technique mapping",
+    "source": "https://attack.mitre.org/",
+    "mitre_version": "v16",
+    "last_updated": "2026-03-01"
+  },
+  "mappings": {
+    "CWE-20": {
+      "techniques": ["T1059"],
+      "tactic": "Execution",
+      "name": "Command and Scripting Interpreter"
+    },
+    "CWE-22": {
+      "techniques": ["T1083"],
+      "tactic": "Discovery",
+      "name": "File and Directory Discovery"
+    },
+    "CWE-77": {
+      "techniques": ["T1059"],
+      "tactic": "Execution",
+      "name": "Command and Scripting Interpreter"
+    },
+    "CWE-78": {
+      "techniques": ["T1059.004"],
+      "tactic": "Execution",
+      "name": "Unix Shell"
+    },
+    "CWE-79": {
+      "techniques": ["T1189"],
+      "tactic": "Initial Access",
+      "name": "Drive-by Compromise"
+    },
+    "CWE-89": {
+      "techniques": ["T1190"],
+      "tactic": "Initial Access",
+      "name": "Exploit Public-Facing Application"
+    },
+    "CWE-94": {
+      "techniques": ["T1059"],
+      "tactic": "Execution",
+      "name": "Command and Scripting Interpreter"
+    },
+    "CWE-200": {
+      "techniques": ["T1005"],
+      "tactic": "Collection",
+      "name": "Data from Local System"
+    },
+    "CWE-250": {
+      "techniques": ["T1068"],
+      "tactic": "Privilege Escalation",
+      "name": "Exploitation for Privilege Escalation"
+    },
+    "CWE-256": {
+      "techniques": ["T1552.001"],
+      "tactic": "Credential Access",
+      "name": "Credentials In Files"
+    },
+    "CWE-269": {
+      "techniques": ["T1068"],
+      "tactic": "Privilege Escalation",
+      "name": "Exploitation for Privilege Escalation"
+    },
+    "CWE-284": {
+      "techniques": ["T1078"],
+      "tactic": "Defense Evasion",
+      "name": "Valid Accounts"
+    },
+    "CWE-287": {
+      "techniques": ["T1078"],
+      "tactic": "Initial Access",
+      "name": "Valid Accounts"
+    },
+    "CWE-311": {
+      "techniques": ["T1557"],
+      "tactic": "Credential Access",
+      "name": "Adversary-in-the-Middle"
+    },
+    "CWE-312": {
+      "techniques": ["T1552"],
+      "tactic": "Credential Access",
+      "name": "Unsecured Credentials"
+    },
+    "CWE-327": {
+      "techniques": ["T1557"],
+      "tactic": "Credential Access",
+      "name": "Adversary-in-the-Middle"
+    },
+    "CWE-352": {
+      "techniques": ["T1185"],
+      "tactic": "Collection",
+      "name": "Browser Session Hijacking"
+    },
+    "CWE-434": {
+      "techniques": ["T1505.003"],
+      "tactic": "Persistence",
+      "name": "Web Shell"
+    },
+    "CWE-502": {
+      "techniques": ["T1059"],
+      "tactic": "Execution",
+      "name": "Command and Scripting Interpreter"
+    },
+    "CWE-522": {
+      "techniques": ["T1552"],
+      "tactic": "Credential Access",
+      "name": "Unsecured Credentials"
+    },
+    "CWE-798": {
+      "techniques": ["T1552.001"],
+      "tactic": "Credential Access",
+      "name": "Credentials In Files"
+    },
+    "CWE-862": {
+      "techniques": ["T1078"],
+      "tactic": "Privilege Escalation",
+      "name": "Valid Accounts"
+    },
+    "CWE-918": {
+      "techniques": ["T1190"],
+      "tactic": "Initial Access",
+      "name": "Exploit Public-Facing Application"
+    }
+  }
+}

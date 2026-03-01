@@ -1,0 +1,44 @@
+{
+  "_meta": {
+    "description": "RBAC severity policies for security gate decisions",
+    "version": "1.0.0",
+    "last_updated": "2026-03-01"
+  },
+  "roles": {
+    "developer": {
+      "description": "Standard developer — blocks only critical findings",
+      "fail_on": ["CRITICAL"],
+      "suppress_allowed": false,
+      "max_age_hours": 48,
+      "require_scan_types": ["sast", "secret"]
+    },
+    "security-lead": {
+      "description": "Security team lead — blocks critical and high findings",
+      "fail_on": ["CRITICAL", "HIGH"],
+      "suppress_allowed": true,
+      "max_age_hours": 24,
+      "require_scan_types": ["sast", "sca", "secret", "container"]
+    },
+    "release-manager": {
+      "description": "Release manager — strict policy for production deployments",
+      "fail_on": ["CRITICAL", "HIGH", "MEDIUM"],
+      "suppress_allowed": true,
+      "max_age_hours": 24,
+      "require_scan_types": [
+        "sast",
+        "sca",
+        "secret",
+        "container",
+        "iac",
+        "sbom"
+      ]
+    }
+  },
+  "default_role": "developer",
+  "global_settings": {
+    "scan_result_max_age_hours": 48,
+    "require_audit_trail": true,
+    "allow_gate_override": false,
+    "override_requires_role": "security-lead"
+  }
+}

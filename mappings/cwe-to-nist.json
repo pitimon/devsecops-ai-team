@@ -1,0 +1,121 @@
+{
+  "_meta": {
+    "description": "CWE to NIST SP 800-53 Rev. 5 control mapping",
+    "source": "https://csrc.nist.gov/publications/detail/sp/800-53/rev-5/final",
+    "nist_version": "Rev. 5",
+    "last_updated": "2026-03-01"
+  },
+  "mappings": {
+    "CWE-20": {
+      "controls": ["SI-10"],
+      "family": "System and Information Integrity"
+    },
+    "CWE-22": { "controls": ["AC-6", "CM-7"], "family": "Access Control" },
+    "CWE-77": {
+      "controls": ["SI-10", "SI-3"],
+      "family": "System and Information Integrity"
+    },
+    "CWE-78": {
+      "controls": ["SI-10", "SI-3"],
+      "family": "System and Information Integrity"
+    },
+    "CWE-79": {
+      "controls": ["SI-10", "SI-15"],
+      "family": "System and Information Integrity"
+    },
+    "CWE-89": {
+      "controls": ["SI-10"],
+      "family": "System and Information Integrity"
+    },
+    "CWE-94": {
+      "controls": ["SI-10", "SI-3"],
+      "family": "System and Information Integrity"
+    },
+    "CWE-120": {
+      "controls": ["SI-16"],
+      "family": "System and Information Integrity"
+    },
+    "CWE-200": { "controls": ["AC-4", "SC-28"], "family": "Access Control" },
+    "CWE-250": { "controls": ["AC-6", "CM-7"], "family": "Access Control" },
+    "CWE-256": {
+      "controls": ["IA-5", "SC-28"],
+      "family": "Identification and Authentication"
+    },
+    "CWE-269": { "controls": ["AC-6"], "family": "Access Control" },
+    "CWE-284": { "controls": ["AC-3", "AC-6"], "family": "Access Control" },
+    "CWE-287": {
+      "controls": ["IA-2", "IA-8"],
+      "family": "Identification and Authentication"
+    },
+    "CWE-295": {
+      "controls": ["IA-5", "SC-23"],
+      "family": "Identification and Authentication"
+    },
+    "CWE-311": {
+      "controls": ["SC-8", "SC-28"],
+      "family": "System and Communications Protection"
+    },
+    "CWE-312": {
+      "controls": ["SC-28"],
+      "family": "System and Communications Protection"
+    },
+    "CWE-326": {
+      "controls": ["SC-12", "SC-13"],
+      "family": "System and Communications Protection"
+    },
+    "CWE-327": {
+      "controls": ["SC-13"],
+      "family": "System and Communications Protection"
+    },
+    "CWE-330": {
+      "controls": ["SC-13"],
+      "family": "System and Communications Protection"
+    },
+    "CWE-346": {
+      "controls": ["SC-23"],
+      "family": "System and Communications Protection"
+    },
+    "CWE-352": {
+      "controls": ["SC-23", "SI-10"],
+      "family": "System and Communications Protection"
+    },
+    "CWE-400": {
+      "controls": ["SC-5"],
+      "family": "System and Communications Protection"
+    },
+    "CWE-434": {
+      "controls": ["SI-10", "CM-7"],
+      "family": "System and Information Integrity"
+    },
+    "CWE-502": {
+      "controls": ["SI-10"],
+      "family": "System and Information Integrity"
+    },
+    "CWE-522": {
+      "controls": ["IA-5"],
+      "family": "Identification and Authentication"
+    },
+    "CWE-532": {
+      "controls": ["AU-9", "SI-11"],
+      "family": "Audit and Accountability"
+    },
+    "CWE-601": {
+      "controls": ["SI-10"],
+      "family": "System and Information Integrity"
+    },
+    "CWE-611": {
+      "controls": ["SI-10", "CM-6"],
+      "family": "System and Information Integrity"
+    },
+    "CWE-798": {
+      "controls": ["IA-5", "SC-28"],
+      "family": "Identification and Authentication"
+    },
+    "CWE-862": { "controls": ["AC-3"], "family": "Access Control" },
+    "CWE-863": { "controls": ["AC-3"], "family": "Access Control" },
+    "CWE-918": {
+      "controls": ["SC-7", "AC-4"],
+      "family": "System and Communications Protection"
+    }
+  }
+}

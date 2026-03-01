@@ -1,0 +1,53 @@
+# DevSecOps AI Team — Strict Security Policy
+# For production deployments and release branches
+
+policy:
+  name: strict
+  description: Strict policy for production — blocks critical, high, and medium findings
+  role: release-manager
+
+gate:
+  fail_on:
+    - CRITICAL
+    - HIGH
+    - MEDIUM
+  warn_on:
+    - LOW
+  suppress_allowed: true
+  suppress_requires_justification: true
+  max_age_hours: 24
+
+required_scans:
+  - sast
+  - secret
+  - sca
+  - container
+  - iac
+  - sbom
+
+optional_scans:
+  - dast
+
+compliance:
+  require_owasp_mapping: true
+  require_nist_mapping: true
+  minimum_coverage: 70
+
+exceptions:
+  paths:
+    - "tests/**"
+    - "docs/**"
+    - "**/fixtures/**"
+
+notifications:
+  on_critical: true
+  on_high: true
+  on_gate_fail: true
+  on_gate_pass: true
+  format: sarif
+
+audit:
+  enabled: true
+  path: .devsecops/audit.jsonl
+  include_findings: true
+  include_gate_decisions: true

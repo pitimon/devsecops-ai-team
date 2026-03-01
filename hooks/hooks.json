@@ -1,0 +1,37 @@
+{
+  "description": "DevSecOps AI Team hooks — inject security context at session start, scan writes for secrets/injection, block commits with critical findings",
+  "hooks": {
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "${CLAUDE_PLUGIN_ROOT}/hooks/session-start.sh"
+          }
+        ]
+      }
+    ],
+    "PreToolUse": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash ${CLAUDE_PLUGIN_ROOT}/hooks/scan-on-write.sh",
+            "timeout": 500
+          }
+        ],
+        "matcher": "Edit|Write|MultiEdit"
+      },
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash ${CLAUDE_PLUGIN_ROOT}/hooks/pre-commit-gate.sh",
+            "timeout": 5000
+          }
+        ],
+        "matcher": "Bash"
+      }
+    ]
+  }
+}

@@ -1,0 +1,41 @@
+[
+  {
+    "check_type": "terraform",
+    "results": {
+      "passed_checks": [
+        {
+          "check_id": "CKV_AWS_18",
+          "name": "Ensure the S3 bucket has access logging enabled",
+          "check_result": { "result": "PASSED" },
+          "file_path": "/main.tf",
+          "resource": "aws_s3_bucket.data",
+          "file_line_range": [10, 25]
+        }
+      ],
+      "failed_checks": [
+        {
+          "check_id": "CKV_AWS_145",
+          "name": "Ensure that S3 Bucket has server-side encryption enabled with KMS",
+          "severity": "HIGH",
+          "check_result": { "result": "FAILED" },
+          "file_path": "/main.tf",
+          "resource": "aws_s3_bucket.data",
+          "file_line_range": [10, 25],
+          "guideline": "https://docs.bridgecrew.io/docs/ensure-that-s3-bucket-has-server-side-encryption-enabled-with-kms"
+        },
+        {
+          "check_id": "CKV_AWS_19",
+          "name": "Ensure the S3 bucket has versioning enabled",
+          "severity": "MEDIUM",
+          "check_result": { "result": "FAILED" },
+          "file_path": "/main.tf",
+          "resource": "aws_s3_bucket.data",
+          "file_line_range": [10, 25],
+          "guideline": "https://docs.bridgecrew.io/docs/s3_16-enable-versioning"
+        }
+      ],
+      "skipped_checks": []
+    },
+    "summary": { "passed": 1, "failed": 2, "skipped": 0 }
+  }
+]

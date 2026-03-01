@@ -1,0 +1,186 @@
+# DevSecOps AI Team — Self-Scan (Dogfooding)
+# Uses our own tools to scan our own codebase
+
+name: Security Self-Scan
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  schedule:
+    - cron: "0 6 * * 1" # Weekly Monday 6am UTC
+
+permissions:
+  contents: read
+  security-events: write
+
+jobs:
+  secret-scan:
+    name: Secret Detection (GitLeaks)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Run GitLeaks
+        uses: gitleaks/gitleaks-action@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        continue-on-error: true
+
+  sast-scan:
+    name: SAST (Semgrep)
+    runs-on: ubuntu-latest
+    container:
+      image: returntocorp/semgrep:latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Run Semgrep
+        run: |
+          semgrep scan \
+            --config p/security-audit \
+            --config p/secrets \
+            --sarif \
+            --output semgrep-results.sarif \
+            . || true
+
+      - name: Upload SARIF
+        uses: github/codeql-action/upload-sarif@v3
+        if: always()
+        with:
+          sarif_file: semgrep-results.sarif
+          category: semgrep
+        continue-on-error: true
+
+  shell-security:
+    name: Shell Script Security
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install ShellCheck
+        run: sudo apt-get install -y shellcheck
+
+      - name: Security-focused ShellCheck
+        run: |
+          echo "=== Shell Security Scan ==="
+          FINDINGS=0
+
+          for f in $(find . -name "*.sh" -not -path "./.git/*"); do
+            # Check for command injection patterns
+            if grep -nE '(eval |`.*\$|exec |system\()' "$f" 2>/dev/null; then
+              echo "[WARN] Potential command injection in $f"
+              FINDINGS=$((FINDINGS + 1))
+            fi
+
+            # Check for unsafe variable usage
+            if grep -nE '\$\{?[A-Z_]+\}?\s' "$f" | grep -v 'set -' | grep -v '#' | grep -v '"' 2>/dev/null | head -5; then
+              echo "[INFO] Unquoted variables in $f (review needed)"
+            fi
+          done
+
+          echo ""
+          echo "Shell security scan complete. Findings: $FINDINGS"
+
+  dockerfile-scan:
+    name: Dockerfile Security
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Run Hadolint
+        uses: hadolint/hadolint-action@v3.1.0
+        with:
+          dockerfile: runner/Dockerfile
+          failure-threshold: error
+        continue-on-error: true
+
+      - name: Check Dockerfile best practices
+        run: |
+          echo "=== Dockerfile Security Check ==="
+          DOCKERFILE="runner/Dockerfile"
+
+          # Check for USER instruction (non-root)
+          grep -q "^USER " "$DOCKERFILE" && echo "[OK] Non-root USER set" || echo "[WARN] No USER instruction"
+
+          # Check for HEALTHCHECK
+          grep -q "^HEALTHCHECK " "$DOCKERFILE" && echo "[OK] HEALTHCHECK defined" || echo "[WARN] No HEALTHCHECK"
+
+          # Check for pinned versions
+          grep -q "AS " "$DOCKERFILE" && echo "[OK] Multi-stage build" || echo "[INFO] Single-stage build"
+
+          # Check for secrets in build args
+          grep -qi "password\|secret\|key\|token" "$DOCKERFILE" && echo "[WARN] Potential secret in Dockerfile" || echo "[OK] No secrets detected"
+
+  json-security:
+    name: JSON & Config Security
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Scan for secrets in JSON
+        run: |
+          echo "=== JSON Secret Scan ==="
+          FINDINGS=0
+
+          for f in $(find . -name "*.json" -not -path "./.git/*"); do
+            # Skip test fixtures (they contain intentional examples)
+            echo "$f" | grep -q "fixtures" && continue
+
+            # Check for secret-like values
+            if python3 -c "
+          import json, re
+          try:
+              data = json.load(open('$f'))
+              text = json.dumps(data)
+              patterns = [
+                  r'AKIA[0-9A-Z]{16}',
+                  r'ghp_[a-zA-Z0-9]{36}',
+                  r'sk-[a-zA-Z0-9]{48}',
+                  r'xox[bpras]-[a-zA-Z0-9-]+',
+              ]
+              for p in patterns:
+                  if re.search(p, text):
+                      print(f'[WARN] Secret pattern in $f')
+                      exit(1)
+          except: pass
+          " 2>/dev/null; then
+              :
+            else
+              FINDINGS=$((FINDINGS + 1))
+            fi
+          done
+
+          echo "JSON secret scan complete. Findings: $FINDINGS"
+          [ "$FINDINGS" -eq 0 ] || exit 1
+
+  summary:
+    name: Security Summary
+    runs-on: ubuntu-latest
+    needs:
+      [secret-scan, sast-scan, shell-security, dockerfile-scan, json-security]
+    if: always()
+    steps:
+      - name: Security scan summary
+        run: |
+          echo "======================================"
+          echo "DevSecOps AI Team — Security Self-Scan"
+          echo "======================================"
+          echo ""
+          echo "This is dogfooding — we use our own tools"
+          echo "to secure our own codebase."
+          echo ""
+          echo "Job results:"
+          echo "  Secret Scan:     ${{ needs.secret-scan.result }}"
+          echo "  SAST Scan:       ${{ needs.sast-scan.result }}"
+          echo "  Shell Security:  ${{ needs.shell-security.result }}"
+          echo "  Dockerfile Scan: ${{ needs.dockerfile-scan.result }}"
+          echo "  JSON Security:   ${{ needs.json-security.result }}"

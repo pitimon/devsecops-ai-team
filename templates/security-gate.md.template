@@ -1,0 +1,30 @@
+# Security Gate Result
+
+## Decision: {{GATE_DECISION}}
+
+### Evaluation Summary
+| Check | Status | Details |
+|-------|--------|---------|
+{{EVALUATION_ROWS}}
+
+### Policy Applied
+- **Role**: {{ROLE}}
+- **Policy**: {{POLICY_NAME}}
+- **Fail on**: {{FAIL_ON_SEVERITIES}}
+- **Required scans**: {{REQUIRED_SCANS}}
+
+### Findings Summary
+| Severity | Count | Threshold | Status |
+|----------|-------|-----------|--------|
+{{SEVERITY_ROWS}}
+
+{{#if VIOLATIONS}}
+### Violations
+{{VIOLATION_DETAILS}}
+{{/if}}
+
+### Recommendation
+{{RECOMMENDATION}}
+
+---
+*Evaluated by DevSecOps AI Team pipeline-guardian*

@@ -1,0 +1,32 @@
+# Dependencies
+node_modules/
+
+# Results (ephemeral)
+.devsecops/results/
+*.sarif
+*.sarif.json
+
+# Audit trail (local only)
+.devsecops/audit.jsonl
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Docker volumes
+runner/cache/
+runner/results/
+
+# Environment
+.env
+.env.local
+.env.*.local
+
+# Claude Code local settings
+.claude/settings.local.json

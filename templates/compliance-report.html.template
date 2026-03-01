@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Compliance Report — DevSecOps AI Team</title>
+<style>
+body { font-family: -apple-system, BlinkMacSystemFont, sans-serif; margin: 2em; background: #f8f9fa; }
+.dashboard { max-width: 1200px; margin: 0 auto; }
+h1 { color: #343a40; }
+.framework-card { background: white; border-radius: 8px; padding: 1.5em; margin-bottom: 1em; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+.framework-card h3 { margin-top: 0; }
+.status-pass { color: #198754; }
+.status-fail { color: #dc3545; }
+.status-partial { color: #fd7e14; }
+table { width: 100%; border-collapse: collapse; }
+th { background: #343a40; color: white; padding: 0.5em; text-align: left; }
+td { padding: 0.5em; border-bottom: 1px solid #dee2e6; }
+.footer { text-align: center; color: #6c757d; margin-top: 2em; font-size: 0.9em; }
+</style>
+</head>
+<body>
+<div class="dashboard">
+<h1>Compliance Report</h1>
+<p>Generated: {{TIMESTAMP}}</p>
+
+<div class="framework-card">
+<h3>OWASP Top 10 (2021)</h3>
+<table>
+<tr><th>Category</th><th>Findings</th><th>Status</th></tr>
+{{OWASP_ROWS}}
+</table>
+</div>
+
+<div class="framework-card">
+<h3>NIST SP 800-53 (Rev. 5)</h3>
+<table>
+<tr><th>Control Family</th><th>Controls Tested</th><th>Findings</th><th>Status</th></tr>
+{{NIST_ROWS}}
+</table>
+</div>
+
+<div class="framework-card">
+<h3>MITRE ATT&CK (v16)</h3>
+<table>
+<tr><th>Tactic</th><th>Techniques Mapped</th><th>Findings</th></tr>
+{{MITRE_ROWS}}
+</table>
+</div>
+
+<div class="framework-card">
+<h3>Gap Analysis</h3>
+<p>{{GAP_ANALYSIS}}</p>
+</div>
+
+<div class="footer">
+<p>DevSecOps AI Team v1.0.0 — pitimon/devsecops-ai-team</p>
+</div>
+</div>
+</body>
+</html>

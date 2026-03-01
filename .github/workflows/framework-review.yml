@@ -1,0 +1,69 @@
+# DevSecOps AI Team — Quarterly Framework Staleness Check
+# Automatically creates GitHub issues when framework versions are stale
+
+name: Framework Version Review
+
+on:
+  schedule:
+    - cron: "0 9 1 */3 *" # Quarterly: 1st day, every 3 months, 9am UTC
+  workflow_dispatch: # Manual trigger
+
+permissions:
+  contents: read
+  issues: write
+
+jobs:
+  check-frameworks:
+    name: Check Framework Staleness
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Run framework staleness check
+        id: check
+        run: |
+          bash tests/check-framework-updates.sh --json > /tmp/staleness-report.json 2>/dev/null || true
+          bash tests/check-framework-updates.sh > /tmp/staleness-report.txt 2>&1 || true
+
+          # Count stale frameworks
+          STALE_COUNT=$(grep -c "\[STALE\]" /tmp/staleness-report.txt 2>/dev/null || echo "0")
+          echo "stale_count=$STALE_COUNT" >> "$GITHUB_OUTPUT"
+
+          cat /tmp/staleness-report.txt
+
+      - name: Create issue for stale frameworks
+        if: steps.check.outputs.stale_count != '0'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            const report = fs.readFileSync('/tmp/staleness-report.txt', 'utf8');
+            const staleCount = '${{ steps.check.outputs.stale_count }}';
+
+            // Check if there's already an open issue
+            const existingIssues = await github.rest.issues.listForRepo({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              labels: 'framework-staleness',
+              state: 'open'
+            });
+
+            if (existingIssues.data.length > 0) {
+              // Update existing issue
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: existingIssues.data[0].number,
+                body: `## Quarterly Framework Review Update\n\n${staleCount} framework(s) may need updating.\n\n\`\`\`\n${report}\n\`\`\`\n\nSee \`docs/FRAMEWORK-UPDATE-RUNBOOK.md\` for update procedures.`
+              });
+            } else {
+              // Create new issue
+              await github.rest.issues.create({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                title: `[Quarterly Review] ${staleCount} framework(s) may need version updates`,
+                labels: ['framework-staleness', 'maintenance'],
+                body: `## Framework Staleness Report\n\nAutomated quarterly check detected ${staleCount} framework(s) that may need version updates.\n\n### Report\n\n\`\`\`\n${report}\n\`\`\`\n\n### Action Required\n\n1. Review each stale framework\n2. Check upstream for new versions\n3. Follow \`docs/FRAMEWORK-UPDATE-RUNBOOK.md\` for update procedures\n4. Update \`frameworks.json\` with new version and \`last_checked\` date\n5. Run \`grep\` for old version references in all files listed in \`used_in\`\n\n### References\n\n- [FRAMEWORK-UPDATE-RUNBOOK.md](docs/FRAMEWORK-UPDATE-RUNBOOK.md)\n- [frameworks.json](frameworks.json)`
+              });
+            }

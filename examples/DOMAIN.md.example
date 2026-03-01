@@ -1,0 +1,90 @@
+# DOMAIN.md — Security Findings Domain Model
+
+## Entities
+
+### Finding
+
+| Field         | Type     | Constraints                                                        |
+| ------------- | -------- | ------------------------------------------------------------------ |
+| id            | string   | Format: `FINDING-YYYYMMDD-NNN`, unique across all scans            |
+| source_tool   | enum     | One of: semgrep, zap, grype, trivy, checkov, gitleaks, syft        |
+| scan_type     | enum     | One of: sast, dast, sca, container, iac, secret, sbom              |
+| severity      | enum     | One of: CRITICAL, HIGH, MEDIUM, LOW, INFO                          |
+| confidence    | enum     | One of: HIGH, MEDIUM, LOW                                          |
+| title         | string   | Human-readable summary, max 200 chars                              |
+| description   | string   | Detailed explanation with context                                  |
+| cwe_id        | string   | Format: `CWE-NNN`, nullable                                       |
+| cvss_score    | float    | 0.0-10.0, nullable (for SCA/container findings)                    |
+| location      | Location | Where the finding was detected                                     |
+| compliance    | object   | Framework mappings (OWASP, NIST, MITRE)                            |
+| remediation   | object   | Fix guidance with code examples                                    |
+| status        | enum     | One of: open, suppressed, fixed, false_positive                    |
+| first_seen    | datetime | ISO 8601, when first detected                                     |
+| scan_id       | string   | Links to parent ScanRun                                            |
+
+### Location
+
+| Field      | Type   | Constraints                                 |
+| ---------- | ------ | ------------------------------------------- |
+| file       | string | Relative path from project root             |
+| line_start | int    | 1-indexed, nullable (for container/SCA)     |
+| line_end   | int    | 1-indexed, nullable                         |
+| snippet    | string | Code context, max 500 chars                 |
+| image      | string | Container image reference, nullable         |
+| package    | string | Package name for SCA findings, nullable     |
+| resource   | string | IaC resource identifier, nullable           |
+
+### ScanRun
+
+| Field       | Type     | Constraints                                            |
+| ----------- | -------- | ------------------------------------------------------ |
+| id          | string   | Format: `SCAN-YYYYMMDD-HHMMSS-TOOL`                   |
+| tool        | enum     | Same as Finding.source_tool                            |
+| scan_type   | enum     | Same as Finding.scan_type                              |
+| started_at  | datetime | ISO 8601                                               |
+| finished_at | datetime | ISO 8601                                               |
+| target      | string   | Scanned path, image, or URL                            |
+| rules_used  | string[] | Rule sets or profiles applied                          |
+| exit_code   | int      | Tool exit code                                         |
+| summary     | object   | Count by severity: {critical, high, medium, low, info} |
+
+### ComplianceMapping
+
+| Field           | Type     | Constraints                              |
+| --------------- | -------- | ---------------------------------------- |
+| cwe_id          | string   | Source CWE identifier                    |
+| owasp_top_10    | string[] | OWASP Top 10 2021 categories (A01-A10)   |
+| nist_800_53     | string[] | NIST 800-53 control identifiers          |
+| mitre_attack    | string[] | MITRE ATT&CK technique IDs              |
+| cis_benchmark   | string[] | CIS Benchmark control references         |
+
+### GateResult
+
+| Field       | Type     | Constraints                                         |
+| ----------- | -------- | --------------------------------------------------- |
+| id          | string   | Format: `GATE-YYYYMMDD-HHMMSS`                     |
+| decision    | enum     | One of: pass, fail, warn                            |
+| policy      | string   | Policy name applied (default, strict, custom)       |
+| role        | enum     | developer, security-lead, release-manager           |
+| scan_ids    | string[] | ScanRun IDs evaluated                               |
+| violations  | object[] | Findings that triggered failure                     |
+| evaluated_at| datetime | ISO 8601                                            |
+
+## Invariants
+
+- Finding.severity MUST be one of the 5 defined levels — no custom values
+- Finding.id MUST be globally unique across all scan runs
+- ScanRun.finished_at MUST be after ScanRun.started_at
+- GateResult.decision MUST be `fail` if any Finding with severity >= policy threshold exists and status is `open`
+- ComplianceMapping entries MUST reference valid CWE identifiers
+- Finding.status transitions: open -> suppressed | fixed | false_positive (no reverse)
+- Suppressed findings MUST have a justification recorded in audit trail
+- DAST scan targets MUST be explicitly approved by user (In-the-Loop)
+
+## API Contract Rules
+
+- All scan results MUST include ScanRun metadata
+- Findings MUST be deduplicated by (source_tool, cwe_id, location.file, location.line_start)
+- Gate decisions MUST reference the policy used and all scan IDs evaluated
+- Compliance mappings MUST use current framework versions from frameworks.json
+- Output formats: SARIF v2.1.0, CycloneDX v1.5, SPDX v2.3

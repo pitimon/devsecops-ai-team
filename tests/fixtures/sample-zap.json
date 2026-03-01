@@ -1,0 +1,50 @@
+{
+  "@version": "2.15.0",
+  "site": [
+    {
+      "@name": "http://localhost:3000",
+      "@host": "localhost",
+      "@port": "3000",
+      "alerts": [
+        {
+          "pluginid": "10016",
+          "alertRef": "10016",
+          "alert": "Web Browser XSS Protection Not Enabled",
+          "name": "Web Browser XSS Protection Not Enabled",
+          "riskcode": "1",
+          "confidence": "2",
+          "riskdesc": "Low (Medium)",
+          "desc": "Web Browser XSS Protection is not enabled.",
+          "instances": [
+            {
+              "uri": "http://localhost:3000/",
+              "method": "GET",
+              "param": "X-XSS-Protection"
+            }
+          ],
+          "count": "1",
+          "solution": "Ensure that the web browser's XSS filter is enabled.",
+          "cweid": "933",
+          "wascid": "14"
+        },
+        {
+          "pluginid": "10021",
+          "alertRef": "10021",
+          "alert": "X-Content-Type-Options Header Missing",
+          "name": "X-Content-Type-Options Header Missing",
+          "riskcode": "1",
+          "confidence": "2",
+          "riskdesc": "Low (Medium)",
+          "desc": "The Anti-MIME-Sniffing header X-Content-Type-Options was not set to 'nosniff'.",
+          "instances": [
+            { "uri": "http://localhost:3000/api/users", "method": "GET" }
+          ],
+          "count": "1",
+          "solution": "Ensure that the application/web server sets the Content-Type header appropriately.",
+          "cweid": "693",
+          "wascid": "15"
+        }
+      ]
+    }
+  ]
+}

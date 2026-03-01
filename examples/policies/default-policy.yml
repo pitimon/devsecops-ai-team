@@ -1,0 +1,39 @@
+# DevSecOps AI Team — Default Security Policy
+# Suitable for development environments
+
+policy:
+  name: default
+  description: Standard developer policy — blocks only critical findings
+  role: developer
+
+gate:
+  fail_on:
+    - CRITICAL
+  warn_on:
+    - HIGH
+  suppress_allowed: false
+  max_age_hours: 48
+
+required_scans:
+  - sast
+  - secret
+
+optional_scans:
+  - sca
+  - container
+  - iac
+  - sbom
+
+exceptions:
+  # Files/paths excluded from scanning
+  paths:
+    - "tests/**"
+    - "docs/**"
+    - "**/fixtures/**"
+    - "**/*.test.*"
+    - "**/*.spec.*"
+
+notifications:
+  on_critical: true
+  on_gate_fail: true
+  format: markdown

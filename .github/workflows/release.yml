@@ -1,0 +1,131 @@
+# DevSecOps AI Team — Release Workflow
+# Creates versioned releases with changelog
+
+name: Release
+
+on:
+  push:
+    tags:
+      - "v*.*.*"
+
+permissions:
+  contents: write
+  packages: write
+
+jobs:
+  validate:
+    name: Pre-Release Validation
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Run full validation
+        run: bash tests/validate-plugin.sh
+
+      - name: Verify version consistency
+        run: |
+          TAG_VERSION="${GITHUB_REF#refs/tags/v}"
+          PLUGIN_VERSION=$(python3 -c "import json; print(json.load(open('.claude-plugin/plugin.json'))['version'])")
+          CHANGELOG_VERSION=$(grep -m1 '## \[' CHANGELOG.md | grep -oE '[0-9]+\.[0-9]+\.[0-9]+')
+
+          echo "Tag version:       $TAG_VERSION"
+          echo "Plugin version:    $PLUGIN_VERSION"
+          echo "Changelog version: $CHANGELOG_VERSION"
+
+          if [ "$TAG_VERSION" != "$PLUGIN_VERSION" ]; then
+            echo "[FAIL] Tag version ($TAG_VERSION) does not match plugin.json ($PLUGIN_VERSION)"
+            exit 1
+          fi
+
+          echo "[OK] Version consistency verified"
+
+  release:
+    name: Create Release
+    needs: validate
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Extract changelog
+        id: changelog
+        run: |
+          VERSION="${GITHUB_REF#refs/tags/v}"
+          # Extract changelog section for this version
+          CHANGELOG=$(awk "/^## \[$VERSION\]/{flag=1; next} /^## \[/{flag=0} flag" CHANGELOG.md)
+
+          if [ -z "$CHANGELOG" ]; then
+            CHANGELOG="Release $VERSION"
+          fi
+
+          # Write to file for multi-line output
+          echo "$CHANGELOG" > /tmp/release-notes.md
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+
+      - name: Generate release stats
+        run: |
+          echo "" >> /tmp/release-notes.md
+          echo "---" >> /tmp/release-notes.md
+          echo "" >> /tmp/release-notes.md
+          echo "### Plugin Stats" >> /tmp/release-notes.md
+          echo "" >> /tmp/release-notes.md
+
+          SKILL_COUNT=$(find skills/ -name "SKILL.md" | wc -l | tr -d ' ')
+          AGENT_COUNT=$(find agents/ -name "*.md" -type f | wc -l | tr -d ' ')
+          REF_COUNT=$(find skills/references/ -name "*.md" | wc -l | tr -d ' ')
+          FRAMEWORK_COUNT=$(python3 -c "import json; print(len(json.load(open('frameworks.json'))))")
+
+          echo "- **Skills**: $SKILL_COUNT" >> /tmp/release-notes.md
+          echo "- **Agents**: $AGENT_COUNT" >> /tmp/release-notes.md
+          echo "- **Reference Files**: $REF_COUNT" >> /tmp/release-notes.md
+          echo "- **Tracked Frameworks**: $FRAMEWORK_COUNT" >> /tmp/release-notes.md
+          echo "- **Security Tools**: Semgrep, GitLeaks, Grype, Trivy, Checkov, ZAP, Syft" >> /tmp/release-notes.md
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          body_path: /tmp/release-notes.md
+          draft: false
+          prerelease: ${{ contains(github.ref, 'alpha') || contains(github.ref, 'beta') || contains(github.ref, 'rc') }}
+          generate_release_notes: true
+
+  docker-push:
+    name: Push Runner Image
+    needs: validate
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Login to GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Extract metadata
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ghcr.io/${{ github.repository }}/runner
+          tags: |
+            type=semver,pattern={{version}}
+            type=semver,pattern={{major}}.{{minor}}
+            type=sha
+
+      - name: Build and push runner image
+        uses: docker/build-push-action@v6
+        with:
+          context: runner/
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max

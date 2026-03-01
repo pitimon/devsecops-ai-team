@@ -1,0 +1,220 @@
+# DevSecOps AI Team — Plugin Structure Validation
+# Runs on every push and PR to ensure plugin integrity
+
+name: Validate Plugin Structure
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  validate-structure:
+    name: Plugin Structure Checks
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Validate plugin metadata
+        run: |
+          echo "=== Plugin Metadata ==="
+          # Check plugin.json exists and is valid JSON
+          python3 -c "import json; json.load(open('.claude-plugin/plugin.json'))" || exit 1
+          echo "[OK] plugin.json is valid JSON"
+
+          # Check marketplace.json exists and is valid JSON
+          python3 -c "import json; json.load(open('.claude-plugin/marketplace.json'))" || exit 1
+          echo "[OK] marketplace.json is valid JSON"
+
+      - name: Validate skills
+        run: |
+          echo "=== Skills Validation ==="
+          EXPECTED_SKILLS="devsecops-setup sast-scan dast-scan sca-scan container-scan iac-scan secret-scan sbom-generate full-pipeline compliance-report incident-response security-gate"
+          for skill in $EXPECTED_SKILLS; do
+            if [ -f "skills/$skill/SKILL.md" ]; then
+              echo "[OK] skills/$skill/SKILL.md exists"
+              # Check YAML frontmatter
+              head -1 "skills/$skill/SKILL.md" | grep -q "^---" || { echo "[FAIL] $skill missing YAML frontmatter"; exit 1; }
+              echo "[OK] $skill has YAML frontmatter"
+            else
+              echo "[FAIL] skills/$skill/SKILL.md missing"
+              exit 1
+            fi
+          done
+
+      - name: Validate agents
+        run: |
+          echo "=== Agents Validation ==="
+          AGENT_COUNT=$(find agents/ -name "*.md" -type f | wc -l | tr -d ' ')
+          echo "Found $AGENT_COUNT agent files"
+          if [ "$AGENT_COUNT" -lt 18 ]; then
+            echo "[FAIL] Expected 18 agents, found $AGENT_COUNT"
+            exit 1
+          fi
+          echo "[OK] All 18 agents present"
+
+          # Validate frontmatter on all agents
+          for agent in agents/**/*.md; do
+            head -1 "$agent" | grep -q "^---" || { echo "[FAIL] $agent missing YAML frontmatter"; exit 1; }
+            grep -q "^model:" "$agent" || { echo "[FAIL] $agent missing model field"; exit 1; }
+          done
+          echo "[OK] All agents have valid frontmatter"
+
+      - name: Validate hooks
+        run: |
+          echo "=== Hooks Validation ==="
+          python3 -c "import json; json.load(open('hooks/hooks.json'))" || exit 1
+          echo "[OK] hooks.json is valid JSON"
+
+          for hook in hooks/session-start.sh hooks/scan-on-write.sh hooks/pre-commit-gate.sh; do
+            [ -f "$hook" ] && echo "[OK] $hook exists" || { echo "[FAIL] $hook missing"; exit 1; }
+            [ -x "$hook" ] && echo "[OK] $hook is executable" || echo "[WARN] $hook not executable"
+          done
+
+      - name: Validate runner
+        run: |
+          echo "=== Runner Validation ==="
+          for f in runner/Dockerfile runner/docker-compose.yml runner/docker-compose.minimal.yml runner/entrypoint.sh runner/job-dispatcher.sh runner/result-collector.sh runner/healthcheck.sh; do
+            [ -f "$f" ] && echo "[OK] $f exists" || { echo "[FAIL] $f missing"; exit 1; }
+          done
+
+          # Validate docker-compose syntax
+          docker compose -f runner/docker-compose.yml config --quiet 2>/dev/null && echo "[OK] docker-compose.yml valid" || echo "[WARN] docker-compose.yml validation skipped (no Docker)"
+          docker compose -f runner/docker-compose.minimal.yml config --quiet 2>/dev/null && echo "[OK] docker-compose.minimal.yml valid" || echo "[WARN] docker-compose.minimal.yml validation skipped"
+
+      - name: Validate formatters
+        run: |
+          echo "=== Formatters Validation ==="
+          for f in formatters/json-normalizer.sh formatters/sarif-formatter.sh formatters/markdown-formatter.sh formatters/html-formatter.sh; do
+            [ -f "$f" ] && echo "[OK] $f exists" || { echo "[FAIL] $f missing"; exit 1; }
+          done
+
+      - name: Validate mappings
+        run: |
+          echo "=== Mappings Validation ==="
+          for f in mappings/cwe-to-owasp.json mappings/cwe-to-nist.json mappings/cwe-to-mitre.json mappings/severity-policy.json; do
+            python3 -c "import json; json.load(open('$f'))" || { echo "[FAIL] $f is not valid JSON"; exit 1; }
+            echo "[OK] $f is valid JSON"
+          done
+
+      - name: Validate references
+        run: |
+          echo "=== References Validation ==="
+          EXPECTED_REFS="sast-patterns dast-methodology sca-supply-chain container-hardening iac-security-patterns secret-management compliance-frameworks threat-modeling incident-response remediation-patterns"
+          for ref in $EXPECTED_REFS; do
+            [ -f "skills/references/$ref.md" ] && echo "[OK] $ref.md exists" || { echo "[FAIL] $ref.md missing"; exit 1; }
+          done
+
+      - name: Validate templates
+        run: |
+          echo "=== Templates Validation ==="
+          for f in templates/compliance-report.html.template templates/pr-comment.md.template templates/incident-playbook.md.template templates/security-gate.md.template; do
+            [ -f "$f" ] && echo "[OK] $f exists" || { echo "[FAIL] $f missing"; exit 1; }
+          done
+
+      - name: Validate frameworks.json
+        run: |
+          echo "=== Frameworks Validation ==="
+          python3 -c "
+          import json
+          data = json.load(open('frameworks.json'))
+          assert isinstance(data, list), 'frameworks.json must be a list'
+          assert len(data) >= 10, f'Expected 10+ frameworks, found {len(data)}'
+          required_fields = ['id', 'name', 'version', 'source_url', 'last_checked']
+          for fw in data:
+              for field in required_fields:
+                  assert field in fw, f'Framework {fw.get(\"id\",\"unknown\")} missing {field}'
+          print(f'[OK] {len(data)} frameworks validated')
+          "
+
+      - name: Validate documentation
+        run: |
+          echo "=== Documentation Validation ==="
+          for f in README.md CLAUDE.md CHANGELOG.md LICENSE SECURITY.md; do
+            [ -f "$f" ] && echo "[OK] $f exists" || { echo "[FAIL] $f missing"; exit 1; }
+          done
+          for f in docs/INSTALL.md docs/TROUBLESHOOTING.md docs/AGENT-CATALOG.md docs/FRAMEWORK-UPDATE-RUNBOOK.md docs/MANDAY-ESTIMATION.md; do
+            [ -f "$f" ] && echo "[OK] $f exists" || { echo "[FAIL] $f missing"; exit 1; }
+          done
+
+      - name: Validate test infrastructure
+        run: |
+          echo "=== Test Infrastructure Validation ==="
+          for f in tests/validate-plugin.sh tests/test-runner.sh tests/test-formatters.sh tests/smoke-test-prompts.md; do
+            [ -f "$f" ] && echo "[OK] $f exists" || { echo "[FAIL] $f missing"; exit 1; }
+          done
+
+          # Check test fixtures
+          FIXTURE_COUNT=$(ls tests/fixtures/sample-*.json 2>/dev/null | wc -l | tr -d ' ')
+          echo "Found $FIXTURE_COUNT test fixtures"
+          [ "$FIXTURE_COUNT" -ge 6 ] && echo "[OK] Sufficient fixtures" || { echo "[FAIL] Expected 6+ fixtures"; exit 1; }
+
+      - name: Cross-reference check
+        run: |
+          echo "=== Cross-Reference Checks ==="
+          # Skills referenced in plugin.json match actual skills
+          PLUGIN_SKILLS_PATH=$(python3 -c "import json; print(json.load(open('.claude-plugin/plugin.json')).get('skills_path', ''))")
+          echo "Skills path: $PLUGIN_SKILLS_PATH"
+
+          # All agent model fields are valid
+          for agent in agents/**/*.md; do
+            MODEL=$(grep "^model:" "$agent" | awk '{print $2}')
+            case "$MODEL" in
+              sonnet|opus|haiku) echo "[OK] $agent model=$MODEL" ;;
+              *) echo "[FAIL] $agent has invalid model: $MODEL"; exit 1 ;;
+            esac
+          done
+
+          echo ""
+          echo "=== All Checks Passed ==="
+
+  json-validation:
+    name: JSON Schema Validation
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Validate all JSON files
+        run: |
+          echo "=== JSON File Validation ==="
+          FAIL=0
+          for f in $(find . -name "*.json" -not -path "./.git/*" -not -path "./node_modules/*"); do
+            if python3 -c "import json; json.load(open('$f'))" 2>/dev/null; then
+              echo "[OK] $f"
+            else
+              echo "[FAIL] $f is not valid JSON"
+              FAIL=$((FAIL + 1))
+            fi
+          done
+          [ "$FAIL" -eq 0 ] && echo "All JSON files valid" || exit 1
+
+  shellcheck:
+    name: Shell Script Linting
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install ShellCheck
+        run: sudo apt-get install -y shellcheck
+
+      - name: Run ShellCheck
+        run: |
+          echo "=== ShellCheck ==="
+          FAIL=0
+          for f in $(find . -name "*.sh" -not -path "./.git/*"); do
+            if shellcheck -S warning "$f" 2>/dev/null; then
+              echo "[OK] $f"
+            else
+              echo "[WARN] $f has shellcheck findings"
+              # Don't fail on warnings, only errors
+              shellcheck -S error "$f" 2>/dev/null || { echo "[FAIL] $f has shellcheck errors"; FAIL=$((FAIL + 1)); }
+            fi
+          done
+          [ "$FAIL" -eq 0 ] || exit 1

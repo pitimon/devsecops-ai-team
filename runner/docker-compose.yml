@@ -1,0 +1,133 @@
+# DevSecOps AI Team — Full Stack Docker Compose
+# Usage: docker compose --profile <tool> up -d
+# Profiles: sast, dast, sca, container, iac, secret, sbom
+
+x-common: &common
+  restart: unless-stopped
+  networks:
+    - devsecops
+
+services:
+  # ─── Sidecar Runner ───
+  runner:
+    build: .
+    container_name: devsecops-runner
+    volumes:
+      - workspace:/workspace:ro
+      - results:/results
+      - config:/config:ro
+      - cache:/cache
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    networks:
+      - devsecops
+    environment:
+      - RUNNER_MODE=full
+    healthcheck:
+      test: ["CMD", "/usr/local/bin/healthcheck.sh"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+
+  # ─── SAST: Semgrep ───
+  semgrep:
+    image: returntocorp/semgrep:latest
+    container_name: devsecops-semgrep
+    entrypoint: ["sleep", "infinity"]
+    profiles: ["sast", "all"]
+    volumes:
+      - workspace:/workspace:ro
+      - results:/results
+      - config:/config:ro
+    <<: *common
+
+  # ─── DAST: ZAP ───
+  zap:
+    image: ghcr.io/zaproxy/zaproxy:stable
+    container_name: devsecops-zap
+    entrypoint: ["sleep", "infinity"]
+    profiles: ["dast", "all"]
+    volumes:
+      - results:/results
+      - config:/config:ro
+    networks:
+      - devsecops
+      - devsecops-dast
+    restart: unless-stopped
+
+  # ─── SCA: Grype ───
+  grype:
+    image: anchore/grype:latest
+    container_name: devsecops-grype
+    entrypoint: ["sleep", "infinity"]
+    profiles: ["sca", "all"]
+    volumes:
+      - workspace:/workspace:ro
+      - results:/results
+      - cache:/cache
+    <<: *common
+
+  # ─── Container Security: Trivy ───
+  trivy:
+    image: aquasec/trivy:latest
+    container_name: devsecops-trivy
+    entrypoint: ["sleep", "infinity"]
+    profiles: ["container", "all"]
+    volumes:
+      - workspace:/workspace:ro
+      - results:/results
+      - cache:/cache
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    <<: *common
+
+  # ─── IaC Security: Checkov ───
+  checkov:
+    image: bridgecrew/checkov:latest
+    container_name: devsecops-checkov
+    entrypoint: ["sleep", "infinity"]
+    profiles: ["iac", "all"]
+    volumes:
+      - workspace:/workspace:ro
+      - results:/results
+      - config:/config:ro
+    <<: *common
+
+  # ─── Secret Scanning: GitLeaks ───
+  gitleaks:
+    image: zricethezav/gitleaks:latest
+    container_name: devsecops-gitleaks
+    entrypoint: ["sleep", "infinity"]
+    profiles: ["secret", "all"]
+    volumes:
+      - workspace:/workspace:ro
+      - results:/results
+    <<: *common
+
+  # ─── SBOM: Syft ───
+  syft:
+    image: anchore/syft:latest
+    container_name: devsecops-syft
+    entrypoint: ["sleep", "infinity"]
+    profiles: ["sbom", "all"]
+    volumes:
+      - workspace:/workspace:ro
+      - results:/results
+    <<: *common
+
+volumes:
+  workspace:
+    driver: local
+  results:
+    driver_opts:
+      type: tmpfs
+      device: tmpfs
+  config:
+    driver: local
+  cache:
+    driver: local
+
+networks:
+  devsecops:
+    driver: bridge
+    internal: true
+  devsecops-dast:
+    driver: bridge

@@ -1,0 +1,68 @@
+rules:
+  - id: devsecops-hardcoded-secret-in-config
+    patterns:
+      - pattern-either:
+          - pattern: |
+              $KEY = "..."
+          - pattern: |
+              $KEY: "..."
+    pattern-sinks:
+      - pattern: |
+          $KEY = "..."
+        requires: $KEY matches /(?i)(secret|token|password|api.?key|auth)/
+    message: >
+      Hardcoded secret detected in configuration. Use environment variables
+      or a secret manager instead.
+    severity: ERROR
+    languages: [python, javascript, typescript, go, java]
+    metadata:
+      cwe: ["CWE-798"]
+      owasp: ["A07:2021"]
+      category: security
+
+  - id: devsecops-sql-string-concat
+    patterns:
+      - pattern-either:
+          - pattern: |
+              $QUERY = f"... {$VAR} ..."
+          - pattern: |
+              $QUERY = "..." + $VAR + "..."
+          - pattern: |
+              $QUERY = `... ${$VAR} ...`
+    message: >
+      SQL query uses string concatenation with user input.
+      Use parameterized queries instead.
+    severity: ERROR
+    languages: [python, javascript, typescript]
+    metadata:
+      cwe: ["CWE-89"]
+      owasp: ["A03:2021"]
+      category: security
+
+  - id: devsecops-eval-usage
+    pattern: eval(...)
+    message: >
+      Use of eval() with potentially untrusted input.
+      Consider safer alternatives.
+    severity: WARNING
+    languages: [python, javascript, typescript]
+    metadata:
+      cwe: ["CWE-94"]
+      owasp: ["A03:2021"]
+      category: security
+
+  - id: devsecops-missing-auth-check
+    patterns:
+      - pattern: |
+          app.$METHOD($PATH, (req, res) => { ... })
+      - pattern-not: |
+          app.$METHOD($PATH, $AUTH, (req, res) => { ... })
+    message: >
+      API route handler may be missing authentication middleware.
+      Ensure auth middleware is applied.
+    severity: WARNING
+    languages: [javascript, typescript]
+    metadata:
+      cwe: ["CWE-862"]
+      owasp: ["A01:2021"]
+      category: security

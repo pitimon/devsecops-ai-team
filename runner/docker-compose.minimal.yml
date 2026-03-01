@@ -1,0 +1,55 @@
+# DevSecOps AI Team — Minimal (Oneshot) Docker Compose
+# Uses 'docker run --rm' pattern — no persistent containers
+# For development and one-off scans
+
+services:
+  # Each tool runs as a one-shot container
+  # Usage: docker compose -f docker-compose.minimal.yml run --rm <service> <command>
+
+  semgrep:
+    image: returntocorp/semgrep:latest
+    volumes:
+      - ../:/workspace:ro
+    working_dir: /workspace
+    profiles: ["sast"]
+
+  gitleaks:
+    image: zricethezav/gitleaks:latest
+    volumes:
+      - ../:/workspace:ro
+    profiles: ["secret"]
+
+  grype:
+    image: anchore/grype:latest
+    volumes:
+      - ../:/workspace:ro
+      - grype-cache:/root/.cache/grype
+    profiles: ["sca"]
+
+  trivy:
+    image: aquasec/trivy:latest
+    volumes:
+      - ../:/workspace:ro
+      - trivy-cache:/root/.cache/
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    profiles: ["container"]
+
+  checkov:
+    image: bridgecrew/checkov:latest
+    volumes:
+      - ../:/workspace:ro
+    profiles: ["iac"]
+
+  zap:
+    image: ghcr.io/zaproxy/zaproxy:stable
+    profiles: ["dast"]
+
+  syft:
+    image: anchore/syft:latest
+    volumes:
+      - ../:/workspace:ro
+    profiles: ["sbom"]
+
+volumes:
+  grype-cache:
+  trivy-cache:
