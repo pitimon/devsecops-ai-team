@@ -45,9 +45,20 @@
 ### 1. Install Plugin
 
 ```bash
-# ติดตั้งผ่าน Claude Code
-claude plugin add pitimon/devsecops-ai-team
+# Step 1: ลงทะเบียน marketplace
+claude plugin marketplace add pitimon/devsecops-ai-team
+
+# Step 2: ติดตั้ง plugin
+claude plugin install devsecops-ai-team@pitimon-devsecops
 ```
+
+> **ทางเลือก**: ติดตั้งจาก local directory
+>
+> ```bash
+> git clone https://github.com/pitimon/devsecops-ai-team.git
+> claude plugin marketplace add ./devsecops-ai-team
+> claude plugin install devsecops-ai-team@pitimon-devsecops
+> ```
 
 ### 2. ตรวจสอบ Prerequisites
 
