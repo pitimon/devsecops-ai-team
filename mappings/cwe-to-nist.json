@@ -216,6 +216,86 @@
     "CWE-843": {
       "controls": ["SI-16"],
       "family": "System and Information Integrity"
+    },
+    "CWE-16": {
+      "controls": ["CM-6", "CM-7"],
+      "family": "Configuration Management"
+    },
+    "CWE-209": {
+      "controls": ["SI-11"],
+      "family": "System and Information Integrity"
+    },
+    "CWE-223": {
+      "controls": ["AU-2", "AU-12"],
+      "family": "Audit and Accountability"
+    },
+    "CWE-252": {
+      "controls": ["SI-11", "SI-16"],
+      "family": "System and Information Integrity"
+    },
+    "CWE-259": {
+      "controls": ["IA-5", "SC-28"],
+      "family": "Identification and Authentication"
+    },
+    "CWE-276": {
+      "controls": ["AC-6", "CM-6"],
+      "family": "Access Control"
+    },
+    "CWE-290": {
+      "controls": ["IA-2", "IA-8"],
+      "family": "Identification and Authentication"
+    },
+    "CWE-306": {
+      "controls": ["IA-2", "AC-3"],
+      "family": "Identification and Authentication"
+    },
+    "CWE-308": {
+      "controls": ["IA-2(1)", "IA-2(2)"],
+      "family": "Identification and Authentication"
+    },
+    "CWE-319": {
+      "controls": ["SC-8", "SC-23"],
+      "family": "System and Communications Protection"
+    },
+    "CWE-345": {
+      "controls": ["SI-7"],
+      "family": "System and Information Integrity"
+    },
+    "CWE-353": {
+      "controls": ["SI-7"],
+      "family": "System and Information Integrity"
+    },
+    "CWE-384": {
+      "controls": ["SC-23"],
+      "family": "System and Communications Protection"
+    },
+    "CWE-639": {
+      "controls": ["AC-3"],
+      "family": "Access Control"
+    },
+    "CWE-778": {
+      "controls": ["AU-2", "AU-3"],
+      "family": "Audit and Accountability"
+    },
+    "CWE-829": {
+      "controls": ["SI-7", "CM-11"],
+      "family": "System and Information Integrity"
+    },
+    "CWE-942": {
+      "controls": ["SC-23", "AC-4"],
+      "family": "System and Communications Protection"
+    },
+    "CWE-1035": {
+      "controls": ["SI-2", "RA-5"],
+      "family": "System and Information Integrity"
+    },
+    "CWE-1333": {
+      "controls": ["SC-5", "SI-16"],
+      "family": "System and Communications Protection"
+    },
+    "CWE-1336": {
+      "controls": ["SI-10"],
+      "family": "System and Information Integrity"
     }
   }
 }

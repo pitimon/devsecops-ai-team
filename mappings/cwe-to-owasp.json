@@ -335,6 +335,106 @@
       "owasp": ["A06:2021"],
       "category": "Vulnerable Components",
       "name": "Access of Resource Using Incompatible Type (Type Confusion)"
+    },
+    "CWE-16": {
+      "owasp": ["A05:2021"],
+      "category": "Security Misconfiguration",
+      "name": "Configuration"
+    },
+    "CWE-209": {
+      "owasp": ["A04:2021"],
+      "category": "Insecure Design",
+      "name": "Generation of Error Message Containing Sensitive Information"
+    },
+    "CWE-223": {
+      "owasp": ["A09:2021"],
+      "category": "Security Logging and Monitoring Failures",
+      "name": "Omission of Security-relevant Information"
+    },
+    "CWE-252": {
+      "owasp": ["A06:2021"],
+      "category": "Vulnerable Components",
+      "name": "Unchecked Return Value"
+    },
+    "CWE-259": {
+      "owasp": ["A07:2021"],
+      "category": "Identification and Authentication Failures",
+      "name": "Use of Hard-coded Password"
+    },
+    "CWE-276": {
+      "owasp": ["A01:2021"],
+      "category": "Broken Access Control",
+      "name": "Incorrect Default Permissions"
+    },
+    "CWE-290": {
+      "owasp": ["A07:2021"],
+      "category": "Identification and Authentication Failures",
+      "name": "Authentication Bypass by Spoofing"
+    },
+    "CWE-306": {
+      "owasp": ["A07:2021"],
+      "category": "Identification and Authentication Failures",
+      "name": "Missing Authentication for Critical Function"
+    },
+    "CWE-308": {
+      "owasp": ["A07:2021"],
+      "category": "Identification and Authentication Failures",
+      "name": "Use of Single-factor Authentication"
+    },
+    "CWE-319": {
+      "owasp": ["A02:2021"],
+      "category": "Cryptographic Failures",
+      "name": "Cleartext Transmission of Sensitive Information"
+    },
+    "CWE-345": {
+      "owasp": ["A08:2021"],
+      "category": "Software and Data Integrity Failures",
+      "name": "Insufficient Verification of Data Authenticity"
+    },
+    "CWE-353": {
+      "owasp": ["A08:2021"],
+      "category": "Software and Data Integrity Failures",
+      "name": "Missing Support for Integrity Check"
+    },
+    "CWE-384": {
+      "owasp": ["A07:2021"],
+      "category": "Identification and Authentication Failures",
+      "name": "Session Fixation"
+    },
+    "CWE-639": {
+      "owasp": ["A01:2021"],
+      "category": "Broken Access Control",
+      "name": "Authorization Bypass Through User-Controlled Key"
+    },
+    "CWE-778": {
+      "owasp": ["A09:2021"],
+      "category": "Security Logging and Monitoring Failures",
+      "name": "Insufficient Logging"
+    },
+    "CWE-829": {
+      "owasp": ["A08:2021"],
+      "category": "Software and Data Integrity Failures",
+      "name": "Inclusion of Functionality from Untrusted Control Sphere"
+    },
+    "CWE-942": {
+      "owasp": ["A05:2021"],
+      "category": "Security Misconfiguration",
+      "name": "Permissive Cross-domain Policy with Untrusted Domains"
+    },
+    "CWE-1035": {
+      "owasp": ["A06:2021"],
+      "category": "Vulnerable Components",
+      "name": "Using Components with Known Vulnerabilities"
+    },
+    "CWE-1333": {
+      "owasp": ["A06:2021"],
+      "category": "Vulnerable Components",
+      "name": "Inefficient Regular Expression Complexity"
+    },
+    "CWE-1336": {
+      "owasp": ["A03:2021"],
+      "category": "Injection",
+      "name": "Improper Neutralization of Special Elements Used in a Template Engine"
     }
   }
 }

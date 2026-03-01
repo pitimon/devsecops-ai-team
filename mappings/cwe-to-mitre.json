@@ -245,6 +245,106 @@
       "techniques": ["T1203"],
       "tactic": "Execution",
       "name": "Exploitation for Client Execution"
+    },
+    "CWE-16": {
+      "techniques": ["T1562"],
+      "tactic": "Defense Evasion",
+      "name": "Impair Defenses"
+    },
+    "CWE-209": {
+      "techniques": ["T1005"],
+      "tactic": "Collection",
+      "name": "Data from Local System"
+    },
+    "CWE-223": {
+      "techniques": ["T1070"],
+      "tactic": "Defense Evasion",
+      "name": "Indicator Removal"
+    },
+    "CWE-252": {
+      "techniques": ["T1499"],
+      "tactic": "Impact",
+      "name": "Endpoint Denial of Service"
+    },
+    "CWE-259": {
+      "techniques": ["T1552.001"],
+      "tactic": "Credential Access",
+      "name": "Credentials In Files"
+    },
+    "CWE-276": {
+      "techniques": ["T1222"],
+      "tactic": "Defense Evasion",
+      "name": "File and Directory Permissions Modification"
+    },
+    "CWE-290": {
+      "techniques": ["T1078"],
+      "tactic": "Initial Access",
+      "name": "Valid Accounts"
+    },
+    "CWE-306": {
+      "techniques": ["T1078"],
+      "tactic": "Initial Access",
+      "name": "Valid Accounts"
+    },
+    "CWE-308": {
+      "techniques": ["T1078"],
+      "tactic": "Initial Access",
+      "name": "Valid Accounts"
+    },
+    "CWE-319": {
+      "techniques": ["T1557"],
+      "tactic": "Credential Access",
+      "name": "Adversary-in-the-Middle"
+    },
+    "CWE-345": {
+      "techniques": ["T1565"],
+      "tactic": "Impact",
+      "name": "Data Manipulation"
+    },
+    "CWE-353": {
+      "techniques": ["T1565"],
+      "tactic": "Impact",
+      "name": "Data Manipulation"
+    },
+    "CWE-384": {
+      "techniques": ["T1185"],
+      "tactic": "Collection",
+      "name": "Browser Session Hijacking"
+    },
+    "CWE-639": {
+      "techniques": ["T1078"],
+      "tactic": "Privilege Escalation",
+      "name": "Valid Accounts"
+    },
+    "CWE-778": {
+      "techniques": ["T1070"],
+      "tactic": "Defense Evasion",
+      "name": "Indicator Removal"
+    },
+    "CWE-829": {
+      "techniques": ["T1195"],
+      "tactic": "Initial Access",
+      "name": "Supply Chain Compromise"
+    },
+    "CWE-942": {
+      "techniques": ["T1189"],
+      "tactic": "Initial Access",
+      "name": "Drive-by Compromise"
+    },
+    "CWE-1035": {
+      "techniques": ["T1190"],
+      "tactic": "Initial Access",
+      "name": "Exploit Public-Facing Application"
+    },
+    "CWE-1333": {
+      "techniques": ["T1499"],
+      "tactic": "Impact",
+      "name": "Endpoint Denial of Service"
+    },
+    "CWE-1336": {
+      "techniques": ["T1059"],
+      "tactic": "Execution",
+      "name": "Command and Scripting Interpreter"
     }
   }
 }

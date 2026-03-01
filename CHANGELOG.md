@@ -5,6 +5,16 @@ All notable changes to the DevSecOps AI Team plugin will be documented in this f
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.0.2] - 2026-03-01
+
+### Added
+
+- **20 high-frequency CWEs** added to all 3 compliance mapping files:
+  - `cwe-to-owasp.json`: 66 → 86 CWEs (+20: CWE-16, CWE-209, CWE-223, CWE-252, CWE-259, CWE-276, CWE-290, CWE-306, CWE-308, CWE-319, CWE-345, CWE-353, CWE-384, CWE-639, CWE-778, CWE-829, CWE-942, CWE-1035, CWE-1333, CWE-1336)
+  - `cwe-to-nist.json`: 58 → 78 CWEs (mapped to CM-6, AU-2, SI-7, IA-2, SC-23, RA-5 controls)
+  - `cwe-to-mitre.json`: 48 → 68 CWEs (mapped to T1562, T1070, T1195, T1565, T1222 techniques)
+- Covers previously unmapped tool-reported CWEs: Security Misconfiguration, Vulnerable Components, IDOR, Session Fixation, CORS, ReDoS, Template Injection, Supply Chain, Insufficient Logging
+
 ## [2.0.1] - 2026-03-01
 
 ### Fixed

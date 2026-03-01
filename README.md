@@ -3,7 +3,7 @@
   <img src="https://img.shields.io/badge/Agents-18-blue?style=for-the-badge" alt="18 Agents">
   <img src="https://img.shields.io/badge/Skills-12-green?style=for-the-badge" alt="12 Skills">
   <img src="https://img.shields.io/badge/Tools-7-orange?style=for-the-badge" alt="7 Tools">
-  <img src="https://img.shields.io/badge/Version-2.0.1-brightgreen?style=for-the-badge" alt="v2.0.1">
+  <img src="https://img.shields.io/badge/Version-2.0.2-brightgreen?style=for-the-badge" alt="v2.0.1">
   <img src="https://img.shields.io/badge/Tests-334%2F334-success?style=for-the-badge" alt="Tests">
   <img src="https://img.shields.io/badge/MCP-5_Tools-purple?style=for-the-badge" alt="MCP">
   <img src="https://img.shields.io/badge/License-MIT-yellow?style=for-the-badge" alt="MIT License">
@@ -30,20 +30,24 @@
 - **7 Security Tools, 1 Command** — `/full-pipeline` รันทุกเครื่องมือแบบ parallel, deduplicate ผลข้าม tools, สร้าง unified report ในคำสั่งเดียว
 - **Real-Time Protection** — บล็อก commits ที่มี CRITICAL findings, ตรวจจับ secrets (AWS keys, GitHub tokens, JWT) ก่อนเขียนลง disk — ทำงานใน 500ms
 - **CVSS v4.0 Prioritization** — ไม่ใช่แค่ severity labels — วิเคราะห์ business impact, exploitability (Weaponized → None), กำหนด SLA tiers (P1: 24 ชม. → P4: backlog)
-- **66+ CWE Compliance Mappings** — Auto-map ผลสแกนไปยัง OWASP Top 10 (66 CWEs), NIST 800-53 (58 CWEs), MITRE ATT&CK (48 CWEs)
+- **86 CWE Compliance Mappings** — Auto-map ผลสแกนไปยัง OWASP Top 10 (86 CWEs), NIST 800-53 (78 CWEs), MITRE ATT&CK (68 CWEs)
 - **MCP Server** — 5 composable tools (`devsecops_scan`, `devsecops_gate`, ...) สำหรับ programmatic integration กับ MCP-compatible clients
 
 ---
 
 ## What's New
 
-> ดู [CHANGELOG.md](CHANGELOG.md) สำหรับรายละเอียดทั้งหมด (v1.0.0 → v2.0.1)
+> ดู [CHANGELOG.md](CHANGELOG.md) สำหรับรายละเอียดทั้งหมด (v1.0.0 → v2.0.2)
+
+### v2.0.2 — Compliance Coverage
+
+- **20 CWEs เพิ่มเติม** — เพิ่ม CWEs ที่ tools ตรวจเจอบ่อยแต่ยังไม่ mapped: Security Misconfiguration (CWE-16), Vulnerable Component (CWE-1035), IDOR (CWE-639), Session Fixation (CWE-384), ReDoS (CWE-1333), Template Injection (CWE-1336) ฯลฯ
+- **Compliance Coverage**: OWASP 66→86, NIST 58→78, MITRE 48→68
 
 ### v2.0.1 — Patch
 
 - **BUG-6/7/8 Fixed** — null-safety fixes ใน json-normalizer.sh (Semgrep null severity, Trivy null arrays, CWE ID parsing)
 - **25 Memory-Safety CWEs** — เพิ่ม buffer overflow, use-after-free, integer overflow, race condition ฯลฯ ใน compliance mappings ทั้ง 3 ไฟล์ (OWASP 41→66, NIST 33→58, MITRE 23→48)
-- **Version bump** — อัพเดท version ใน 6 config/doc files
 
 ### v2.0.0 Highlights
 
@@ -409,7 +413,7 @@ bash formatters/dedup-findings.sh --inputs semgrep.json,grype.json,trivy.json --
 
 ## Compliance Mapping
 
-Plugin นี้ map ผลลัพธ์จาก CWE ไปยัง compliance frameworks อัตโนมัติ — **66 CWEs** mapped to OWASP, **58 CWEs** to NIST, **48 CWEs** to MITRE:
+Plugin นี้ map ผลลัพธ์จาก CWE ไปยัง compliance frameworks อัตโนมัติ — **86 CWEs** mapped to OWASP, **78 CWEs** to NIST, **68 CWEs** to MITRE:
 
 | Framework          | Version | ใช้ทำอะไร                           |
 | ------------------ | ------- | ----------------------------------- |
@@ -588,7 +592,7 @@ devsecops-ai-team/
 | [FRAMEWORK-UPDATE-RUNBOOK.md](docs/FRAMEWORK-UPDATE-RUNBOOK.md) | ขั้นตอนอัพเดท framework versions                   |
 | [MANDAY-ESTIMATION.md](docs/MANDAY-ESTIMATION.md)               | ROI analysis + cost comparison (10,222% ROI)       |
 | [CLAUDE.md](CLAUDE.md)                                          | Architecture + contributing guidelines             |
-| [CHANGELOG.md](CHANGELOG.md)                                    | Version history (v1.0.0 → v2.0.1)                  |
+| [CHANGELOG.md](CHANGELOG.md)                                    | Version history (v1.0.0 → v2.0.2)                  |
 | [SECURITY.md](SECURITY.md)                                      | Vulnerability reporting policy                     |
 
 ---
