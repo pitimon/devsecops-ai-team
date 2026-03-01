@@ -435,6 +435,56 @@
       "owasp": ["A03:2021"],
       "category": "Injection",
       "name": "Improper Neutralization of Special Elements Used in a Template Engine"
+    },
+    "CWE-95": {
+      "owasp": ["A03:2021"],
+      "category": "Injection",
+      "name": "Improper Neutralization of Directives in Dynamically Evaluated Code (Eval Injection)"
+    },
+    "CWE-489": {
+      "owasp": ["A05:2021"],
+      "category": "Security Misconfiguration",
+      "name": "Active Debug Code"
+    },
+    "CWE-524": {
+      "owasp": ["A05:2021"],
+      "category": "Security Misconfiguration",
+      "name": "Use of Cache Containing Sensitive Information"
+    },
+    "CWE-539": {
+      "owasp": ["A05:2021"],
+      "category": "Security Misconfiguration",
+      "name": "Use of Persistent Cookies Containing Sensitive Information"
+    },
+    "CWE-665": {
+      "owasp": ["A05:2021"],
+      "category": "Security Misconfiguration",
+      "name": "Improper Initialization"
+    },
+    "CWE-668": {
+      "owasp": ["A01:2021"],
+      "category": "Broken Access Control",
+      "name": "Exposure of Resource to Wrong Sphere"
+    },
+    "CWE-669": {
+      "owasp": ["A04:2021"],
+      "category": "Insecure Design",
+      "name": "Incorrect Resource Transfer Between Spheres"
+    },
+    "CWE-670": {
+      "owasp": ["A04:2021"],
+      "category": "Insecure Design",
+      "name": "Always-Incorrect Control Flow Implementation"
+    },
+    "CWE-680": {
+      "owasp": ["A06:2021"],
+      "category": "Vulnerable Components",
+      "name": "Integer Overflow to Buffer Overflow"
+    },
+    "CWE-704": {
+      "owasp": ["A06:2021"],
+      "category": "Vulnerable Components",
+      "name": "Incorrect Type Conversion or Cast"
     }
   }
 }

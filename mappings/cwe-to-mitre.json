@@ -345,6 +345,81 @@
       "techniques": ["T1059"],
       "tactic": "Execution",
       "name": "Command and Scripting Interpreter"
+    },
+    "CWE-95": {
+      "techniques": ["T1059"],
+      "tactic": "Execution",
+      "name": "Command and Scripting Interpreter"
+    },
+    "CWE-120": {
+      "techniques": ["T1203"],
+      "tactic": "Execution",
+      "name": "Exploitation for Client Execution"
+    },
+    "CWE-400": {
+      "techniques": ["T1499"],
+      "tactic": "Impact",
+      "name": "Endpoint Denial of Service"
+    },
+    "CWE-489": {
+      "techniques": ["T1082"],
+      "tactic": "Discovery",
+      "name": "System Information Discovery"
+    },
+    "CWE-524": {
+      "techniques": ["T1005"],
+      "tactic": "Collection",
+      "name": "Data from Local System"
+    },
+    "CWE-539": {
+      "techniques": ["T1539"],
+      "tactic": "Credential Access",
+      "name": "Steal Web Session Cookie"
+    },
+    "CWE-601": {
+      "techniques": ["T1566"],
+      "tactic": "Initial Access",
+      "name": "Phishing"
+    },
+    "CWE-665": {
+      "techniques": ["T1068"],
+      "tactic": "Privilege Escalation",
+      "name": "Exploitation for Privilege Escalation"
+    },
+    "CWE-668": {
+      "techniques": ["T1005"],
+      "tactic": "Collection",
+      "name": "Data from Local System"
+    },
+    "CWE-669": {
+      "techniques": ["T1048"],
+      "tactic": "Exfiltration",
+      "name": "Exfiltration Over Alternative Protocol"
+    },
+    "CWE-670": {
+      "techniques": ["T1068"],
+      "tactic": "Privilege Escalation",
+      "name": "Exploitation for Privilege Escalation"
+    },
+    "CWE-680": {
+      "techniques": ["T1203"],
+      "tactic": "Execution",
+      "name": "Exploitation for Client Execution"
+    },
+    "CWE-693": {
+      "techniques": ["T1190"],
+      "tactic": "Initial Access",
+      "name": "Exploit Public-Facing Application"
+    },
+    "CWE-704": {
+      "techniques": ["T1203"],
+      "tactic": "Execution",
+      "name": "Exploitation for Client Execution"
+    },
+    "CWE-732": {
+      "techniques": ["T1222"],
+      "tactic": "Defense Evasion",
+      "name": "File and Directory Permissions Modification"
     }
   }
 }

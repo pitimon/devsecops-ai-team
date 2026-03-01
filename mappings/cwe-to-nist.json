@@ -296,6 +296,54 @@
     "CWE-1336": {
       "controls": ["SI-10"],
       "family": "System and Information Integrity"
+    },
+    "CWE-95": {
+      "controls": ["SI-10"],
+      "family": "System and Information Integrity"
+    },
+    "CWE-489": {
+      "controls": ["CM-6"],
+      "family": "Configuration Management"
+    },
+    "CWE-524": {
+      "controls": ["SC-28"],
+      "family": "System and Communications Protection"
+    },
+    "CWE-539": {
+      "controls": ["SC-23"],
+      "family": "System and Communications Protection"
+    },
+    "CWE-665": {
+      "controls": ["SI-16"],
+      "family": "System and Information Integrity"
+    },
+    "CWE-668": {
+      "controls": ["AC-3"],
+      "family": "Access Control"
+    },
+    "CWE-669": {
+      "controls": ["AC-4"],
+      "family": "Access Control"
+    },
+    "CWE-670": {
+      "controls": ["SI-16"],
+      "family": "System and Information Integrity"
+    },
+    "CWE-680": {
+      "controls": ["SI-16"],
+      "family": "System and Information Integrity"
+    },
+    "CWE-693": {
+      "controls": ["SC-7"],
+      "family": "System and Communications Protection"
+    },
+    "CWE-704": {
+      "controls": ["SI-16"],
+      "family": "System and Information Integrity"
+    },
+    "CWE-732": {
+      "controls": ["AC-6"],
+      "family": "Access Control"
     }
   }
 }

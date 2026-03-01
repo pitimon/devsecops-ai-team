@@ -46,6 +46,8 @@ services:
     container_name: devsecops-zap
     entrypoint: ["sleep", "infinity"]
     profiles: ["dast", "all"]
+    mem_limit: 2g
+    memswap_limit: 2g
     volumes:
       - results:/results
       - config:/config:ro

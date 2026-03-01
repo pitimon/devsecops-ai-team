@@ -97,6 +97,35 @@ claude plugin remove devsecops-ai-team
 claude plugin add pitimon/devsecops-ai-team
 ```
 
+### ZAP container killed (OOM)
+
+**Symptom**: ZAP scan exits with code 137, or `docker inspect` shows `OOMKilled: true`
+
+**Cause**: ZAP's spider/active scan consumes more memory than available. Default Java heap can grow unbounded.
+
+**Solution**:
+
+The `docker-compose.yml` now sets `mem_limit: 2g` for ZAP. If you still hit OOM:
+
+```bash
+# Check if OOM killed
+docker inspect devsecops-zap --format '{{.State.OOMKilled}}'
+
+# Increase limit in docker-compose.yml
+mem_limit: 4g
+memswap_limit: 4g
+```
+
+**Workaround**: Use baseline scan instead of full scan for large targets:
+
+```bash
+# Baseline scan (faster, less memory)
+zap-baseline.py -t https://target.com
+
+# Instead of full scan
+# zap-full-scan.py -t https://target.com
+```
+
 ### SARIF upload fails
 
 **Symptom**: GitHub Security tab doesn't show results

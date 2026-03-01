@@ -6,6 +6,12 @@ set -euo pipefail
 #
 # Usage: json-normalizer.sh --tool <tool> --input <file> --output <file>
 
+# Require python3 for JSON parsing
+if ! command -v python3 &>/dev/null; then
+  echo "ERROR: python3 required but not found. Install Python 3.8+" >&2
+  exit 1
+fi
+
 TOOL=""
 INPUT=""
 OUTPUT=""
