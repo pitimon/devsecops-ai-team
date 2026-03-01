@@ -57,7 +57,7 @@ SKILL_COUNT=0
 for skill in $EXPECTED_SKILLS; do
   if [ -f "$ROOT_DIR/skills/$skill/SKILL.md" ]; then
     pass "skill $skill exists"
-    ((SKILL_COUNT++))
+    SKILL_COUNT=$((SKILL_COUNT + 1))
     # Check YAML frontmatter
     head -1 "$ROOT_DIR/skills/$skill/SKILL.md" | grep -q "^---" && pass "  $skill has frontmatter" || fail "  $skill missing frontmatter"
     grep -q "^name:" "$ROOT_DIR/skills/$skill/SKILL.md" && pass "  $skill has name field" || fail "  $skill missing name"
@@ -79,7 +79,7 @@ for group in orchestrators specialists experts core-team; do
     pass "agent group $group exists"
     for agent_file in "$ROOT_DIR/agents/$group"/*.md; do
       if [ -f "$agent_file" ]; then
-        ((AGENT_COUNT++))
+        AGENT_COUNT=$((AGENT_COUNT + 1))
         BASENAME=$(basename "$agent_file")
         head -1 "$agent_file" | grep -q "^---" && pass "  $BASENAME has frontmatter" || fail "  $BASENAME missing frontmatter"
         grep -q "^model:" "$agent_file" && pass "  $BASENAME has model" || fail "  $BASENAME missing model"
@@ -159,7 +159,7 @@ REF_COUNT=0
 for ref in $EXPECTED_REFS; do
   if [ -f "$ROOT_DIR/skills/references/$ref" ]; then
     pass "reference $ref exists"
-    ((REF_COUNT++))
+    REF_COUNT=$((REF_COUNT + 1))
   else
     fail "reference $ref missing"
   fi
