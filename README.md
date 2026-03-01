@@ -3,7 +3,7 @@
   <img src="https://img.shields.io/badge/Agents-18-blue?style=for-the-badge" alt="18 Agents">
   <img src="https://img.shields.io/badge/Skills-12-green?style=for-the-badge" alt="12 Skills">
   <img src="https://img.shields.io/badge/Tools-7-orange?style=for-the-badge" alt="7 Tools">
-  <img src="https://img.shields.io/badge/Version-2.0.0-brightgreen?style=for-the-badge" alt="v2.0.0">
+  <img src="https://img.shields.io/badge/Version-2.0.1-brightgreen?style=for-the-badge" alt="v2.0.1">
   <img src="https://img.shields.io/badge/MCP-5_Tools-purple?style=for-the-badge" alt="MCP">
   <img src="https://img.shields.io/badge/License-MIT-yellow?style=for-the-badge" alt="MIT License">
 </p>
