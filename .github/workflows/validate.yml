@@ -173,6 +173,37 @@ jobs:
           echo ""
           echo "=== All Checks Passed ==="
 
+  normalizer-tests:
+    name: Normalizer Unit Tests
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Run normalizer tests
+        run: bash tests/test-normalizer.sh
+
+      - name: Run formatter tests
+        run: bash tests/test-formatters.sh
+
+      - name: Run runner tests
+        run: bash tests/test-runner.sh
+
+  mcp-validation:
+    name: MCP Server Validation
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Run MCP server tests
+        run: bash tests/test-mcp-server.sh
+
   json-validation:
     name: JSON Schema Validation
     runs-on: ubuntu-latest

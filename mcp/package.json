@@ -1,0 +1,14 @@
+{
+  "name": "devsecops-mcp-server",
+  "version": "2.0.0",
+  "type": "module",
+  "description": "MCP server for DevSecOps AI Team — exposes security scanning tools as MCP tools",
+  "main": "server.mjs",
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.0.0",
+    "zod": "^3.23.0"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}

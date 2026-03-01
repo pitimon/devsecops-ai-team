@@ -1,0 +1,82 @@
+[
+  {
+    "check_type": "terraform",
+    "results": {
+      "passed_checks": [],
+      "failed_checks": [
+        {
+          "check_id": "CKV_AWS_145",
+          "name": "Ensure that S3 Bucket has server-side encryption enabled with KMS",
+          "severity": "HIGH",
+          "check_result": { "result": "FAILED" },
+          "file_path": "/main.tf",
+          "resource": "aws_s3_bucket.data",
+          "file_line_range": [10, 25],
+          "guideline": "https://docs.bridgecrew.io/docs/s3-kms"
+        },
+        {
+          "check_id": "CKV_AWS_19",
+          "name": "Ensure the S3 bucket has versioning enabled",
+          "severity": null,
+          "check_result": { "result": "FAILED" },
+          "file_path": "/main.tf",
+          "resource": "aws_s3_bucket.data",
+          "file_line_range": [10, 25],
+          "guideline": "https://docs.bridgecrew.io/docs/s3-versioning"
+        }
+      ],
+      "skipped_checks": []
+    },
+    "summary": { "passed": 0, "failed": 2, "skipped": 0 }
+  },
+  {
+    "check_type": "kubernetes",
+    "results": {
+      "passed_checks": [],
+      "failed_checks": [
+        {
+          "check_id": "CKV_K8S_22",
+          "name": "Ensure that container is not run with read-only filesystem",
+          "severity": "MEDIUM",
+          "check_result": { "result": "FAILED" },
+          "file_path": "/k8s/deployment.yaml",
+          "resource": "Deployment.default.myapp",
+          "file_line_range": [1, 30],
+          "guideline": "https://docs.bridgecrew.io/docs/k8s-read-only-fs"
+        },
+        {
+          "check_id": "CKV_K8S_28",
+          "name": "Ensure that the allowPrivilegeEscalation field is set to false",
+          "severity": "HIGH",
+          "check_result": { "result": "FAILED" },
+          "file_path": "/k8s/deployment.yaml",
+          "resource": "Deployment.default.myapp",
+          "file_line_range": [15, 22],
+          "guideline": "https://docs.bridgecrew.io/docs/k8s-privilege-escalation"
+        }
+      ],
+      "skipped_checks": []
+    },
+    "summary": { "passed": 0, "failed": 2, "skipped": 0 }
+  },
+  {
+    "check_type": "dockerfile",
+    "results": {
+      "passed_checks": [],
+      "failed_checks": [
+        {
+          "check_id": "CKV_DOCKER_2",
+          "name": "Ensure that HEALTHCHECK instructions have been added to container images",
+          "severity": "LOW",
+          "check_result": { "result": "FAILED" },
+          "file_path": "/Dockerfile",
+          "resource": "/Dockerfile.",
+          "file_line_range": [1, 15],
+          "guideline": "https://docs.bridgecrew.io/docs/docker-healthcheck"
+        }
+      ],
+      "skipped_checks": []
+    },
+    "summary": { "passed": 0, "failed": 1, "skipped": 0 }
+  }
+]

@@ -21,7 +21,7 @@ TEMPLATE_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../templates" 2>/dev/null && 
 
 python3 -c "
 import json, html
-from datetime import datetime
+from datetime import datetime, timezone
 
 data = json.load(open('$INPUT'))
 findings = data.get('findings', [])
@@ -61,7 +61,7 @@ code {{ background: #e9ecef; padding: 2px 6px; border-radius: 3px; }}
 <body>
 <div class=\"dashboard\">
 <h1>DevSecOps Security Report</h1>
-<p>Generated: {datetime.utcnow().strftime(\"%Y-%m-%d %H:%M UTC\")}</p>
+<p>Generated: {datetime.now(timezone.utc).strftime(\"%Y-%m-%d %H:%M UTC\")}</p>
 <div class=\"summary\">
 <div class=\"card\"><h3 style=\"color:#dc3545\">{summary.get(\"critical\", 0)}</h3><p>Critical</p></div>
 <div class=\"card\"><h3 style=\"color:#fd7e14\">{summary.get(\"high\", 0)}</h3><p>High</p></div>

@@ -39,7 +39,9 @@ for i, r in enumerate(data.get('results', []), 1):
         'id': f'FINDING-${DATE_PREFIX}-{i:03d}',
         'source_tool': 'semgrep',
         'scan_type': 'sast',
-        'severity': r.get('extra', {}).get('severity', 'MEDIUM').upper(),
+        'severity': {'ERROR': 'HIGH', 'WARNING': 'MEDIUM', 'INFO': 'INFO',
+                     'CRITICAL': 'CRITICAL', 'HIGH': 'HIGH', 'MEDIUM': 'MEDIUM', 'LOW': 'LOW'
+                    }.get(r.get('extra', {}).get('severity', 'MEDIUM').upper(), 'MEDIUM'),
         'confidence': r.get('extra', {}).get('metadata', {}).get('confidence', 'MEDIUM').upper(),
         'title': r.get('extra', {}).get('message', r.get('check_id', '')),
         'cwe_id': next((c for c in r.get('extra', {}).get('metadata', {}).get('cwe', []) if c.startswith('CWE-')), None),
@@ -160,6 +162,26 @@ for result in data.get('Results', []):
             'fix_versions': [vuln.get('FixedVersion', '')] if vuln.get('FixedVersion') else []
         })
         idx += 1
+    for misconf in result.get('Misconfigurations', []):
+        findings.append({
+            'id': f'FINDING-${DATE_PREFIX}-{idx:03d}',
+            'source_tool': 'trivy',
+            'scan_type': 'config',
+            'severity': severity_map.get(misconf.get('Severity', ''), 'MEDIUM'),
+            'confidence': 'HIGH',
+            'title': f\"{misconf.get('ID', '')}: {misconf.get('Title', '')}\",
+            'cwe_id': None,
+            'location': {
+                'file': misconf.get('CauseMetadata', {}).get('Resource', result.get('Target', '')),
+                'line_start': misconf.get('CauseMetadata', {}).get('StartLine', 0),
+                'line_end': misconf.get('CauseMetadata', {}).get('EndLine', 0),
+                'image': result.get('Target', '')
+            },
+            'rule_id': misconf.get('ID', ''),
+            'resolution': misconf.get('Resolution', ''),
+            'status': 'open'
+        })
+        idx += 1
 json.dump({'findings': findings, 'summary': {
     'total': len(findings),
     'critical': sum(1 for f in findings if f['severity'] == 'CRITICAL'),
@@ -175,14 +197,19 @@ json.dump({'findings': findings, 'summary': {
     python3 -c "
 import json
 data = json.load(open('$INPUT'))
-if isinstance(data, list): data = data[0] if data else {}
+all_failed = []
+if isinstance(data, list):
+    for item in data:
+        all_failed.extend(item.get('results', {}).get('failed_checks', []))
+else:
+    all_failed = data.get('results', {}).get('failed_checks', [])
 findings = []
-for i, check in enumerate(data.get('results', {}).get('failed_checks', []), 1):
+for i, check in enumerate(all_failed, 1):
     findings.append({
         'id': f'FINDING-${DATE_PREFIX}-{i:03d}',
         'source_tool': 'checkov',
         'scan_type': 'iac',
-        'severity': check.get('severity', 'MEDIUM'),
+        'severity': check.get('severity') or 'MEDIUM',
         'confidence': 'HIGH',
         'title': check.get('check_id', '') + ': ' + check.get('name', ''),
         'cwe_id': None,

@@ -222,6 +222,54 @@ for f in .github/workflows/validate.yml .github/workflows/security-scan.yml .git
   [ -f "$ROOT_DIR/$f" ] && pass "$f exists" || fail "$f missing"
 done
 
+# ─── Section 16: MCP Server ───
+echo ""
+echo "--- Section 16: MCP Server ---"
+
+[ -f "$ROOT_DIR/.mcp.json" ] && pass ".mcp.json exists" || fail ".mcp.json missing"
+[ -f "$ROOT_DIR/mcp/server.mjs" ] && pass "mcp/server.mjs exists" || fail "mcp/server.mjs missing"
+[ -f "$ROOT_DIR/mcp/package.json" ] && pass "mcp/package.json exists" || fail "mcp/package.json missing"
+
+if [ -f "$ROOT_DIR/.mcp.json" ]; then
+  python3 -c "import json; json.load(open('$ROOT_DIR/.mcp.json'))" 2>/dev/null && pass ".mcp.json is valid JSON" || fail ".mcp.json invalid"
+  python3 -c "import json; d=json.load(open('$ROOT_DIR/.mcp.json')); assert 'devsecops' in d.get('mcpServers',{})" 2>/dev/null && pass ".mcp.json has devsecops server" || fail ".mcp.json missing devsecops"
+fi
+
+if [ -f "$ROOT_DIR/mcp/package.json" ]; then
+  python3 -c "import json; d=json.load(open('$ROOT_DIR/mcp/package.json')); assert d['type']=='module'" 2>/dev/null && pass "package.json is ESM module" || fail "package.json not ESM"
+  python3 -c "import json; d=json.load(open('$ROOT_DIR/mcp/package.json')); assert '@modelcontextprotocol/sdk' in d.get('dependencies',{})" 2>/dev/null && pass "MCP SDK dependency declared" || fail "MCP SDK missing"
+fi
+
+if [ -f "$ROOT_DIR/mcp/server.mjs" ]; then
+  TOOL_COUNT=$(python3 -c "import re; c=open('$ROOT_DIR/mcp/server.mjs').read(); print(len(set(re.findall(r'name:\s*\"(devsecops_\w+)\"', c))))" 2>/dev/null || echo 0)
+  [ "$TOOL_COUNT" -eq 5 ] && pass "MCP server defines 5 tools" || fail "MCP server has $TOOL_COUNT tools (expected 5)"
+  grep -q "StdioServerTransport" "$ROOT_DIR/mcp/server.mjs" && pass "Uses stdio transport" || fail "Missing stdio transport"
+fi
+
+# ─── Section 17: Normalizer Tests ───
+echo ""
+echo "--- Section 17: Normalizer Tests ---"
+
+[ -f "$ROOT_DIR/tests/test-normalizer.sh" ] && pass "test-normalizer.sh exists" || fail "test-normalizer.sh missing"
+[ -f "$ROOT_DIR/tests/test-mcp-server.sh" ] && pass "test-mcp-server.sh exists" || fail "test-mcp-server.sh missing"
+[ -f "$ROOT_DIR/formatters/dedup-findings.sh" ] && pass "dedup-findings.sh exists" || fail "dedup-findings.sh missing"
+[ -f "$ROOT_DIR/tests/fixtures/sample-checkov-multi.json" ] && pass "sample-checkov-multi.json fixture exists" || fail "sample-checkov-multi.json missing"
+[ -f "$ROOT_DIR/tests/fixtures/sample-trivy-misconfig.json" ] && pass "sample-trivy-misconfig.json fixture exists" || fail "sample-trivy-misconfig.json missing"
+
+if [ -f "$ROOT_DIR/tests/fixtures/sample-checkov-multi.json" ]; then
+  python3 -c "import json; d=json.load(open('$ROOT_DIR/tests/fixtures/sample-checkov-multi.json')); assert isinstance(d, list) and len(d)>=2" 2>/dev/null && pass "checkov-multi fixture has 2+ check types" || fail "checkov-multi fixture invalid"
+fi
+
+if [ -f "$ROOT_DIR/tests/fixtures/sample-trivy-misconfig.json" ]; then
+  python3 -c "
+import json
+d=json.load(open('$ROOT_DIR/tests/fixtures/sample-trivy-misconfig.json'))
+has_vulns = any(r.get('Vulnerabilities') for r in d.get('Results',[]))
+has_misconf = any(r.get('Misconfigurations') for r in d.get('Results',[]))
+assert has_vulns and has_misconf
+" 2>/dev/null && pass "trivy-misconfig fixture has both Vulnerabilities and Misconfigurations" || fail "trivy-misconfig fixture incomplete"
+fi
+
 # ─── Summary ───
 echo ""
 echo "============================================"

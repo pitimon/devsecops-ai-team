@@ -12,6 +12,24 @@ Run all enabled security scans and produce a unified report.
 
 **Decision Loop**: On-the-Loop (AI proposes results, human reviews gate decision)
 
+## Agent Delegation Chain
+
+This skill MUST delegate to agents in this exact order:
+
+1. `@agent-security-stack-analyst` → detect stack
+2. Scan specialists (parallel based on detection):
+   - `@agent-sast-specialist` (if source code detected)
+   - `@agent-secret-scanner-specialist` (always)
+   - `@agent-sca-specialist` (if dependency files detected)
+   - `@agent-container-security-specialist` (if Dockerfile/images detected)
+   - `@agent-iac-security-specialist` (if IaC files detected)
+   - `@agent-sbom-analyst` (always)
+3. `@agent-vuln-triager` → deduplicate + prioritize all findings
+4. `@agent-compliance-officer` → map to frameworks
+5. `@agent-remediation-advisor` → fix guidance for HIGH+
+6. `@agent-report-generator` → unified report
+7. `@agent-pipeline-guardian` → gate decision
+
 ## Pipeline Process
 
 ### 1. Load Configuration
@@ -39,11 +57,21 @@ DAST (ZAP) is NEVER included automatically — requires explicit In-the-Loop app
 
 For each completed scan, run the result collector and normalize to unified format.
 
-### 4. Aggregate Findings
+### 4. Aggregate and Deduplicate Findings
 
-Merge all normalized findings:
+Merge all normalized findings using the cross-tool deduplicator:
 
-- Deduplicate by (tool, cwe_id, file, line)
+```bash
+bash ${CLAUDE_PLUGIN_ROOT}/formatters/dedup-findings.sh \
+  --inputs normalized-semgrep.json,normalized-gitleaks.json,normalized-grype.json,normalized-trivy.json,normalized-checkov.json \
+  --output merged-findings.json
+```
+
+Dedup key: `(cve_id, file, line_start)` for file findings, `(cve_id, package)` for dependencies.
+On merge: keep highest severity, concatenate source tools.
+
+Then:
+
 - Sort by severity (CRITICAL first)
 - Apply compliance mappings from `mappings/cwe-to-*.json`
 

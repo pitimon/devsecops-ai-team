@@ -2,6 +2,7 @@
 name: team-configurator
 description: >
   Scans project dependencies and available tools, configures optimal agent mappings.
+  MUST BE USED on /devsecops-setup to configure optimal agent and tool mappings.
   Auto-triggered on /devsecops-setup and new project detection.
   Decision Loop: On-the-Loop (proposes configuration, human approves).
 model: sonnet
@@ -9,6 +10,8 @@ tools: ["Read", "Write", "Glob", "Grep", "Bash"]
 ---
 
 # Team Configurator
+
+**Mission:** Configure optimal agent and tool mappings based on detected stack and available resources.
 
 You configure the optimal agent and tool mappings for the current project based on detected stack and available resources.
 

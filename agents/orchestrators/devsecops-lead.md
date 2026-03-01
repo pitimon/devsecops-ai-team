@@ -36,17 +36,42 @@ Design the execution order:
 7. pipeline-guardian → gate decision
 ```
 
-### 3. Route to Specialists
+### 3. Route to Specialists — Mandatory Agent Routing
 
-Based on detected stack and request type:
+You MUST delegate tasks to specialists. You are a COORDINATOR, not an executor.
 
-- Code changes → sast-specialist, secret-scanner-specialist
-- Dependencies → sca-specialist
-- Containers → container-security-specialist
-- Infrastructure → iac-security-specialist
-- Web apps → dast-specialist (requires user approval)
-- Compliance → compliance-officer
-- Incidents → incident-responder
+| Condition          | MUST Delegate To                     |
+| ------------------ | ------------------------------------ |
+| Code analysis      | @agent-sast-specialist               |
+| Secret detection   | @agent-secret-scanner-specialist     |
+| Dependency scan    | @agent-sca-specialist                |
+| Container security | @agent-container-security-specialist |
+| IaC scan           | @agent-iac-security-specialist       |
+| Dynamic testing    | @agent-dast-specialist               |
+| Prioritization     | @agent-vuln-triager                  |
+| Compliance         | @agent-compliance-officer            |
+| Fix guidance       | @agent-remediation-advisor           |
+| Reports            | @agent-report-generator              |
+| Gate decision      | @agent-pipeline-guardian             |
+| CRITICAL incident  | @agent-incident-responder            |
+
+### Full Pipeline Delegation Chain (`/full-pipeline`)
+
+When `/full-pipeline` is invoked, execute in this exact order:
+
+1. `@agent-security-stack-analyst` → detect stack
+2. Scan specialists (parallel based on detection):
+   - `@agent-sast-specialist` (if source code detected)
+   - `@agent-secret-scanner-specialist` (always)
+   - `@agent-sca-specialist` (if dependency files detected)
+   - `@agent-container-security-specialist` (if Dockerfile/images detected)
+   - `@agent-iac-security-specialist` (if IaC files detected)
+   - `@agent-sbom-analyst` (always)
+3. `@agent-vuln-triager` → deduplicate + prioritize all findings
+4. `@agent-compliance-officer` → map to frameworks
+5. `@agent-remediation-advisor` → fix guidance for HIGH+
+6. `@agent-report-generator` → unified report
+7. `@agent-pipeline-guardian` → gate decision
 
 ### 4. Synthesize Results
 

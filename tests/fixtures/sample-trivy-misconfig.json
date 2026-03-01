@@ -1,0 +1,78 @@
+{
+  "SchemaVersion": 2,
+  "Results": [
+    {
+      "Target": "myapp:latest (alpine 3.19)",
+      "Class": "os-pkgs",
+      "Type": "alpine",
+      "Vulnerabilities": [
+        {
+          "VulnerabilityID": "CVE-2024-11111",
+          "PkgName": "libcrypto3",
+          "InstalledVersion": "3.1.4-r0",
+          "FixedVersion": "3.1.4-r1",
+          "Severity": "CRITICAL",
+          "Title": "OpenSSL buffer overflow",
+          "CweIDs": ["CWE-120"],
+          "CVSS": { "nvd": { "V3Score": 9.1 } }
+        }
+      ]
+    },
+    {
+      "Target": "Dockerfile",
+      "Class": "config",
+      "Type": "dockerfile",
+      "Misconfigurations": [
+        {
+          "Type": "Dockerfile Security Check",
+          "ID": "DS002",
+          "Title": "Image user should not be root",
+          "Description": "Running as root is a security risk",
+          "Severity": "HIGH",
+          "Resolution": "Add USER instruction to Dockerfile",
+          "CauseMetadata": {
+            "Resource": "Dockerfile",
+            "Provider": "dockerfile",
+            "StartLine": 1,
+            "EndLine": 1
+          }
+        },
+        {
+          "Type": "Dockerfile Security Check",
+          "ID": "DS026",
+          "Title": "No HEALTHCHECK defined",
+          "Description": "Container should have a healthcheck",
+          "Severity": "LOW",
+          "Resolution": "Add HEALTHCHECK instruction",
+          "CauseMetadata": {
+            "Resource": "Dockerfile",
+            "Provider": "dockerfile",
+            "StartLine": 1,
+            "EndLine": 15
+          }
+        }
+      ]
+    },
+    {
+      "Target": "k8s/deployment.yaml",
+      "Class": "config",
+      "Type": "kubernetes",
+      "Misconfigurations": [
+        {
+          "Type": "Kubernetes Security Check",
+          "ID": "KSV001",
+          "Title": "Process can elevate its own privileges",
+          "Description": "Container should not allow privilege escalation",
+          "Severity": "MEDIUM",
+          "Resolution": "Set securityContext.allowPrivilegeEscalation to false",
+          "CauseMetadata": {
+            "Resource": "Deployment/myapp",
+            "Provider": "kubernetes",
+            "StartLine": 18,
+            "EndLine": 25
+          }
+        }
+      ]
+    }
+  ]
+}
