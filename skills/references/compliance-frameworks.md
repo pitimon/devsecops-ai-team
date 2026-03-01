@@ -275,9 +275,58 @@ evidence:
 
 ---
 
-## 8. Regulatory Quick Reference / กฎระเบียบอ้างอิงด่วน
+## 8. NCSA Website Security Standard v1.0 / มาตรฐานความมั่นคงปลอดภัยเว็บไซต์ สพธอ.
 
-### 8.1 Region-Specific Regulations
+Reference: https://www.ncsa.or.th
+
+The NCSA (National Cyber Security Agency — สำนักงานคณะกรรมการการรักษาความมั่นคงปลอดภัยไซเบอร์แห่งชาติ) Website Security Standard v1.0 defines 31 security requirements across 7 categories. It is the Thai national standard for web application security.
+
+### 8.1 Standard Categories / หมวดหมู่
+
+| Category | ID Range | Description (EN)   | คำอธิบาย (TH)                      | CWE Count |
+| -------- | -------- | ------------------ | ---------------------------------- | --------- |
+| 1        | 1.x      | HTTP Security      | ความมั่นคงปลอดภัย HTTP             | 7         |
+| 2        | 2.x      | Transport Security | ความมั่นคงปลอดภัยในการรับส่งข้อมูล | 6         |
+| 3        | 3.x      | Authentication     | การยืนยันตัวตน                     | 8         |
+| 4        | 4.x      | Session Management | การจัดการ Session                  | 5         |
+| 5        | 5.x      | Input Validation   | การตรวจสอบข้อมูลนำเข้า             | 15        |
+| 6        | 6.x      | Error Handling     | การจัดการข้อผิดพลาด                | 4         |
+| 7        | 7.x      | Access Control     | การควบคุมการเข้าถึง                | 7         |
+
+### 8.2 Key Requirements / ข้อกำหนดสำคัญ
+
+| ID  | Requirement                             | DevSecOps Tool | OWASP Mapping |
+| --- | --------------------------------------- | -------------- | ------------- |
+| 1.1 | Security headers (CSP, X-Frame-Options) | DAST (ZAP)     | A05           |
+| 1.3 | XSS protection headers                  | SAST, DAST     | A03           |
+| 2.1 | TLS 1.2+ enforcement                    | DAST           | A02           |
+| 2.3 | Strong cipher suites only               | DAST, IaC scan | A02           |
+| 3.1 | Secure password storage (bcrypt/argon2) | SAST           | A07           |
+| 3.3 | Authentication for critical functions   | SAST, DAST     | A07           |
+| 4.2 | Session fixation prevention             | DAST           | A07           |
+| 5.1 | Input validation on all endpoints       | SAST           | A03           |
+| 5.4 | SQL injection prevention                | SAST, DAST     | A03           |
+| 6.1 | No sensitive data in error messages     | SAST           | A04           |
+| 7.1 | Least privilege access control          | SAST, IaC scan | A01           |
+| 7.2 | Authorization checks on all resources   | SAST, DAST     | A01           |
+
+### 8.3 Cross-Walk: NCSA → OWASP → NIST
+
+| NCSA Category        | OWASP 2021 | NIST 800-53r5      | CIS v8.1 |
+| -------------------- | ---------- | ------------------ | -------- |
+| 1.x HTTP Security    | A05        | CM-6, SC-8         | CIS-4    |
+| 2.x Transport        | A02        | SC-8, SC-12, SC-13 | CIS-3    |
+| 3.x Authentication   | A07        | IA-2, IA-5         | CIS-5    |
+| 4.x Session Mgmt     | A07        | AC-12, SC-23       | CIS-6    |
+| 5.x Input Validation | A03        | SI-10              | CIS-16   |
+| 6.x Error Handling   | A04, A09   | SI-11, AU-2        | CIS-8    |
+| 7.x Access Control   | A01        | AC-3, AC-6         | CIS-6    |
+
+---
+
+## 9. Regulatory Quick Reference / กฎระเบียบอ้างอิงด่วน
+
+### 9.1 Region-Specific Regulations
 
 | Regulation  | Region          | Key Requirement for DevSecOps                   | Penalty (Max)        |
 | ----------- | --------------- | ----------------------------------------------- | -------------------- |
@@ -288,7 +337,7 @@ evidence:
 | SOX         | US (Public Co)  | IT controls for financial reporting integrity   | Criminal penalties   |
 | CCPA/CPRA   | US (California) | Consumer data rights, security requirements     | $7,500 per violation |
 
-### 8.2 Thailand-Specific: PDPA Compliance Checklist / รายการตรวจสอบ PDPA
+### 9.2 Thailand-Specific: PDPA Compliance Checklist / รายการตรวจสอบ PDPA
 
 ```text
 1. [ ] Data Protection Impact Assessment (DPIA) completed
@@ -316,3 +365,4 @@ evidence:
 - Thailand PDPA: https://www.pdpc.or.th/
 - GDPR: https://gdpr.eu/
 - NIST Cybersecurity Framework v2.0: https://www.nist.gov/cyberframework
+- NCSA Website Security Standard v1.0: https://www.ncsa.or.th

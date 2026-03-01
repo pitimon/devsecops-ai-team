@@ -4,7 +4,7 @@
   <img src="https://img.shields.io/badge/Skills-12-green?style=for-the-badge" alt="12 Skills">
   <img src="https://img.shields.io/badge/Tools-7-orange?style=for-the-badge" alt="7 Tools">
   <img src="https://img.shields.io/badge/Version-2.2.0-brightgreen?style=for-the-badge" alt="v2.2.0">
-  <img src="https://img.shields.io/badge/Tests-334%2F334-success?style=for-the-badge" alt="Tests">
+  <img src="https://img.shields.io/badge/Tests-354%2F354-success?style=for-the-badge" alt="Tests">
   <img src="https://img.shields.io/badge/MCP-5_Tools-purple?style=for-the-badge" alt="MCP">
   <img src="https://img.shields.io/badge/License-MIT-yellow?style=for-the-badge" alt="MIT License">
 </p>
@@ -30,7 +30,7 @@
 - **7 Security Tools, 1 Command** — `/full-pipeline` รันทุกเครื่องมือแบบ parallel, deduplicate ผลข้าม tools, สร้าง unified report ในคำสั่งเดียว
 - **Real-Time Protection** — บล็อก commits ที่มี CRITICAL findings, ตรวจจับ secrets (AWS keys, GitHub tokens, JWT) ก่อนเขียนลง disk — ทำงานใน 500ms
 - **CVSS v4.0 Prioritization** — ไม่ใช่แค่ severity labels — วิเคราะห์ business impact, exploitability (Weaponized → None), กำหนด SLA tiers (P1: 24 ชม. → P4: backlog)
-- **86 CWE Compliance Mappings** — Auto-map ผลสแกนไปยัง OWASP Top 10 (86 CWEs), NIST 800-53 (78 CWEs), MITRE ATT&CK (68 CWEs)
+- **96 CWE Compliance Mappings** — Auto-map ผลสแกนไปยัง OWASP Top 10 (96 CWEs), NIST 800-53 (90 CWEs), MITRE ATT&CK (83 CWEs)
 - **MCP Server** — 5 composable tools (`devsecops_scan`, `devsecops_gate`, ...) สำหรับ programmatic integration กับ MCP-compatible clients
 
 ---
@@ -213,7 +213,7 @@ MCP server จะถูก load อัตโนมัติผ่าน `.mcp.js
    ├── @iac-specialist       → ถ้ามี Terraform/K8s
    └── @sbom-analyst         → เสมอ
 3. @vuln-triager             → deduplicate + prioritize
-4. @compliance-officer       → map to OWASP/NIST/MITRE
+4. @compliance-officer       → map to OWASP/NIST/MITRE/NCSA
 5. @remediation-advisor      → fix guidance (HIGH+)
 6. @report-generator         → unified report
 7. @pipeline-guardian        → gate decision (PASS/FAIL)
@@ -277,12 +277,12 @@ MCP server จะถูก load อัตโนมัติผ่าน `.mcp.js
 
 ### Universal Experts — ผู้เชี่ยวชาญข้ามสาขา (4 agents)
 
-| Agent                   | หน้าที่                                                          | Routing Cue                        |
-| ----------------------- | ---------------------------------------------------------------- | ---------------------------------- |
-| **compliance-officer**  | Map findings → NIST 800-53, OWASP Top 10, MITRE ATT&CK, CIS      | Use PROACTIVELY after scans        |
-| **threat-modeler**      | วิเคราะห์ภัยคุกคามด้วย STRIDE/PASTA methodology                  | Use PROACTIVELY on arch changes    |
-| **vuln-triager**        | จัดลำดับความสำคัญ: CVSS scoring, exploitability, business impact | Use PROACTIVELY after scan results |
-| **remediation-advisor** | แนะนำวิธีแก้ไขพร้อมตัวอย่างโค้ด, ประเมิน effort                  | Use PROACTIVELY after triage       |
+| Agent                   | หน้าที่                                                           | Routing Cue                        |
+| ----------------------- | ----------------------------------------------------------------- | ---------------------------------- |
+| **compliance-officer**  | Map findings → NIST 800-53, OWASP Top 10, MITRE ATT&CK, NCSA, CIS | Use PROACTIVELY after scans        |
+| **threat-modeler**      | วิเคราะห์ภัยคุกคามด้วย STRIDE/PASTA methodology                   | Use PROACTIVELY on arch changes    |
+| **vuln-triager**        | จัดลำดับความสำคัญ: CVSS scoring, exploitability, business impact  | Use PROACTIVELY after scan results |
+| **remediation-advisor** | แนะนำวิธีแก้ไขพร้อมตัวอย่างโค้ด, ประเมิน effort                   | Use PROACTIVELY after triage       |
 
 ### Core Team — ทีมหลัก (4 agents)
 
@@ -358,7 +358,7 @@ Claude Code / MCP Client ──── stdio ────▶ mcp/server.mjs
 | `devsecops_scan`       | tool, target, rules       | job_id + normalized findings | รัน security scan (เลือก tool ได้)          |
 | `devsecops_results`    | job_id, format            | formatted results            | ดึงผลลัพธ์ scan ในรูปแบบที่ต้องการ          |
 | `devsecops_gate`       | results_file, policy      | PASS/FAIL + violations       | ประเมิน pass/fail ตาม severity policy       |
-| `devsecops_compliance` | findings_file, frameworks | cross-walk matrix            | Map findings ไปยัง OWASP/NIST/MITRE         |
+| `devsecops_compliance` | findings_file, frameworks | cross-walk matrix            | Map findings ไปยัง OWASP/NIST/MITRE/NCSA    |
 | `devsecops_status`     | (none)                    | runner + images status       | ตรวจสอบ Docker + tool images ที่พร้อมใช้งาน |
 
 ### ติดตั้ง MCP
@@ -430,18 +430,19 @@ bash formatters/dedup-findings.sh --inputs semgrep.json,grype.json,trivy.json --
 
 ## Compliance Mapping
 
-Plugin นี้ map ผลลัพธ์จาก CWE ไปยัง compliance frameworks อัตโนมัติ — **86 CWEs** mapped to OWASP, **78 CWEs** to NIST, **68 CWEs** to MITRE:
+Plugin นี้ map ผลลัพธ์จาก CWE ไปยัง compliance frameworks อัตโนมัติ — **96 CWEs** mapped to OWASP, **90 CWEs** to NIST, **83 CWEs** to MITRE, **52 CWEs** to NCSA:
 
-| Framework          | Version | ใช้ทำอะไร                           |
-| ------------------ | ------- | ----------------------------------- |
-| **OWASP Top 10**   | 2021    | Web application security categories |
-| **NIST SP 800-53** | Rev. 5  | Federal security controls           |
-| **MITRE ATT&CK**   | v16     | Adversary tactics & techniques      |
-| **CIS Benchmarks** | Various | Configuration hardening baselines   |
-| **PCI DSS**        | 4.0.1   | Payment card industry compliance    |
-| **CVSS**           | 4.0     | Vulnerability severity scoring      |
+| Framework             | Version | ใช้ทำอะไร                                   |
+| --------------------- | ------- | ------------------------------------------- |
+| **OWASP Top 10**      | 2021    | Web application security categories         |
+| **NIST SP 800-53**    | Rev. 5  | Federal security controls                   |
+| **MITRE ATT&CK**      | v16     | Adversary tactics & techniques              |
+| **NCSA Web Security** | 1.0     | Thai national web security standard (สพธอ.) |
+| **CIS Benchmarks**    | Various | Configuration hardening baselines           |
+| **PCI DSS**           | 4.0.1   | Payment card industry compliance            |
+| **CVSS**              | 4.0     | Vulnerability severity scoring              |
 
-> ดูรายละเอียดทั้ง 15 frameworks ที่ติดตามใน [`frameworks.json`](frameworks.json)
+> ดูรายละเอียดทั้ง 16 frameworks ที่ติดตามใน [`frameworks.json`](frameworks.json)
 
 ---
 
@@ -587,12 +588,12 @@ devsecops-ai-team/
 ├── mcp/                     # MCP server — 5 tools (v2.0)
 │   ├── server.mjs           #   ESM module, stdio transport
 │   └── package.json         #   @modelcontextprotocol/sdk + zod
-├── mappings/                # CWE→OWASP, CWE→NIST, CWE→MITRE, severity policy
+├── mappings/                # CWE→OWASP, CWE→NIST, CWE→MITRE, CWE→NCSA, severity policy
 ├── templates/               # Report templates (HTML, Markdown)
 ├── hooks/                   # 3 hooks (session-start, scan-on-write, pre-commit-gate)
 ├── examples/                # Rules, policies, DOMAIN.md, Semgrep rules
 ├── scripts/                 # install-runner, install-rules, check-prerequisites
-├── tests/                   # 334 tests (validate 223, normalizer 34, MCP 23, runner 28, formatters 11, frameworks 15)
+├── tests/                   # 352 tests (validate 223, normalizer 41, MCP server 23, MCP handlers 23, hooks 27, dedup 15)
 ├── docs/                    # INSTALL, TROUBLESHOOTING, AGENT-CATALOG, RUNBOOK, MANDAY
 └── frameworks.json          # 15 tracked security frameworks with version info
 ```
@@ -618,24 +619,24 @@ devsecops-ai-team/
 
 ```
 Validation:  223/223 structural checks passed (incl. MCP + normalizer sections)
-Runner:       28/28  normalizer + integration tests passed
-Formatters:   11/11  SARIF + Markdown + HTML tests passed
-Normalizer:   34/34  severity mapping + multi-array + null safety tests passed
+Normalizer:   41/41  severity mapping + multi-array + null safety tests passed
 MCP Server:   23/23  config + syntax + tool definitions tests passed
-Frameworks:   15/15  staleness checks OK
+MCP Handlers: 25/25  Zod validation + gate logic + compliance crosswalk + NCSA passed
+Hooks:        27/27  session-start + scan-on-write + pre-commit-gate passed
+Dedup:        15/15  cross-tool deduplication tests passed
 ──────────────────────────────────────────────────
-Total:       334/334 checks passed
+Total:       354/354 checks passed
 ```
 
 ### Run Tests Locally
 
 ```bash
 bash tests/validate-plugin.sh          # 223 structural checks
-bash tests/test-runner.sh              # Runner + normalizer tests
-bash tests/test-formatters.sh          # Formatter tests
-bash tests/test-normalizer.sh          # Normalizer unit tests (v2.0)
-bash tests/test-mcp-server.sh          # MCP server tests (v2.0)
-bash tests/check-framework-updates.sh  # Framework staleness check
+bash tests/test-normalizer.sh          # 41 normalizer unit tests
+bash tests/test-mcp-server.sh          # 23 MCP server tests
+bash tests/test-mcp-handlers.sh        # 25 MCP handler logic tests
+bash tests/test-hooks.sh               # 27 hook tests
+bash tests/test-dedup.sh               # 15 dedup tests
 ```
 
 ---

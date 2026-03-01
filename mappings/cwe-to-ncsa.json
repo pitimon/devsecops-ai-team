@@ -1,0 +1,279 @@
+{
+  "_meta": {
+    "description": "CWE to NCSA Website Security Standard v1.0 mapping",
+    "source": "https://www.ncsa.or.th",
+    "ncsa_version": "1.0",
+    "last_updated": "2026-03-02",
+    "categories": {
+      "1.x": "HTTP Security",
+      "2.x": "Transport Security",
+      "3.x": "Authentication",
+      "4.x": "Session Management",
+      "5.x": "Input Validation",
+      "6.x": "Error Handling",
+      "7.x": "Access Control"
+    }
+  },
+  "mappings": {
+    "CWE-16": {
+      "ncsa": ["1.1", "1.2"],
+      "category": "HTTP Security",
+      "name": "Configuration"
+    },
+    "CWE-79": {
+      "ncsa": ["1.3", "5.1"],
+      "category": "HTTP Security / Input Validation",
+      "name": "Cross-site Scripting (XSS)"
+    },
+    "CWE-93": {
+      "ncsa": ["1.4"],
+      "category": "HTTP Security",
+      "name": "HTTP Response Splitting"
+    },
+    "CWE-113": {
+      "ncsa": ["1.4"],
+      "category": "HTTP Security",
+      "name": "HTTP Response Splitting"
+    },
+    "CWE-614": {
+      "ncsa": ["1.5", "4.3"],
+      "category": "HTTP Security / Session Management",
+      "name": "Sensitive Cookie Without Secure Flag"
+    },
+    "CWE-693": {
+      "ncsa": ["1.2", "1.6"],
+      "category": "HTTP Security",
+      "name": "Protection Mechanism Failure"
+    },
+    "CWE-933": {
+      "ncsa": ["1.1", "1.2", "1.3"],
+      "category": "HTTP Security",
+      "name": "Missing Security Header"
+    },
+    "CWE-295": {
+      "ncsa": ["2.1"],
+      "category": "Transport Security",
+      "name": "Improper Certificate Validation"
+    },
+    "CWE-311": {
+      "ncsa": ["2.1", "2.2"],
+      "category": "Transport Security",
+      "name": "Missing Encryption"
+    },
+    "CWE-319": {
+      "ncsa": ["2.1", "2.2"],
+      "category": "Transport Security",
+      "name": "Cleartext Transmission of Sensitive Information"
+    },
+    "CWE-326": {
+      "ncsa": ["2.3"],
+      "category": "Transport Security",
+      "name": "Inadequate Encryption Strength"
+    },
+    "CWE-327": {
+      "ncsa": ["2.3"],
+      "category": "Transport Security",
+      "name": "Use of Broken Crypto Algorithm"
+    },
+    "CWE-330": {
+      "ncsa": ["2.4"],
+      "category": "Transport Security",
+      "name": "Use of Insufficiently Random Values"
+    },
+    "CWE-256": {
+      "ncsa": ["3.1"],
+      "category": "Authentication",
+      "name": "Plaintext Storage of Password"
+    },
+    "CWE-259": {
+      "ncsa": ["3.1"],
+      "category": "Authentication",
+      "name": "Use of Hard-coded Password"
+    },
+    "CWE-287": {
+      "ncsa": ["3.1", "3.2"],
+      "category": "Authentication",
+      "name": "Improper Authentication"
+    },
+    "CWE-290": {
+      "ncsa": ["3.2"],
+      "category": "Authentication",
+      "name": "Authentication Bypass by Spoofing"
+    },
+    "CWE-306": {
+      "ncsa": ["3.3"],
+      "category": "Authentication",
+      "name": "Missing Authentication for Critical Function"
+    },
+    "CWE-308": {
+      "ncsa": ["3.4"],
+      "category": "Authentication",
+      "name": "Use of Single-factor Authentication"
+    },
+    "CWE-522": {
+      "ncsa": ["3.1", "3.5"],
+      "category": "Authentication",
+      "name": "Insufficiently Protected Credentials"
+    },
+    "CWE-798": {
+      "ncsa": ["3.1"],
+      "category": "Authentication",
+      "name": "Use of Hard-coded Credentials"
+    },
+    "CWE-346": {
+      "ncsa": ["4.1"],
+      "category": "Session Management",
+      "name": "Origin Validation Error"
+    },
+    "CWE-352": {
+      "ncsa": ["4.1", "4.4"],
+      "category": "Session Management",
+      "name": "Cross-Site Request Forgery (CSRF)"
+    },
+    "CWE-384": {
+      "ncsa": ["4.2"],
+      "category": "Session Management",
+      "name": "Session Fixation"
+    },
+    "CWE-524": {
+      "ncsa": ["4.3"],
+      "category": "Session Management",
+      "name": "Use of Cache Containing Sensitive Information"
+    },
+    "CWE-539": {
+      "ncsa": ["4.3"],
+      "category": "Session Management",
+      "name": "Use of Persistent Cookies Containing Sensitive Information"
+    },
+    "CWE-20": {
+      "ncsa": ["5.1"],
+      "category": "Input Validation",
+      "name": "Improper Input Validation"
+    },
+    "CWE-22": {
+      "ncsa": ["5.2"],
+      "category": "Input Validation",
+      "name": "Path Traversal"
+    },
+    "CWE-77": {
+      "ncsa": ["5.3"],
+      "category": "Input Validation",
+      "name": "Command Injection"
+    },
+    "CWE-78": {
+      "ncsa": ["5.3"],
+      "category": "Input Validation",
+      "name": "OS Command Injection"
+    },
+    "CWE-89": {
+      "ncsa": ["5.4"],
+      "category": "Input Validation",
+      "name": "SQL Injection"
+    },
+    "CWE-90": {
+      "ncsa": ["5.5"],
+      "category": "Input Validation",
+      "name": "LDAP Injection"
+    },
+    "CWE-91": {
+      "ncsa": ["5.6"],
+      "category": "Input Validation",
+      "name": "XML Injection"
+    },
+    "CWE-94": {
+      "ncsa": ["5.3"],
+      "category": "Input Validation",
+      "name": "Code Injection"
+    },
+    "CWE-95": {
+      "ncsa": ["5.3"],
+      "category": "Input Validation",
+      "name": "Eval Injection"
+    },
+    "CWE-129": {
+      "ncsa": ["5.1"],
+      "category": "Input Validation",
+      "name": "Improper Validation of Array Index"
+    },
+    "CWE-434": {
+      "ncsa": ["5.7"],
+      "category": "Input Validation",
+      "name": "Unrestricted Upload"
+    },
+    "CWE-502": {
+      "ncsa": ["5.1"],
+      "category": "Input Validation",
+      "name": "Deserialization of Untrusted Data"
+    },
+    "CWE-611": {
+      "ncsa": ["5.6"],
+      "category": "Input Validation",
+      "name": "XXE"
+    },
+    "CWE-918": {
+      "ncsa": ["5.8"],
+      "category": "Input Validation",
+      "name": "SSRF"
+    },
+    "CWE-1336": {
+      "ncsa": ["5.3"],
+      "category": "Input Validation",
+      "name": "Template Injection"
+    },
+    "CWE-209": {
+      "ncsa": ["6.1"],
+      "category": "Error Handling",
+      "name": "Generation of Error Message Containing Sensitive Information"
+    },
+    "CWE-532": {
+      "ncsa": ["6.2"],
+      "category": "Error Handling",
+      "name": "Info Exposure Through Log Files"
+    },
+    "CWE-778": {
+      "ncsa": ["6.3"],
+      "category": "Error Handling",
+      "name": "Insufficient Logging"
+    },
+    "CWE-200": {
+      "ncsa": ["6.1", "7.1"],
+      "category": "Error Handling / Access Control",
+      "name": "Information Exposure"
+    },
+    "CWE-269": {
+      "ncsa": ["7.1"],
+      "category": "Access Control",
+      "name": "Improper Privilege Management"
+    },
+    "CWE-284": {
+      "ncsa": ["7.1", "7.2"],
+      "category": "Access Control",
+      "name": "Improper Access Control"
+    },
+    "CWE-639": {
+      "ncsa": ["7.2"],
+      "category": "Access Control",
+      "name": "Authorization Bypass Through User-Controlled Key"
+    },
+    "CWE-668": {
+      "ncsa": ["7.3"],
+      "category": "Access Control",
+      "name": "Exposure of Resource to Wrong Sphere"
+    },
+    "CWE-732": {
+      "ncsa": ["7.1"],
+      "category": "Access Control",
+      "name": "Incorrect Permission Assignment"
+    },
+    "CWE-862": {
+      "ncsa": ["7.2"],
+      "category": "Access Control",
+      "name": "Missing Authorization"
+    },
+    "CWE-863": {
+      "ncsa": ["7.2"],
+      "category": "Access Control",
+      "name": "Incorrect Authorization"
+    }
+  }
+}

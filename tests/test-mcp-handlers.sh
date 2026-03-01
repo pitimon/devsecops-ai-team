@@ -128,7 +128,7 @@ RESULT=$(run_node_zod << 'TESTEOF'
 import { z } from "zod";
 const ComplianceSchema = z.object({
   findings_file: z.string().min(1),
-  frameworks: z.array(z.enum(["owasp","nist","mitre"])).optional(),
+  frameworks: z.array(z.enum(["owasp","nist","mitre","ncsa"])).optional(),
 });
 const r = ComplianceSchema.safeParse({ findings_file: "/tmp/f.json", frameworks: ["owasp","nist"] });
 console.log(r.success ? "PASS" : "FAIL");
@@ -141,7 +141,7 @@ RESULT=$(run_node_zod << 'TESTEOF'
 import { z } from "zod";
 const ComplianceSchema = z.object({
   findings_file: z.string().min(1),
-  frameworks: z.array(z.enum(["owasp","nist","mitre"])).optional(),
+  frameworks: z.array(z.enum(["owasp","nist","mitre","ncsa"])).optional(),
 });
 const r = ComplianceSchema.safeParse({ findings_file: "/tmp/f.json", frameworks: ["invalid"] });
 console.log(r.success ? "FAIL" : "PASS");
@@ -299,6 +299,32 @@ console.log(result.length === 1 && result[0].owasp === "A03:2021" ? "PASS" : "FA
 TESTEOF
 2>/dev/null)
 [ "$RESULT" = "PASS" ] && pass "Compliance: buildCrosswalk filters null CWEs and maps correctly" || fail "Compliance: buildCrosswalk logic failed"
+
+# Test: NCSA mapping file exists and has valid structure
+RESULT=$(node --input-type=module << TESTEOF
+import { readFileSync } from "node:fs";
+const data = JSON.parse(readFileSync("$ROOT_DIR/mappings/cwe-to-ncsa.json", "utf-8"));
+const hasMeta = data._meta && data._meta.ncsa_version === "1.0";
+const hasMappings = data.mappings && Object.keys(data.mappings).length >= 40;
+// CWE-89 (SQL Injection) should map to NCSA 5.4 (Input Validation)
+const has89 = data.mappings["CWE-89"] && data.mappings["CWE-89"].ncsa.includes("5.4");
+console.log(hasMeta && hasMappings && has89 ? "PASS" : "FAIL");
+TESTEOF
+2>/dev/null)
+[ "$RESULT" = "PASS" ] && pass "Compliance: NCSA mapping file valid with 40+ CWEs" || fail "Compliance: NCSA mapping file invalid"
+
+# Test: NCSA framework accepted by Zod schema
+RESULT=$(run_node_zod << 'TESTEOF'
+import { z } from "zod";
+const ComplianceSchema = z.object({
+  findings_file: z.string().min(1),
+  frameworks: z.array(z.enum(["owasp","nist","mitre","ncsa"])).optional(),
+});
+const r = ComplianceSchema.safeParse({ findings_file: "/tmp/f.json", frameworks: ["ncsa"] });
+console.log(r.success ? "PASS" : "FAIL");
+TESTEOF
+2>/dev/null)
+[ "$RESULT" = "PASS" ] && pass "Zod: ncsa framework accepted" || fail "Zod: ncsa framework should be accepted"
 
 # ═══════════════════════════════════════════
 # Helper Function Tests

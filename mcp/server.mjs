@@ -167,7 +167,7 @@ const TOOLS = [
   {
     name: "devsecops_compliance",
     description:
-      "Map findings to compliance frameworks (OWASP, NIST, MITRE ATT&CK). Returns cross-walk matrix.",
+      "Map findings to compliance frameworks (OWASP, NIST, MITRE ATT&CK, NCSA). Returns cross-walk matrix.",
     inputSchema: {
       type: "object",
       properties: {
@@ -179,7 +179,7 @@ const TOOLS = [
           type: "array",
           items: {
             type: "string",
-            enum: ["owasp", "nist", "mitre"],
+            enum: ["owasp", "nist", "mitre", "ncsa"],
           },
           description: "Frameworks to map against (default: all)",
         },
@@ -346,7 +346,7 @@ async function handleCompliance({ findings_file, frameworks }) {
   const results = readJsonFile(findings_file);
   if (!results) return mcpError(`Findings file not found: ${findings_file}`);
 
-  const targetFrameworks = frameworks || ["owasp", "nist", "mitre"];
+  const targetFrameworks = frameworks || ["owasp", "nist", "mitre", "ncsa"];
   const mappings = loadMappings(targetFrameworks);
   const findings = results.findings || [];
   const crosswalk = buildCrosswalk(findings, mappings);
@@ -446,7 +446,7 @@ const GateSchema = z.object({
 
 const ComplianceSchema = z.object({
   findings_file: z.string().min(1),
-  frameworks: z.array(z.enum(["owasp", "nist", "mitre"])).optional(),
+  frameworks: z.array(z.enum(["owasp", "nist", "mitre", "ncsa"])).optional(),
 });
 
 const StatusSchema = z.object({}).passthrough();
