@@ -47,138 +47,128 @@ echo "[dispatcher] Tool: $TOOL"
 echo "[dispatcher] Target: $TARGET"
 echo "[dispatcher] Format: $FORMAT"
 
+LOG="${RESULTS_DIR}/dispatcher.log"
+
+run_semgrep() {
+  local RULE_ARG="${RULES:-p/security-audit}"
+  if [ "$RUNNER_MODE" = "full" ]; then
+    docker exec devsecops-semgrep semgrep \
+      --config "$RULE_ARG" \
+      --json --output "/results/${JOB_ID}/semgrep-results.json" \
+      "$TARGET" 2>>"$LOG"
+  else
+    docker run --rm \
+      -v "$(pwd):/workspace:ro" -v "${RESULTS_DIR}:/results" \
+      returntocorp/semgrep:latest \
+      semgrep --config "$RULE_ARG" --json --output "/results/semgrep-results.json" \
+      /workspace 2>>"$LOG"
+  fi
+}
+
+run_gitleaks() {
+  if [ "$RUNNER_MODE" = "full" ]; then
+    docker exec devsecops-gitleaks gitleaks detect \
+      --source "$TARGET" \
+      --report-path "/results/${JOB_ID}/gitleaks-results.json" \
+      --report-format json --no-banner 2>>"$LOG"
+  else
+    docker run --rm \
+      -v "$(pwd):/workspace:ro" -v "${RESULTS_DIR}:/results" \
+      zricethezav/gitleaks:latest detect \
+      --source /workspace --report-path /results/gitleaks-results.json \
+      --report-format json --no-banner 2>>"$LOG"
+  fi
+}
+
+run_grype() {
+  if [ "$RUNNER_MODE" = "full" ]; then
+    docker exec devsecops-grype grype \
+      "dir:${TARGET}" \
+      -o json --file "/results/${JOB_ID}/grype-results.json" 2>>"$LOG"
+  else
+    docker run --rm \
+      -v "$(pwd):/workspace:ro" -v "${RESULTS_DIR}:/results" \
+      -v "${HOME}/.cache/grype:/cache" \
+      anchore/grype:latest \
+      dir:/workspace -o json --file /results/grype-results.json 2>>"$LOG"
+  fi
+}
+
+run_trivy() {
+  local TRIVY_TARGET="${IMAGE:-$TARGET}"
+  local TRIVY_CMD="fs"
+  [ -n "$IMAGE" ] && TRIVY_CMD="image"
+  if [ "$RUNNER_MODE" = "full" ]; then
+    docker exec devsecops-trivy trivy "$TRIVY_CMD" \
+      --format json --output "/results/${JOB_ID}/trivy-results.json" \
+      "$TRIVY_TARGET" 2>>"$LOG"
+  else
+    docker run --rm \
+      -v "$(pwd):/workspace:ro" -v "${RESULTS_DIR}:/results" \
+      -v /var/run/docker.sock:/var/run/docker.sock:ro \
+      -v "${HOME}/.cache/trivy:/root/.cache/" \
+      aquasec/trivy:latest "$TRIVY_CMD" \
+      --format json --output /results/trivy-results.json \
+      "$TRIVY_TARGET" 2>>"$LOG"
+  fi
+}
+
+run_checkov() {
+  if [ "$RUNNER_MODE" = "full" ]; then
+    docker exec devsecops-checkov checkov \
+      -d "$TARGET" --output json \
+      --output-file-path "/results/${JOB_ID}/" 2>>"$LOG"
+  else
+    docker run --rm \
+      -v "$(pwd):/workspace:ro" -v "${RESULTS_DIR}:/results" \
+      bridgecrew/checkov:latest \
+      -d /workspace --output json \
+      --output-file-path /results/ 2>>"$LOG"
+  fi
+}
+
+run_zap() {
+  if [ "$RUNNER_MODE" = "full" ]; then
+    docker exec devsecops-zap zap-baseline.py \
+      -t "$TARGET" \
+      -J "/results/${JOB_ID}/zap-results.json" \
+      -r "/results/${JOB_ID}/zap-report.html" 2>>"$LOG"
+  else
+    docker run --rm \
+      -v "${RESULTS_DIR}:/results" --network host \
+      ghcr.io/zaproxy/zaproxy:stable zap-baseline.py \
+      -t "$TARGET" -J /results/zap-results.json 2>>"$LOG"
+  fi
+}
+
+run_syft() {
+  local SYFT_TARGET="${IMAGE:-dir:$TARGET}"
+  local SYFT_FORMAT="${FORMAT:-cyclonedx-json}"
+  if [ "$RUNNER_MODE" = "full" ]; then
+    docker exec devsecops-syft syft "$SYFT_TARGET" \
+      -o "$SYFT_FORMAT" --file "/results/${JOB_ID}/sbom.json" 2>>"$LOG"
+  else
+    docker run --rm \
+      -v "$(pwd):/workspace:ro" -v "${RESULTS_DIR}:/results" \
+      anchore/syft:latest "dir:/workspace" \
+      -o "$SYFT_FORMAT" --file /results/sbom.json 2>>"$LOG"
+  fi
+}
+
 run_tool() {
-  local EXIT_CODE=0
-  local LOG="${RESULTS_DIR}/dispatcher.log"
-
   case "$TOOL" in
-    semgrep)
-      local RULE_ARG="${RULES:-p/security-audit}"
-      if [ "$RUNNER_MODE" = "full" ]; then
-        docker exec devsecops-semgrep semgrep \
-          --config "$RULE_ARG" \
-          --json --output "/results/${JOB_ID}/semgrep-results.json" \
-          "$TARGET" 2>>"$LOG" || EXIT_CODE=$?
-      else
-        docker run --rm \
-          -v "$(pwd):/workspace:ro" \
-          -v "${RESULTS_DIR}:/results" \
-          returntocorp/semgrep:latest \
-          semgrep --config "$RULE_ARG" --json --output "/results/semgrep-results.json" \
-          /workspace 2>>"$LOG" || EXIT_CODE=$?
-      fi
-      ;;
-
-    gitleaks)
-      if [ "$RUNNER_MODE" = "full" ]; then
-        docker exec devsecops-gitleaks gitleaks detect \
-          --source "$TARGET" \
-          --report-path "/results/${JOB_ID}/gitleaks-results.json" \
-          --report-format json \
-          --no-banner 2>>"$LOG" || EXIT_CODE=$?
-      else
-        docker run --rm \
-          -v "$(pwd):/workspace:ro" \
-          -v "${RESULTS_DIR}:/results" \
-          zricethezav/gitleaks:latest detect \
-          --source /workspace \
-          --report-path /results/gitleaks-results.json \
-          --report-format json \
-          --no-banner 2>>"$LOG" || EXIT_CODE=$?
-      fi
-      ;;
-
-    grype)
-      local GRYPE_TARGET="${TARGET}"
-      if [ "$RUNNER_MODE" = "full" ]; then
-        docker exec devsecops-grype grype \
-          "dir:${GRYPE_TARGET}" \
-          -o json --file "/results/${JOB_ID}/grype-results.json" 2>>"$LOG" || EXIT_CODE=$?
-      else
-        docker run --rm \
-          -v "$(pwd):/workspace:ro" \
-          -v "${RESULTS_DIR}:/results" \
-          -v "${HOME}/.cache/grype:/cache" \
-          anchore/grype:latest \
-          dir:/workspace -o json --file /results/grype-results.json 2>>"$LOG" || EXIT_CODE=$?
-      fi
-      ;;
-
-    trivy)
-      local TRIVY_TARGET="${IMAGE:-$TARGET}"
-      local TRIVY_CMD="fs"
-      [ -n "$IMAGE" ] && TRIVY_CMD="image"
-      if [ "$RUNNER_MODE" = "full" ]; then
-        docker exec devsecops-trivy trivy "$TRIVY_CMD" \
-          --format json --output "/results/${JOB_ID}/trivy-results.json" \
-          "$TRIVY_TARGET" 2>>"$LOG" || EXIT_CODE=$?
-      else
-        docker run --rm \
-          -v "$(pwd):/workspace:ro" \
-          -v "${RESULTS_DIR}:/results" \
-          -v /var/run/docker.sock:/var/run/docker.sock:ro \
-          -v "${HOME}/.cache/trivy:/root/.cache/" \
-          aquasec/trivy:latest "$TRIVY_CMD" \
-          --format json --output /results/trivy-results.json \
-          "$TRIVY_TARGET" 2>>"$LOG" || EXIT_CODE=$?
-      fi
-      ;;
-
-    checkov)
-      if [ "$RUNNER_MODE" = "full" ]; then
-        docker exec devsecops-checkov checkov \
-          -d "$TARGET" \
-          --output json \
-          --output-file-path "/results/${JOB_ID}/" 2>>"$LOG" || EXIT_CODE=$?
-      else
-        docker run --rm \
-          -v "$(pwd):/workspace:ro" \
-          -v "${RESULTS_DIR}:/results" \
-          bridgecrew/checkov:latest \
-          -d /workspace --output json \
-          --output-file-path /results/ 2>>"$LOG" || EXIT_CODE=$?
-      fi
-      ;;
-
-    zap)
-      local ZAP_TARGET="${TARGET}"
-      if [ "$RUNNER_MODE" = "full" ]; then
-        docker exec devsecops-zap zap-baseline.py \
-          -t "$ZAP_TARGET" \
-          -J "/results/${JOB_ID}/zap-results.json" \
-          -r "/results/${JOB_ID}/zap-report.html" 2>>"$LOG" || EXIT_CODE=$?
-      else
-        docker run --rm \
-          -v "${RESULTS_DIR}:/results" \
-          --network host \
-          ghcr.io/zaproxy/zaproxy:stable zap-baseline.py \
-          -t "$ZAP_TARGET" \
-          -J /results/zap-results.json 2>>"$LOG" || EXIT_CODE=$?
-      fi
-      ;;
-
-    syft)
-      local SYFT_TARGET="${IMAGE:-dir:$TARGET}"
-      local SYFT_FORMAT="${FORMAT:-cyclonedx-json}"
-      if [ "$RUNNER_MODE" = "full" ]; then
-        docker exec devsecops-syft syft "$SYFT_TARGET" \
-          -o "$SYFT_FORMAT" --file "/results/${JOB_ID}/sbom.json" 2>>"$LOG" || EXIT_CODE=$?
-      else
-        docker run --rm \
-          -v "$(pwd):/workspace:ro" \
-          -v "${RESULTS_DIR}:/results" \
-          anchore/syft:latest "dir:/workspace" \
-          -o "$SYFT_FORMAT" --file /results/sbom.json 2>>"$LOG" || EXIT_CODE=$?
-      fi
-      ;;
-
+    semgrep)  run_semgrep ;;
+    gitleaks) run_gitleaks ;;
+    grype)    run_grype ;;
+    trivy)    run_trivy ;;
+    checkov)  run_checkov ;;
+    zap)      run_zap ;;
+    syft)     run_syft ;;
     *)
       echo "[dispatcher] ERROR: Unknown tool: $TOOL"
       exit 1
       ;;
   esac
-
-  return $EXIT_CODE
 }
 
 # Record start time

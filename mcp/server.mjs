@@ -82,6 +82,22 @@ function readJsonFile(filePath) {
   }
 }
 
+function mcpError(text) {
+  return { isError: true, content: [{ type: "text", text }] };
+}
+
+function mcpJson(data) {
+  return { content: [{ type: "text", text: JSON.stringify(data, null, 2) }] };
+}
+
+function checkExistence(dir, fileList) {
+  const status = {};
+  for (const f of fileList) {
+    status[f] = existsSync(resolve(dir, f));
+  }
+  return status;
+}
+
 // ─── Tool Definitions ───
 
 const TOOLS = [
@@ -205,18 +221,18 @@ const TOOLS = [
 
 // ─── Tool Handlers ───
 
+function readNormalizedFindings(jobId) {
+  if (!jobId) return null;
+  const normalizedPath = resolve(`/results/${jobId}`, "normalized.json");
+  return existsSync(normalizedPath) ? readJsonFile(normalizedPath) : null;
+}
+
 async function handleScan({ tool, target, rules, format }) {
   const dispatcher = resolve(RUNNER_DIR, "job-dispatcher.sh");
   if (!existsSync(dispatcher)) {
-    return {
-      isError: true,
-      content: [
-        {
-          type: "text",
-          text: "job-dispatcher.sh not found. Ensure the runner/ directory is intact.",
-        },
-      ],
-    };
+    return mcpError(
+      "job-dispatcher.sh not found. Ensure the runner/ directory is intact.",
+    );
   }
 
   const args = [dispatcher, "--tool", tool];
@@ -225,52 +241,34 @@ async function handleScan({ tool, target, rules, format }) {
   if (format) args.push("--format", format);
 
   const result = runCommand("bash", args, { timeout: 120_000 });
-
-  // Extract job_id from output
   const jobMatch = result.output.match(/Job:\s*(job-[\w-]+)/);
   const jobId = jobMatch ? jobMatch[1] : null;
+  const findings = readNormalizedFindings(jobId);
 
-  // Try to read normalized results
-  let findings = null;
-  if (jobId) {
-    const resultsDir = `/results/${jobId}`;
-    const normalizedPath = resolve(resultsDir, "normalized.json");
-    if (existsSync(normalizedPath)) {
-      findings = readJsonFile(normalizedPath);
-    }
-  }
-
-  return {
-    content: [
-      {
-        type: "text",
-        text: JSON.stringify(
-          {
-            job_id: jobId,
-            tool,
-            target: target || "/workspace",
-            success: result.success,
-            exit_code: result.exitCode || 0,
-            findings: findings?.findings || [],
-            summary: findings?.summary || {},
-            output: result.output,
-            error: result.error || null,
-          },
-          null,
-          2,
-        ),
-      },
-    ],
-  };
+  return mcpJson({
+    job_id: jobId,
+    tool,
+    target: target || "/workspace",
+    success: result.success,
+    exit_code: result.exitCode || 0,
+    findings: findings?.findings || [],
+    summary: findings?.summary || {},
+    output: result.output,
+    error: result.error || null,
+  });
 }
+
+const FORMAT_EXT_MAP = {
+  json: "normalized.json",
+  sarif: "results.sarif",
+  markdown: "results.md",
+  html: "results.html",
+};
 
 async function handleResults({ job_id, format }) {
   const collector = resolve(RUNNER_DIR, "result-collector.sh");
   if (!existsSync(collector)) {
-    return {
-      isError: true,
-      content: [{ type: "text", text: "result-collector.sh not found." }],
-    };
+    return mcpError("result-collector.sh not found.");
   }
 
   const fmt = format || "json";
@@ -280,19 +278,10 @@ async function handleResults({ job_id, format }) {
     { timeout: 30_000 },
   );
 
-  // Try to read the formatted output
-  const resultsDir = `/results/${job_id}`;
-  const formatExtMap = {
-    json: "normalized.json",
-    sarif: "results.sarif",
-    markdown: "results.md",
-    html: "results.html",
-  };
   const outputFile = resolve(
-    resultsDir,
-    formatExtMap[fmt] || "normalized.json",
+    `/results/${job_id}`,
+    FORMAT_EXT_MAP[fmt] || "normalized.json",
   );
-
   let content = result.output;
   if (existsSync(outputFile)) {
     try {
@@ -302,110 +291,62 @@ async function handleResults({ job_id, format }) {
     }
   }
 
-  return {
-    content: [{ type: "text", text: content }],
-  };
+  return { content: [{ type: "text", text: content }] };
+}
+
+function evaluateGateViolations(summary, failOn) {
+  const violations = [];
+  for (const severity of failOn) {
+    const count = summary[severity.toLowerCase()] || 0;
+    if (count > 0) {
+      violations.push({ severity: severity.toUpperCase(), found: count });
+    }
+  }
+  return violations;
 }
 
 async function handleGate({ results_file, role, policy_file }) {
   const policyPath =
     policy_file || resolve(MAPPINGS_DIR, "severity-policy.json");
   const policy = readJsonFile(policyPath);
+  if (!policy) return mcpError(`Policy file not found: ${policyPath}`);
   const results = readJsonFile(results_file);
+  if (!results) return mcpError(`Results file not found: ${results_file}`);
 
-  if (!policy) {
-    return {
-      isError: true,
-      content: [{ type: "text", text: `Policy file not found: ${policyPath}` }],
-    };
-  }
-  if (!results) {
-    return {
-      isError: true,
-      content: [
-        { type: "text", text: `Results file not found: ${results_file}` },
-      ],
-    };
-  }
-
-  // RBAC: resolve role from policy
   const roleName = role || policy.default_role || "developer";
   const roleConfig = policy.roles?.[roleName];
   if (!roleConfig) {
-    return {
-      isError: true,
-      content: [
-        {
-          type: "text",
-          text: `Unknown role: ${roleName}. Available roles: ${Object.keys(policy.roles || {}).join(", ")}`,
-        },
-      ],
-    };
+    return mcpError(
+      `Unknown role: ${roleName}. Available: ${Object.keys(policy.roles || {}).join(", ")}`,
+    );
   }
 
-  const findings = results.findings || [];
   const summary = results.summary || {};
   const failOn = roleConfig.fail_on || ["CRITICAL"];
-  const violations = [];
+  const violations = evaluateGateViolations(summary, failOn);
 
-  for (const severity of failOn) {
-    const key = severity.toLowerCase();
-    const count = summary[key] || 0;
-    if (count > 0) {
-      violations.push({
-        severity: severity.toUpperCase(),
-        found: count,
-      });
-    }
-  }
-
-  const gate = violations.length === 0 ? "PASS" : "FAIL";
-
-  return {
-    content: [
-      {
-        type: "text",
-        text: JSON.stringify(
-          {
-            gate,
-            role: roleName,
-            fail_on: failOn,
-            violations,
-            summary,
-            total_findings: findings.length,
-            policy_file: policyPath,
-          },
-          null,
-          2,
-        ),
-      },
-    ],
-  };
+  return mcpJson({
+    gate: violations.length === 0 ? "PASS" : "FAIL",
+    role: roleName,
+    fail_on: failOn,
+    violations,
+    summary,
+    total_findings: (results.findings || []).length,
+    policy_file: policyPath,
+  });
 }
 
-async function handleCompliance({ findings_file, frameworks }) {
-  const results = readJsonFile(findings_file);
-  if (!results) {
-    return {
-      isError: true,
-      content: [
-        { type: "text", text: `Findings file not found: ${findings_file}` },
-      ],
-    };
-  }
-
-  const targetFrameworks = frameworks || ["owasp", "nist", "mitre"];
+function loadMappings(frameworkList) {
   const mappings = {};
-
-  for (const fw of targetFrameworks) {
-    const mappingFile = resolve(MAPPINGS_DIR, `cwe-to-${fw}.json`);
-    if (existsSync(mappingFile)) {
-      mappings[fw] = readJsonFile(mappingFile) || {};
-    }
+  for (const fw of frameworkList) {
+    const file = resolve(MAPPINGS_DIR, `cwe-to-${fw}.json`);
+    if (existsSync(file)) mappings[fw] = readJsonFile(file) || {};
   }
+  return mappings;
+}
 
-  const findings = results.findings || [];
-  const crosswalk = findings
+function buildCrosswalk(findings, mappings) {
+  return findings
     .filter((f) => f.cwe_id)
     .map((f) => {
       const entry = {
@@ -415,114 +356,85 @@ async function handleCompliance({ findings_file, frameworks }) {
         title: f.title,
       };
       for (const [fw, mapping] of Object.entries(mappings)) {
-        const cweKey = f.cwe_id.replace("CWE-", "");
-        entry[fw] = mapping[cweKey] || mapping[f.cwe_id] || null;
+        const key = f.cwe_id.replace("CWE-", "");
+        entry[fw] = mapping[key] || mapping[f.cwe_id] || null;
       }
       return entry;
     });
-
-  return {
-    content: [
-      {
-        type: "text",
-        text: JSON.stringify(
-          {
-            frameworks: targetFrameworks,
-            total_findings: findings.length,
-            mapped_findings: crosswalk.length,
-            unmapped: findings.length - crosswalk.length,
-            crosswalk,
-          },
-          null,
-          2,
-        ),
-      },
-    ],
-  };
 }
 
-async function handleStatus() {
-  // Check Docker
+async function handleCompliance({ findings_file, frameworks }) {
+  const results = readJsonFile(findings_file);
+  if (!results) return mcpError(`Findings file not found: ${findings_file}`);
+
+  const targetFrameworks = frameworks || ["owasp", "nist", "mitre"];
+  const mappings = loadMappings(targetFrameworks);
+  const findings = results.findings || [];
+  const crosswalk = buildCrosswalk(findings, mappings);
+
+  return mcpJson({
+    frameworks: targetFrameworks,
+    total_findings: findings.length,
+    mapped_findings: crosswalk.length,
+    unmapped: findings.length - crosswalk.length,
+    crosswalk,
+  });
+}
+
+const TOOL_IMAGES = {
+  semgrep: "returntocorp/semgrep",
+  gitleaks: "zricethezav/gitleaks",
+  grype: "anchore/grype",
+  trivy: "aquasec/trivy",
+  checkov: "bridgecrew/checkov",
+  zap: "ghcr.io/zaproxy/zaproxy",
+  syft: "anchore/syft",
+};
+
+function checkDockerTools() {
   const dockerResult = runCommand(
     "docker",
     ["info", "--format", "{{.ServerVersion}}"],
-    {
-      timeout: 5_000,
-    },
+    { timeout: 5_000 },
   );
-  const dockerAvailable = dockerResult.success;
-  const dockerVersion = dockerAvailable ? dockerResult.output : null;
+  if (!dockerResult.success)
+    return { available: false, version: null, tools: {} };
 
-  // Check available images
-  const toolImages = {
-    semgrep: "returntocorp/semgrep",
-    gitleaks: "zricethezav/gitleaks",
-    grype: "anchore/grype",
-    trivy: "aquasec/trivy",
-    checkov: "bridgecrew/checkov",
-    zap: "ghcr.io/zaproxy/zaproxy",
-    syft: "anchore/syft",
-  };
-
-  const availableTools = {};
-  if (dockerAvailable) {
-    const imagesResult = runCommand(
-      "docker",
-      ["images", "--format", "{{.Repository}}:{{.Tag}}"],
-      { timeout: 5_000 },
-    );
-    const installedImages = imagesResult.success
-      ? imagesResult.output.split("\n")
-      : [];
-
-    for (const [tool, image] of Object.entries(toolImages)) {
-      availableTools[tool] = {
-        image,
-        installed: installedImages.some((i) => i.startsWith(image)),
-      };
-    }
+  const imagesResult = runCommand(
+    "docker",
+    ["images", "--format", "{{.Repository}}:{{.Tag}}"],
+    { timeout: 5_000 },
+  );
+  const installed = imagesResult.success ? imagesResult.output.split("\n") : [];
+  const tools = {};
+  for (const [tool, image] of Object.entries(TOOL_IMAGES)) {
+    tools[tool] = {
+      image,
+      installed: installed.some((i) => i.startsWith(image)),
+    };
   }
+  return { available: true, version: dockerResult.output, tools };
+}
 
-  // Check runner scripts
-  const scripts = ["job-dispatcher.sh", "result-collector.sh"];
-  const runnerStatus = {};
-  for (const script of scripts) {
-    runnerStatus[script] = existsSync(resolve(RUNNER_DIR, script));
-  }
+async function handleStatus() {
+  const docker = checkDockerTools();
 
-  // Check formatters
-  const formatters = [
-    "json-normalizer.sh",
-    "sarif-formatter.sh",
-    "markdown-formatter.sh",
-    "html-formatter.sh",
-    "dedup-findings.sh",
-  ];
-  const formatterStatus = {};
-  for (const fmt of formatters) {
-    formatterStatus[fmt] = existsSync(resolve(FORMATTER_DIR, fmt));
-  }
-
-  return {
-    content: [
-      {
-        type: "text",
-        text: JSON.stringify(
-          {
-            docker: { available: dockerAvailable, version: dockerVersion },
-            tools: availableTools,
-            runner: runnerStatus,
-            formatters: formatterStatus,
-            mappings: readdirSync(MAPPINGS_DIR).filter((f) =>
-              f.endsWith(".json"),
-            ),
-          },
-          null,
-          2,
-        ),
-      },
-    ],
-  };
+  return mcpJson({
+    docker: { available: docker.available, version: docker.version },
+    tools: docker.tools,
+    runner: checkExistence(RUNNER_DIR, [
+      "job-dispatcher.sh",
+      "result-collector.sh",
+    ]),
+    formatters: checkExistence(FORMATTER_DIR, [
+      "json-normalizer.sh",
+      "sarif-formatter.sh",
+      "markdown-formatter.sh",
+      "html-formatter.sh",
+      "dedup-findings.sh",
+    ]),
+    mappings: readdirSync(MAPPINGS_DIR).filter((f) => f.endsWith(".json")),
+  });
 }
 
 // ─── Zod Schemas ───
