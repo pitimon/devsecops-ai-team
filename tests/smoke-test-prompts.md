@@ -76,6 +76,12 @@ Manual functional test scenarios for each skill and agent.
 2. "Run the security gate check"
 3. "Pass/fail decision for production release"
 
+### /auto-fix
+
+1. "Fix all critical vulnerabilities automatically"
+2. "Auto-fix the SAST findings"
+3. "Apply security patches --dry-run"
+
 ## Agents (trigger keywords)
 
 ### Orchestrators

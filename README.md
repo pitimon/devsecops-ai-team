@@ -1,7 +1,7 @@
 <p align="center">
   <img src="https://img.shields.io/badge/Claude_Code-Plugin-blueviolet?style=for-the-badge&logo=anthropic" alt="Claude Code Plugin">
   <img src="https://img.shields.io/badge/Agents-18-blue?style=for-the-badge" alt="18 Agents">
-  <img src="https://img.shields.io/badge/Skills-12-green?style=for-the-badge" alt="12 Skills">
+  <img src="https://img.shields.io/badge/Skills-13-green?style=for-the-badge" alt="13 Skills">
   <img src="https://img.shields.io/badge/Tools-7-orange?style=for-the-badge" alt="7 Tools">
   <img src="https://img.shields.io/badge/Version-2.2.1-brightgreen?style=for-the-badge" alt="v2.2.1">
   <img src="https://img.shields.io/badge/Tests-354%2F354-success?style=for-the-badge" alt="Tests">
@@ -228,7 +228,7 @@ MCP server จะถูก load อัตโนมัติผ่าน `.mcp.js
 
 ---
 
-## 12 Skills — คำสั่งทั้งหมด
+## 13 Skills — คำสั่งทั้งหมด
 
 ### Security Scanning
 
@@ -251,6 +251,7 @@ MCP server จะถูก load อัตโนมัติผ่าน `.mcp.js
 | `/compliance-report` | Map findings ไปยัง NIST 800-53, OWASP Top 10, MITRE ATT&CK  | On-the-Loop   |
 | `/incident-response` | สร้าง IR playbook ตาม NIST 800-61 เมื่อพบ CRITICAL findings | In-the-Loop   |
 | `/security-gate`     | ตัดสินใจ pass/fail ตาม severity policy ก่อน deploy          | In-the-Loop   |
+| `/auto-fix`          | อ่านผล scan → สร้าง patch → ขออนุมัติ → แก้ code → re-scan  | On-the-Loop   |
 
 > **Decision Loop** อธิบายระดับการตัดสินใจ:
 >
@@ -588,7 +589,7 @@ devsecops-ai-team/
 │   ├── specialists/         #   7 specialist agents (sast, dast, sca, container, iac, secret, sbom)
 │   ├── experts/             #   4 expert agents (compliance, threat, triage, remediation)
 │   └── core-team/           #   4 core team agents (reviewer, IR, report, guardian)
-├── skills/                  # 12 skill definitions (SKILL.md)
+├── skills/                  # 13 skill definitions (SKILL.md)
 │   └── references/          # 10 domain knowledge files (~500-800 lines each)
 ├── runner/                  # Sidecar Runner (Dockerfile, compose, dispatcher, collector)
 ├── formatters/              # SARIF, Markdown, HTML, JSON normalizer, dedup (v2.0)
