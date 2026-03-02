@@ -67,18 +67,25 @@ run_semgrep() {
     A09_ARG="--config /rules/a09-logging-rules.yml"
     echo "[dispatcher] A09 custom rules detected: $A09_RULES" >>"$LOG"
   fi
+  # Load A10 custom rules if available
+  local A10_RULES="${SCRIPT_DIR}/../rules/a10-ssrf-rules.yml"
+  local A10_ARG=""
+  if [ -f "$A10_RULES" ]; then
+    A10_ARG="--config /rules/a10-ssrf-rules.yml"
+    echo "[dispatcher] A10 custom rules detected: $A10_RULES" >>"$LOG"
+  fi
   if [ "$RUNNER_MODE" = "full" ]; then
     docker exec devsecops-semgrep semgrep \
-      --config "$RULE_ARG" $A09_ARG \
+      --config "$RULE_ARG" $A09_ARG $A10_ARG \
       --json --output "/results/${JOB_ID}/semgrep-results.json" \
       "$TARGET" 2>>"$LOG"
   else
     local VOLUME_ARGS="-v $(pwd):/workspace:ro -v ${RESULTS_DIR}:/results"
-    [ -n "$A09_ARG" ] && VOLUME_ARGS="$VOLUME_ARGS -v $(cd "$SCRIPT_DIR/.." && pwd)/rules:/rules:ro"
+    [ -n "$A09_ARG" ] || [ -n "$A10_ARG" ] && VOLUME_ARGS="$VOLUME_ARGS -v $(cd "$SCRIPT_DIR/.." && pwd)/rules:/rules:ro"
     docker run --rm \
       $VOLUME_ARGS \
       returntocorp/semgrep:latest \
-      semgrep --config "$RULE_ARG" $A09_ARG --json --output "/results/semgrep-results.json" \
+      semgrep --config "$RULE_ARG" $A09_ARG $A10_ARG --json --output "/results/semgrep-results.json" \
       /workspace 2>>"$LOG"
   fi
 }
