@@ -5,6 +5,7 @@ set -euo pipefail
 # Routes scan jobs to appropriate tool containers
 #
 # Usage: job-dispatcher.sh --tool <tool> --target <path> [--rules <rules>] [--format <format>] [--image <image>]
+#        ZAP options: [--mode baseline|full|api] [--auth-token <token>] [--api-spec <path>]
 #
 # Tools: semgrep, gitleaks, grype, trivy, checkov, zap, syft
 
@@ -13,6 +14,9 @@ TARGET=""
 RULES=""
 FORMAT="json"
 IMAGE=""
+ZAP_MODE="baseline"
+AUTH_TOKEN=""
+API_SPEC=""
 JOB_ID="job-$(date +%Y%m%d-%H%M%S)-$$"
 RESULTS_DIR="/results/${JOB_ID}"
 RUNNER_MODE="${RUNNER_MODE:-minimal}"
@@ -20,9 +24,11 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 usage() {
   echo "Usage: $0 --tool <tool> --target <path> [--rules <rules>] [--format <format>] [--image <image>]"
+  echo "       ZAP: [--mode baseline|full|api] [--auth-token <token>] [--api-spec <path>]"
   echo ""
   echo "Tools: semgrep, gitleaks, grype, trivy, checkov, zap, syft"
   echo "Formats: json (default), sarif, text"
+  echo "ZAP modes: baseline (default, 120s), full (1800s), api (600s)"
   exit 1
 }
 
@@ -33,6 +39,9 @@ while [[ $# -gt 0 ]]; do
     --rules) RULES="$2"; shift 2 ;;
     --format) FORMAT="$2"; shift 2 ;;
     --image) IMAGE="$2"; shift 2 ;;
+    --mode) ZAP_MODE="$2"; shift 2 ;;
+    --auth-token) AUTH_TOKEN="$2"; shift 2 ;;
+    --api-spec) API_SPEC="$2"; shift 2 ;;
     *) usage ;;
   esac
 done
@@ -128,16 +137,54 @@ run_checkov() {
 }
 
 run_zap() {
+  # Determine ZAP scan script and timeout based on --mode
+  local ZAP_SCRIPT="zap-baseline.py"
+  local ZAP_TIMEOUT=120
+  local ZAP_EXTRA_ARGS=""
+
+  case "$ZAP_MODE" in
+    baseline)
+      ZAP_SCRIPT="zap-baseline.py"
+      ZAP_TIMEOUT=120
+      ;;
+    full)
+      ZAP_SCRIPT="zap-full-scan.py"
+      ZAP_TIMEOUT=1800
+      ZAP_EXTRA_ARGS="-a -j"
+      ;;
+    api)
+      ZAP_SCRIPT="zap-api-scan.py"
+      ZAP_TIMEOUT=600
+      if [ -n "$API_SPEC" ]; then
+        ZAP_EXTRA_ARGS="-f openapi"
+        TARGET="$API_SPEC"
+      fi
+      ;;
+    *)
+      echo "[dispatcher] ERROR: Unknown ZAP mode: $ZAP_MODE (use baseline|full|api)"
+      exit 1
+      ;;
+  esac
+
+  # Add auth token if provided
+  if [ -n "$AUTH_TOKEN" ]; then
+    ZAP_EXTRA_ARGS="$ZAP_EXTRA_ARGS -z \"-config replacer.full_list(0).matchtype=REQ_HEADER -config replacer.full_list(0).matchstr=Authorization -config replacer.full_list(0).replacement='Bearer ${AUTH_TOKEN}'\""
+  fi
+
+  echo "[dispatcher] ZAP mode: $ZAP_MODE (script: $ZAP_SCRIPT, timeout: ${ZAP_TIMEOUT}s)" >>"$LOG"
+
   if [ "$RUNNER_MODE" = "full" ]; then
-    docker exec devsecops-zap zap-baseline.py \
+    timeout "$ZAP_TIMEOUT" docker exec devsecops-zap "$ZAP_SCRIPT" \
       -t "$TARGET" \
       -J "/results/${JOB_ID}/zap-results.json" \
-      -r "/results/${JOB_ID}/zap-report.html" 2>>"$LOG"
+      -r "/results/${JOB_ID}/zap-report.html" \
+      $ZAP_EXTRA_ARGS 2>>"$LOG"
   else
-    docker run --rm \
+    timeout "$ZAP_TIMEOUT" docker run --rm \
       -v "${RESULTS_DIR}:/results" --network host \
-      ghcr.io/zaproxy/zaproxy:stable zap-baseline.py \
-      -t "$TARGET" -J /results/zap-results.json 2>>"$LOG"
+      ghcr.io/zaproxy/zaproxy:stable "$ZAP_SCRIPT" \
+      -t "$TARGET" -J /results/zap-results.json \
+      $ZAP_EXTRA_ARGS 2>>"$LOG"
   fi
 }
 
