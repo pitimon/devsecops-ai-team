@@ -3,7 +3,7 @@
   <img src="https://img.shields.io/badge/Agents-18-blue?style=for-the-badge" alt="18 Agents">
   <img src="https://img.shields.io/badge/Skills-13-green?style=for-the-badge" alt="13 Skills">
   <img src="https://img.shields.io/badge/Tools-7-orange?style=for-the-badge" alt="7 Tools">
-  <img src="https://img.shields.io/badge/Version-2.2.1-brightgreen?style=for-the-badge" alt="v2.2.1">
+  <img src="https://img.shields.io/badge/Version-2.3.0-brightgreen?style=for-the-badge" alt="v2.3.0">
   <img src="https://img.shields.io/badge/Tests-354%2F354-success?style=for-the-badge" alt="Tests">
   <img src="https://img.shields.io/badge/MCP-5_Tools-purple?style=for-the-badge" alt="MCP">
   <img src="https://img.shields.io/badge/License-MIT-yellow?style=for-the-badge" alt="MIT License">
@@ -37,9 +37,9 @@
 
 ## What's New
 
-> ดู [CHANGELOG.md](CHANGELOG.md) สำหรับรายละเอียดทั้งหมด (v1.0.0 → v2.2.1)
+> ดู [CHANGELOG.md](CHANGELOG.md) สำหรับรายละเอียดทั้งหมด (v1.0.0 → v2.3.0)
 
-### v2.2.1 — NCSA Compliance Mapping
+### v2.3.0 — NCSA Compliance Mapping
 
 - **NCSA Website Security Standard v1.0** — 62 CWE mappings across 7 categories (มาตรฐานความมั่นคงปลอดภัยเว็บไซต์ สพธอ.)
 - **MCP `ncsa` framework support** — `devsecops_compliance` รองรับ NCSA framework
@@ -618,7 +618,7 @@ devsecops-ai-team/
 | [FRAMEWORK-UPDATE-RUNBOOK.md](docs/FRAMEWORK-UPDATE-RUNBOOK.md) | ขั้นตอนอัพเดท framework versions                   |
 | [MANDAY-ESTIMATION.md](docs/MANDAY-ESTIMATION.md)               | ROI analysis + cost comparison (10,222% ROI)       |
 | [CLAUDE.md](CLAUDE.md)                                          | Architecture + contributing guidelines             |
-| [CHANGELOG.md](CHANGELOG.md)                                    | Version history (v1.0.0 → v2.2.1)                  |
+| [CHANGELOG.md](CHANGELOG.md)                                    | Version history (v1.0.0 → v2.3.0)                  |
 | [SECURITY.md](SECURITY.md)                                      | Vulnerability reporting policy                     |
 
 ---
