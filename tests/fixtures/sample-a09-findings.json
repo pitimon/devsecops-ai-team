@@ -1,0 +1,106 @@
+{
+  "findings": [
+    {
+      "id": "FINDING-A09-001",
+      "source_tool": "semgrep",
+      "scan_type": "sast",
+      "rule_id": "a09-missing-auth-logging",
+      "severity": "WARNING",
+      "title": "Authentication function 'login' does not produce audit logs",
+      "cwe_id": "CWE-778",
+      "owasp": "A09:2021",
+      "location": {
+        "file": "src/auth/handlers.py",
+        "line_start": 15,
+        "line_end": 28
+      },
+      "message": "Authentication function 'login' does not produce audit logs. Security-relevant events (login, logout, password reset) MUST be logged per OWASP A09:2021 and NIST AU-2.",
+      "status": "open"
+    },
+    {
+      "id": "FINDING-A09-002",
+      "source_tool": "semgrep",
+      "scan_type": "sast",
+      "rule_id": "a09-catch-without-logging",
+      "severity": "WARNING",
+      "title": "Exception caught but not logged in payment processing",
+      "cwe_id": "CWE-390",
+      "owasp": "A09:2021",
+      "location": {
+        "file": "src/payments/processor.py",
+        "line_start": 42,
+        "line_end": 45
+      },
+      "message": "Exception caught but not logged. Silent error swallowing (CWE-390) prevents detection of security incidents.",
+      "status": "open"
+    },
+    {
+      "id": "FINDING-A09-003",
+      "source_tool": "semgrep",
+      "scan_type": "sast",
+      "rule_id": "a09-sensitive-data-in-log",
+      "severity": "ERROR",
+      "title": "Password logged in authentication flow",
+      "cwe_id": "CWE-532",
+      "owasp": "A09:2021",
+      "location": {
+        "file": "src/auth/handlers.py",
+        "line_start": 33,
+        "line_end": 33
+      },
+      "message": "Sensitive data 'password' is being written to log output (CWE-532). Credentials MUST NOT appear in logs.",
+      "status": "open"
+    },
+    {
+      "id": "FINDING-A09-004",
+      "source_tool": "semgrep",
+      "scan_type": "sast",
+      "rule_id": "a09-log-injection",
+      "severity": "WARNING",
+      "title": "Unsanitized request data in log statement",
+      "cwe_id": "CWE-117",
+      "owasp": "A09:2021",
+      "location": {
+        "file": "src/api/users.js",
+        "line_start": 22,
+        "line_end": 22
+      },
+      "message": "Unsanitized user input from request object in log statement (CWE-117). Use structured logging or sanitize input.",
+      "status": "open"
+    },
+    {
+      "id": "FINDING-A09-005",
+      "source_tool": "semgrep",
+      "scan_type": "sast",
+      "rule_id": "a09-missing-rate-limit-logging",
+      "severity": "INFO",
+      "title": "Rate limiting event not logged",
+      "cwe_id": "CWE-778",
+      "owasp": "A09:2021",
+      "location": {
+        "file": "src/middleware/rate-limiter.js",
+        "line_start": 18,
+        "line_end": 23
+      },
+      "message": "Rate limiting event not logged. When requests are throttled, log the event for security monitoring.",
+      "status": "open"
+    }
+  ],
+  "summary": {
+    "total": 5,
+    "critical": 0,
+    "high": 0,
+    "medium": 0,
+    "low": 0,
+    "info": 0,
+    "warning": 4,
+    "error": 1
+  },
+  "metadata": {
+    "rules_file": "rules/a09-logging-rules.yml",
+    "rule_count": 5,
+    "scan_type": "sast",
+    "owasp_category": "A09:2021",
+    "cwe_coverage": ["CWE-117", "CWE-223", "CWE-390", "CWE-532", "CWE-778"]
+  }
+}
