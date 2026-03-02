@@ -5,6 +5,47 @@ All notable changes to the DevSecOps AI Team plugin will be documented in this f
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.4.0] - 2026-03-02
+
+### Added
+
+- **A09 Custom Semgrep Rules** — 7 rules (5 categories) targeting OWASP A09:2021 anti-patterns:
+  - `a09-missing-auth-logging` (CWE-778): Auth functions without audit logs
+  - `a09-catch-without-logging` (CWE-390): Silent exception swallowing (Python + JS/TS)
+  - `a09-sensitive-data-in-log` (CWE-532): PII/secrets in log output (Python + JS/TS)
+  - `a09-log-injection` (CWE-117): Unsanitized request data in logs
+  - `a09-missing-rate-limit-logging` (CWE-778): Rate limit events not logged
+  - Auto-loaded by `job-dispatcher.sh` during SAST scans
+- **ZAP Multi-Mode Dispatcher** — 3 scan modes in `run_zap()`:
+  - `baseline` (default, 120s): passive scan via `zap-baseline.py`
+  - `full` (1800s): active scan via `zap-full-scan.py` with injection payloads
+  - `api` (600s): spec-driven scan via `zap-api-scan.py` with OpenAPI support
+  - `--auth-token` flag for authenticated scanning (Bearer token injection)
+  - `--api-spec` flag for OpenAPI/Swagger-driven API scans
+- **NCSA Website Security Validator** — `scripts/dast-ncsa-validator.sh`:
+  - NCSA 1.x: HTTP Security Headers (HSTS, X-Frame-Options, X-Content-Type-Options, CSP, Referrer-Policy)
+  - NCSA 2.x: Transport Security (TLS >= 1.2, HTTPS, certificate validity)
+  - NCSA 4.x: Session Management (Cookie Secure, HttpOnly, SameSite flags)
+  - ZAP results cross-reference (CWE → NCSA category mapping)
+  - JSON report output with pass/fail/warning per check
+- **DAST Live Testing** — `tests/test-dast-live.sh` (conditional on `DAST_TARGET` env var):
+  - ZAP baseline/full scan against real targets
+  - NCSA validation integration with live output
+  - Normalizer and gate evaluation on live results
+- **86 new tests** across 3 new suites:
+  - `test-a09-rules.sh` (28): rule YAML, metadata, CWE cross-ref, semgrep --validate
+  - `test-zap-modes.sh` (34): mode parsing, timeout, Docker commands, fixtures, docs
+  - `test-ncsa-validator.sh` (24): script structure, header checks, output format, NCSA mapping
+  - `test-dast-live.sh` (15 conditional): live ZAP + NCSA + normalizer integration
+
+### Changed
+
+- `runner/job-dispatcher.sh` — A09 rule auto-loading + ZAP multi-mode dispatch
+- `skills/dast-scan/SKILL.md` — 3 scan modes, NCSA validation step
+- `agents/specialists/dast-specialist.md` — mode selection decision tree
+- `skills/references/logging-monitoring.md` — Section 8: custom rules reference
+- **547 total tests** (was 461)
+
 ## [2.3.0] - 2026-03-02
 
 ### Added

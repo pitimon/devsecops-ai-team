@@ -3,8 +3,8 @@
   <img src="https://img.shields.io/badge/Agents-18-blue?style=for-the-badge" alt="18 Agents">
   <img src="https://img.shields.io/badge/Skills-13-green?style=for-the-badge" alt="13 Skills">
   <img src="https://img.shields.io/badge/Tools-7-orange?style=for-the-badge" alt="7 Tools">
-  <img src="https://img.shields.io/badge/Version-2.3.0-brightgreen?style=for-the-badge" alt="v2.3.0">
-  <img src="https://img.shields.io/badge/Tests-461%2F461-success?style=for-the-badge" alt="Tests">
+  <img src="https://img.shields.io/badge/Version-2.4.0-brightgreen?style=for-the-badge" alt="v2.4.0">
+  <img src="https://img.shields.io/badge/Tests-547%2F547-success?style=for-the-badge" alt="Tests">
   <img src="https://img.shields.io/badge/MCP-5_Tools-purple?style=for-the-badge" alt="MCP">
   <img src="https://img.shields.io/badge/License-MIT-yellow?style=for-the-badge" alt="MIT License">
 </p>
@@ -37,7 +37,15 @@
 
 ## What's New
 
-> ดู [CHANGELOG.md](CHANGELOG.md) สำหรับรายละเอียดทั้งหมด (v1.0.0 → v2.3.0)
+> ดู [CHANGELOG.md](CHANGELOG.md) สำหรับรายละเอียดทั้งหมด (v1.0.0 → v2.4.0)
+
+### v2.4.0 — DAST Infrastructure, A09 Detection & NCSA Validation
+
+- **A09 Custom Semgrep Rules** — 7 rules (5 categories) ตรวจจับ OWASP A09:2021 anti-patterns (CWE-117/390/532/778) ใน Python + JS/TS
+- **ZAP Multi-Mode Dispatcher** — 3 modes: `baseline` (passive, 120s), `full` (active, 1800s), `api` (OpenAPI, 600s) + authenticated scanning
+- **NCSA Website Security Validator** — ตรวจ HTTP Security Headers (1.x), Transport Security (2.x), Session Management (4.x) ตามมาตรฐาน สพธอ.
+- **DAST Live Testing** — conditional test suite สำหรับ live ZAP scan (ต้องตั้ง `DAST_TARGET`)
+- **547 tests** across 12 suites (was 461)
 
 ### v2.3.0 — NCSA Compliance Mapping
 
@@ -601,9 +609,10 @@ devsecops-ai-team/
 ├── hooks/                   # 3 hooks (session-start, scan-on-write, pre-commit-gate)
 ├── examples/                # Rules, policies, DOMAIN.md, Semgrep rules
 ├── scripts/                 # install-runner, install-rules, check-prerequisites
-├── tests/                   # 352 tests (validate 223, normalizer 41, MCP server 23, MCP handlers 23, hooks 27, dedup 15)
+├── tests/                   # 547 tests across 12 suites
 ├── docs/                    # INSTALL, TROUBLESHOOTING, AGENT-CATALOG, RUNBOOK, MANDAY
-└── frameworks.json          # 15 tracked security frameworks with version info
+├── rules/                   # Custom Semgrep rules (A09 logging/monitoring)
+└── frameworks.json          # 16 tracked security frameworks with version info
 ```
 
 ---
@@ -635,8 +644,11 @@ Dedup:            15/15  cross-tool deduplication tests passed
 Auto-Fix:         37/37  SKILL.md structure + agent config + routing tests passed
 DAST Integration: 22/22  ZAP fixture + normalizer + dispatcher tests passed
 MCP Integration:  37/37  Docker availability + handler logic + runner tests passed
+A09 Rules:        28/28  rule YAML + metadata + CWE cross-ref + semgrep --validate passed
+ZAP Modes:        34/34  mode parsing + timeout + Docker commands + fixtures passed
+NCSA Validator:   24/24  script structure + header checks + output format passed
 ──────────────────────────────────────────────────
-Total:           461/461 checks passed
+Total:           547/547 checks passed
 ```
 
 ### Run Tests Locally
@@ -651,6 +663,9 @@ bash tests/test-dedup.sh               # 15 dedup tests
 bash tests/test-auto-fix.sh            # 37 auto-fix skill tests
 bash tests/test-dast-integration.sh    # 22 DAST integration tests
 bash tests/test-mcp-integration.sh     # 37 MCP Docker integration tests
+bash tests/test-a09-rules.sh           # 28 A09 custom rules tests
+bash tests/test-zap-modes.sh           # 34 ZAP multi-mode tests
+bash tests/test-ncsa-validator.sh      # 24 NCSA validator tests
 ```
 
 ---
