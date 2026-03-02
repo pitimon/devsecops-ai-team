@@ -279,7 +279,7 @@ evidence:
 
 Reference: https://www.ncsa.or.th
 
-The NCSA (National Cyber Security Agency — สำนักงานคณะกรรมการการรักษาความมั่นคงปลอดภัยไซเบอร์แห่งชาติ) Website Security Standard v1.0 defines 31 security requirements across 7 categories. It is the Thai national standard for web application security.
+NCSA (National Cyber Security Agency — สำนักงานคณะกรรมการการรักษาความมั่นคงปลอดภัยไซเบอร์แห่งชาติ) กำหนดมาตรฐานความมั่นคงปลอดภัยเว็บไซต์ v1.0 ประกอบด้วย 31 ข้อกำหนดใน 7 หมวดหมู่ เป็นมาตรฐานระดับชาติสำหรับ web application security ในประเทศไทย
 
 ### 8.1 Standard Categories / หมวดหมู่
 
