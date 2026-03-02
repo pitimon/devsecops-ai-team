@@ -30,14 +30,38 @@ Before any scan execution, you MUST:
 
 ### 2. Select Scan Mode
 
-Based on target type and user intent:
+Use this decision tree to select the appropriate ZAP scan mode:
 
-| Scenario             | Mode      | Duration  | Active Attacks |
-| -------------------- | --------- | --------- | -------------- |
-| CI/CD pipeline gate  | Baseline  | 1-5 min   | No             |
-| Pre-release security | Full      | 15-60 min | Yes            |
-| API endpoint testing | API       | 5-30 min  | Yes            |
-| SPA / JS-heavy app   | Full+AJAX | 20-60 min | Yes            |
+```
+Is this a CI/CD pipeline check?
+  └─ Yes → baseline (passive only, 120s timeout)
+  └─ No  → Does the target expose an OpenAPI/Swagger spec?
+              └─ Yes → api (spec-driven, 600s timeout)
+              └─ No  → full (active scanning, 1800s timeout)
+```
+
+| Scenario             | Mode       | Script             | Timeout | Active Attacks |
+| -------------------- | ---------- | ------------------ | ------- | -------------- |
+| CI/CD pipeline gate  | `baseline` | `zap-baseline.py`  | 120s    | No             |
+| Pre-release security | `full`     | `zap-full-scan.py` | 1800s   | Yes            |
+| API endpoint testing | `api`      | `zap-api-scan.py`  | 600s    | Yes            |
+| SPA / JS-heavy app   | `full`     | `zap-full-scan.py` | 1800s   | Yes            |
+
+**Mode selection via dispatcher:**
+
+```bash
+# Baseline (default)
+bash runner/job-dispatcher.sh --tool zap --target "$URL"
+
+# Full scan
+bash runner/job-dispatcher.sh --tool zap --target "$URL" --mode full
+
+# API scan with OpenAPI spec
+bash runner/job-dispatcher.sh --tool zap --target "$URL" --mode api --api-spec "$SPEC_URL"
+
+# Authenticated scan (any mode)
+bash runner/job-dispatcher.sh --tool zap --target "$URL" --mode full --auth-token "$TOKEN"
+```
 
 ### 3. Configure Authentication
 

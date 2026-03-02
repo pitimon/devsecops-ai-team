@@ -1,0 +1,145 @@
+{
+  "@version": "2.15.0",
+  "@generated": "2026-03-02T12:00:00+07:00",
+  "site": [
+    {
+      "@name": "http://testapp.local:8080",
+      "@host": "testapp.local",
+      "@port": "8080",
+      "@ssl": "false",
+      "alerts": [
+        {
+          "pluginid": "40018",
+          "alertRef": "40018",
+          "alert": "SQL Injection",
+          "name": "SQL Injection",
+          "riskcode": "3",
+          "confidence": "3",
+          "riskdesc": "High (High)",
+          "desc": "SQL injection may be possible.",
+          "instances": [
+            {
+              "uri": "http://testapp.local:8080/api/users/search",
+              "method": "POST",
+              "param": "query",
+              "attack": "' OR '1'='1",
+              "evidence": "SQL syntax error"
+            }
+          ],
+          "count": "1",
+          "solution": "Use parameterized queries or prepared statements.",
+          "cweid": "89",
+          "wascid": "19"
+        },
+        {
+          "pluginid": "40012",
+          "alertRef": "40012",
+          "alert": "Cross Site Scripting (Reflected)",
+          "name": "Cross Site Scripting (Reflected)",
+          "riskcode": "3",
+          "confidence": "2",
+          "riskdesc": "High (Medium)",
+          "desc": "Cross-site scripting (reflected) vulnerability found.",
+          "instances": [
+            {
+              "uri": "http://testapp.local:8080/search",
+              "method": "GET",
+              "param": "q",
+              "attack": "<script>alert(1)</script>",
+              "evidence": "<script>alert(1)</script>"
+            }
+          ],
+          "count": "1",
+          "solution": "Validate and encode all user input.",
+          "cweid": "79",
+          "wascid": "8"
+        },
+        {
+          "pluginid": "10038",
+          "alertRef": "10038",
+          "alert": "Content Security Policy (CSP) Header Not Set",
+          "name": "Content Security Policy (CSP) Header Not Set",
+          "riskcode": "2",
+          "confidence": "3",
+          "riskdesc": "Medium (High)",
+          "desc": "Content Security Policy header is not set.",
+          "instances": [
+            { "uri": "http://testapp.local:8080/", "method": "GET" },
+            { "uri": "http://testapp.local:8080/login", "method": "GET" },
+            { "uri": "http://testapp.local:8080/dashboard", "method": "GET" },
+            { "uri": "http://testapp.local:8080/api/docs", "method": "GET" }
+          ],
+          "count": "4",
+          "solution": "Set CSP header with appropriate directives.",
+          "cweid": "693",
+          "wascid": "15"
+        },
+        {
+          "pluginid": "10202",
+          "alertRef": "10202",
+          "alert": "Absence of Anti-CSRF Tokens",
+          "name": "Absence of Anti-CSRF Tokens",
+          "riskcode": "2",
+          "confidence": "1",
+          "riskdesc": "Medium (Low)",
+          "desc": "No Anti-CSRF tokens were found in HTML forms.",
+          "instances": [
+            {
+              "uri": "http://testapp.local:8080/login",
+              "method": "GET",
+              "evidence": "<form action=\"/login\" method=\"POST\">"
+            },
+            {
+              "uri": "http://testapp.local:8080/settings",
+              "method": "GET",
+              "evidence": "<form action=\"/settings\" method=\"POST\">"
+            }
+          ],
+          "count": "2",
+          "solution": "Add anti-CSRF tokens to all forms.",
+          "cweid": "352",
+          "wascid": "9"
+        },
+        {
+          "pluginid": "10035",
+          "alertRef": "10035",
+          "alert": "Strict-Transport-Security Header Not Set",
+          "name": "Strict-Transport-Security Header Not Set",
+          "riskcode": "1",
+          "confidence": "3",
+          "riskdesc": "Low (High)",
+          "desc": "HTTP Strict Transport Security header is missing.",
+          "instances": [
+            { "uri": "http://testapp.local:8080/", "method": "GET" }
+          ],
+          "count": "1",
+          "solution": "Add HSTS header with appropriate max-age.",
+          "cweid": "319",
+          "wascid": "15"
+        },
+        {
+          "pluginid": "90033",
+          "alertRef": "90033",
+          "alert": "Loosely Scoped Cookie",
+          "name": "Loosely Scoped Cookie",
+          "riskcode": "0",
+          "confidence": "1",
+          "riskdesc": "Informational (Low)",
+          "desc": "Cookies set without proper scope.",
+          "instances": [
+            {
+              "uri": "http://testapp.local:8080/login",
+              "method": "POST",
+              "param": "SESSIONID",
+              "evidence": "Set-Cookie: SESSIONID=abc123; Path=/"
+            }
+          ],
+          "count": "1",
+          "solution": "Set cookie scope to the most restrictive path.",
+          "cweid": "565",
+          "wascid": "15"
+        }
+      ]
+    }
+  ]
+}
