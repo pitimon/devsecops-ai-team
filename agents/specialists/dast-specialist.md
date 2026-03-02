@@ -120,7 +120,26 @@ Assess each alert against OWASP Testing Guide v4.2 categories:
 - **Informational**: Best practice recommendation, no direct risk
 - **False positive**: WAF interference, framework-specific pattern, or CDN artifact
 
-### 6. Security Header Validation
+### 6. NCSA Validation
+
+After ZAP scan completes, run the NCSA Website Security Standard validator to check HTTP headers, TLS, and session management:
+
+```bash
+bash scripts/dast-ncsa-validator.sh \
+  --target "$TARGET_URL" \
+  --zap-results "$REPORT_DIR/report.json" \
+  --output "$REPORT_DIR/ncsa-report.json"
+```
+
+This validates:
+
+- **NCSA 1.x** — HTTP security headers (HSTS, X-Frame-Options, X-Content-Type-Options, CSP, Referrer-Policy)
+- **NCSA 2.x** — Transport security (TLS version >= 1.2, certificate validity)
+- **NCSA 4.x** — Session management (Cookie Secure, HttpOnly, SameSite flags)
+
+The validator cross-references ZAP findings with NCSA categories via CWE mapping and produces a JSON report with pass/fail/warning per sub-control.
+
+### 7. Security Header Validation
 
 Check all required headers per the header validation matrix:
 
