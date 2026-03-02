@@ -35,7 +35,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Skills count**: 12 → 13 (added `/auto-fix`)
 - **Reference files count**: 10 → 12 (added `software-integrity.md`, `logging-monitoring.md`)
 - **Test suites**: 6 → 9 (added `test-auto-fix.sh`, `test-dast-integration.sh`, `test-mcp-integration.sh`)
-- **Total tests**: 354 → 457 (+103 tests)
+- **Total tests**: 354 → 461 (+107 tests)
 - **`compliance-frameworks.md`** — expanded A08/A09 OWASP table rows with full CWE lists; NCSA Session 5→11 CWEs, Error 4→10 CWEs
 - **`sbom-generate/SKILL.md`** — loads `software-integrity.md` reference for A08 verification
 

@@ -4,7 +4,7 @@
   <img src="https://img.shields.io/badge/Skills-13-green?style=for-the-badge" alt="13 Skills">
   <img src="https://img.shields.io/badge/Tools-7-orange?style=for-the-badge" alt="7 Tools">
   <img src="https://img.shields.io/badge/Version-2.3.0-brightgreen?style=for-the-badge" alt="v2.3.0">
-  <img src="https://img.shields.io/badge/Tests-354%2F354-success?style=for-the-badge" alt="Tests">
+  <img src="https://img.shields.io/badge/Tests-461%2F461-success?style=for-the-badge" alt="Tests">
   <img src="https://img.shields.io/badge/MCP-5_Tools-purple?style=for-the-badge" alt="MCP">
   <img src="https://img.shields.io/badge/License-MIT-yellow?style=for-the-badge" alt="MIT License">
 </p>
@@ -590,7 +590,7 @@ devsecops-ai-team/
 │   ├── experts/             #   4 expert agents (compliance, threat, triage, remediation)
 │   └── core-team/           #   4 core team agents (reviewer, IR, report, guardian)
 ├── skills/                  # 13 skill definitions (SKILL.md)
-│   └── references/          # 12 domain knowledge files (~500-800 lines each)
+│   └── references/          # 16 domain knowledge files (~500-800 lines each)
 ├── runner/                  # Sidecar Runner (Dockerfile, compose, dispatcher, collector)
 ├── formatters/              # SARIF, Markdown, HTML, JSON normalizer, dedup (v2.0)
 ├── mcp/                     # MCP server — 5 tools (v2.0)
@@ -626,25 +626,31 @@ devsecops-ai-team/
 ## Testing & Quality
 
 ```
-Validation:  223/223 structural checks passed (incl. MCP + normalizer sections)
-Normalizer:   41/41  severity mapping + multi-array + null safety tests passed
-MCP Server:   23/23  config + syntax + tool definitions tests passed
-MCP Handlers: 25/25  Zod validation + gate logic + compliance crosswalk + NCSA passed
-Hooks:        27/27  session-start + scan-on-write + pre-commit-gate passed
-Dedup:        15/15  cross-tool deduplication tests passed
+Validation:      234/234 structural checks passed (incl. MCP + normalizer sections)
+Normalizer:       41/41  severity mapping + multi-array + null safety tests passed
+MCP Server:       23/23  config + syntax + tool definitions tests passed
+MCP Handlers:     25/25  Zod validation + gate logic + compliance crosswalk + NCSA passed
+Hooks:            27/27  session-start + scan-on-write + pre-commit-gate passed
+Dedup:            15/15  cross-tool deduplication tests passed
+Auto-Fix:         37/37  SKILL.md structure + agent config + routing tests passed
+DAST Integration: 22/22  ZAP fixture + normalizer + dispatcher tests passed
+MCP Integration:  37/37  Docker availability + handler logic + runner tests passed
 ──────────────────────────────────────────────────
-Total:       354/354 checks passed
+Total:           461/461 checks passed
 ```
 
 ### Run Tests Locally
 
 ```bash
-bash tests/validate-plugin.sh          # 223 structural checks
+bash tests/validate-plugin.sh          # 234 structural checks
 bash tests/test-normalizer.sh          # 41 normalizer unit tests
 bash tests/test-mcp-server.sh          # 23 MCP server tests
 bash tests/test-mcp-handlers.sh        # 25 MCP handler logic tests
 bash tests/test-hooks.sh               # 27 hook tests
 bash tests/test-dedup.sh               # 15 dedup tests
+bash tests/test-auto-fix.sh            # 37 auto-fix skill tests
+bash tests/test-dast-integration.sh    # 22 DAST integration tests
+bash tests/test-mcp-integration.sh     # 37 MCP Docker integration tests
 ```
 
 ---

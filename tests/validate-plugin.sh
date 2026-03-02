@@ -154,7 +154,7 @@ done
 echo ""
 echo "--- Section 9: Reference Files ---"
 
-EXPECTED_REFS="sast-patterns.md dast-methodology.md sca-supply-chain.md container-hardening.md iac-security-patterns.md secret-management.md compliance-frameworks.md threat-modeling.md incident-response.md remediation-patterns.md software-integrity.md logging-monitoring.md"
+EXPECTED_REFS="sast-patterns.md dast-methodology.md sca-supply-chain.md container-hardening.md iac-security-patterns.md secret-management.md compliance-frameworks.md threat-modeling.md incident-response.md remediation-patterns.md software-integrity.md logging-monitoring.md remediation-django.md remediation-react-nextjs.md remediation-express-node.md remediation-spring.md"
 REF_COUNT=0
 for ref in $EXPECTED_REFS; do
   if [ -f "$ROOT_DIR/skills/references/$ref" ]; then
@@ -164,7 +164,7 @@ for ref in $EXPECTED_REFS; do
     fail "reference $ref missing"
   fi
 done
-[ "$REF_COUNT" -eq 12 ] && pass "all 12 reference files present" || fail "expected 12 references, found $REF_COUNT"
+[ "$REF_COUNT" -eq 16 ] && pass "all 16 reference files present" || fail "expected 16 references, found $REF_COUNT"
 
 # ─── Section 10: Templates & Examples ───
 echo ""

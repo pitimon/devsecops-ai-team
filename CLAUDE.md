@@ -34,7 +34,7 @@ User prompt → keyword match in SKILL.md frontmatter
 | `.claude-plugin/plugin.json`      | Plugin manifest (name, version, skills path)       |
 | `.claude-plugin/marketplace.json` | Marketplace registry entry                         |
 | `skills/*/SKILL.md`               | Skill definitions (13 skills)                      |
-| `skills/references/*.md`          | On-demand domain knowledge (12 files)              |
+| `skills/references/*.md`          | On-demand domain knowledge (16 files)              |
 | `agents/*/`                       | Agent definitions (18 agents in 4 groups)          |
 | `hooks/hooks.json`                | Hook registrations (3 hooks)                       |
 | `runner/`                         | Sidecar Runner (Dockerfile, compose, scripts)      |
