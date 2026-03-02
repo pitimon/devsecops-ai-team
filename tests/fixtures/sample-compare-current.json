@@ -1,0 +1,100 @@
+{
+  "findings": [
+    {
+      "id": "CURR-001",
+      "source_tool": "semgrep",
+      "scan_type": "sast",
+      "rule_id": "a01-path-traversal",
+      "severity": "ERROR",
+      "title": "Path traversal in file upload",
+      "cwe_id": "CWE-22",
+      "owasp": "A01:2021",
+      "location": {
+        "file": "src/uploads/handler.py",
+        "line_start": 42,
+        "line_end": 42
+      },
+      "message": "Path traversal detected",
+      "status": "open"
+    },
+    {
+      "id": "CURR-002",
+      "source_tool": "semgrep",
+      "scan_type": "sast",
+      "rule_id": "a09-catch-without-logging",
+      "severity": "WARNING",
+      "title": "Silent exception in payment flow",
+      "cwe_id": "CWE-390",
+      "owasp": "A09:2021",
+      "location": {
+        "file": "src/payments/processor.py",
+        "line_start": 88,
+        "line_end": 91
+      },
+      "message": "Exception caught but not logged",
+      "status": "open"
+    },
+    {
+      "id": "CURR-003",
+      "source_tool": "semgrep",
+      "scan_type": "sast",
+      "rule_id": "a10-ssrf-user-url-python",
+      "severity": "ERROR",
+      "title": "SSRF via user URL",
+      "cwe_id": "CWE-918",
+      "owasp": "A10:2021",
+      "location": {
+        "file": "src/api/proxy.py",
+        "line_start": 35,
+        "line_end": 35
+      },
+      "message": "SSRF detected",
+      "status": "open"
+    },
+    {
+      "id": "CURR-004",
+      "source_tool": "semgrep",
+      "scan_type": "sast",
+      "rule_id": "a03-command-injection",
+      "severity": "ERROR",
+      "title": "Command injection in deploy script",
+      "cwe_id": "CWE-78",
+      "owasp": "A03:2021",
+      "location": {
+        "file": "src/deploy/runner.py",
+        "line_start": 55,
+        "line_end": 55
+      },
+      "message": "Command injection via os.system",
+      "status": "open"
+    },
+    {
+      "id": "CURR-005",
+      "source_tool": "semgrep",
+      "scan_type": "sast",
+      "rule_id": "a01-cors-wildcard",
+      "severity": "WARNING",
+      "title": "CORS allows all origins",
+      "cwe_id": "CWE-942",
+      "owasp": "A01:2021",
+      "location": {
+        "file": "src/api/config.py",
+        "line_start": 12,
+        "line_end": 12
+      },
+      "message": "CORS wildcard origin",
+      "status": "open"
+    }
+  ],
+  "summary": {
+    "total": 5,
+    "critical": 0,
+    "high": 0,
+    "medium": 0,
+    "low": 0,
+    "info": 0,
+    "warning": 2,
+    "error": 3
+  },
+  "metadata": { "scan_date": "2026-03-01T10:00:00Z", "scan_type": "sast" }
+}

@@ -5,11 +5,14 @@
  * Exposes security scanning tools as MCP tools via stdio transport.
  *
  * Tools:
- *   devsecops_scan       — Run a security scan
- *   devsecops_results    — Retrieve scan results in a given format
- *   devsecops_gate       — Evaluate severity policy gate
- *   devsecops_compliance — Cross-walk findings against compliance frameworks
- *   devsecops_status     — Check runner status and available images
+ *   devsecops_scan              — Run a security scan
+ *   devsecops_results           — Retrieve scan results in a given format
+ *   devsecops_gate              — Evaluate severity policy gate
+ *   devsecops_compliance        — Cross-walk findings against compliance frameworks
+ *   devsecops_status            — Check runner status and available images
+ *   devsecops_compare           — Compare two scan results for trend analysis
+ *   devsecops_compliance_status — Aggregate compliance status across all frameworks
+ *   devsecops_suggest_fix       — Suggest remediation for a finding
  */
 
 import { Server } from "@modelcontextprotocol/sdk/server/index.js";
@@ -194,6 +197,62 @@ const TOOLS = [
     inputSchema: {
       type: "object",
       properties: {},
+    },
+  },
+  {
+    name: "devsecops_compare",
+    description:
+      "Compare two scan results to show new, fixed, and unchanged findings. Returns trend analysis.",
+    inputSchema: {
+      type: "object",
+      properties: {
+        baseline_file: {
+          type: "string",
+          description: "Path to baseline/older scan results (normalized JSON)",
+        },
+        current_file: {
+          type: "string",
+          description: "Path to current/newer scan results (normalized JSON)",
+        },
+      },
+      required: ["baseline_file", "current_file"],
+    },
+  },
+  {
+    name: "devsecops_compliance_status",
+    description:
+      "Aggregate compliance status across all 4 frameworks (OWASP, NIST, MITRE, NCSA) for a findings file. Returns per-framework coverage and gaps.",
+    inputSchema: {
+      type: "object",
+      properties: {
+        findings_file: {
+          type: "string",
+          description: "Path to normalized JSON findings file",
+        },
+      },
+      required: ["findings_file"],
+    },
+  },
+  {
+    name: "devsecops_suggest_fix",
+    description:
+      "Suggest remediation for a finding based on CWE, OWASP category, and reference knowledge.",
+    inputSchema: {
+      type: "object",
+      properties: {
+        cwe_id: {
+          type: "string",
+          description: "CWE identifier (e.g., CWE-89)",
+        },
+        rule_id: {
+          type: "string",
+          description: "Semgrep rule ID (e.g., a03-sql-injection)",
+        },
+        finding_file: {
+          type: "string",
+          description: "Path to a specific finding JSON file",
+        },
+      },
     },
   },
 ];
@@ -416,6 +475,205 @@ async function handleStatus() {
   });
 }
 
+async function handleCompare({ baseline_file, current_file }) {
+  const baseline = readJsonFile(baseline_file);
+  if (!baseline) return mcpError(`Baseline file not found: ${baseline_file}`);
+  const current = readJsonFile(current_file);
+  if (!current) return mcpError(`Current file not found: ${current_file}`);
+
+  const baseFindings = baseline.findings || [];
+  const currFindings = current.findings || [];
+
+  // Match by rule_id + file + line_start for identity
+  const baseKeys = new Set(
+    baseFindings.map(
+      (f) => `${f.rule_id}:${f.location?.file}:${f.location?.line_start}`,
+    ),
+  );
+  const currKeys = new Set(
+    currFindings.map(
+      (f) => `${f.rule_id}:${f.location?.file}:${f.location?.line_start}`,
+    ),
+  );
+
+  const newFindings = currFindings.filter(
+    (f) =>
+      !baseKeys.has(
+        `${f.rule_id}:${f.location?.file}:${f.location?.line_start}`,
+      ),
+  );
+  const fixedFindings = baseFindings.filter(
+    (f) =>
+      !currKeys.has(
+        `${f.rule_id}:${f.location?.file}:${f.location?.line_start}`,
+      ),
+  );
+  const unchanged = currFindings.filter((f) =>
+    baseKeys.has(`${f.rule_id}:${f.location?.file}:${f.location?.line_start}`),
+  );
+
+  return mcpJson({
+    baseline_total: baseFindings.length,
+    current_total: currFindings.length,
+    new_findings: newFindings.length,
+    fixed_findings: fixedFindings.length,
+    unchanged: unchanged.length,
+    trend:
+      currFindings.length < baseFindings.length
+        ? "improving"
+        : currFindings.length > baseFindings.length
+          ? "degrading"
+          : "stable",
+    delta: currFindings.length - baseFindings.length,
+    new: newFindings,
+    fixed: fixedFindings,
+  });
+}
+
+async function handleComplianceStatus({ findings_file }) {
+  const results = readJsonFile(findings_file);
+  if (!results) return mcpError(`Findings file not found: ${findings_file}`);
+
+  const findings = results.findings || [];
+  const frameworks = ["owasp", "nist", "mitre", "ncsa"];
+  const mappings = loadMappings(frameworks);
+
+  const status = {};
+  for (const fw of frameworks) {
+    const mapping = mappings[fw];
+    if (!mapping) {
+      status[fw] = { available: false, mapped: 0, unmapped: 0 };
+      continue;
+    }
+    const mappingData = mapping.mappings || mapping;
+    let mapped = 0;
+    let unmapped = 0;
+    const mappedCwes = [];
+    const unmappedCwes = [];
+
+    for (const f of findings) {
+      if (!f.cwe_id) {
+        unmapped++;
+        continue;
+      }
+      const key = f.cwe_id;
+      if (mappingData[key]) {
+        mapped++;
+        if (!mappedCwes.includes(key)) mappedCwes.push(key);
+      } else {
+        unmapped++;
+        if (!unmappedCwes.includes(key)) unmappedCwes.push(key);
+      }
+    }
+    status[fw] = {
+      available: true,
+      mapped,
+      unmapped,
+      coverage_pct:
+        findings.length > 0 ? Math.round((mapped / findings.length) * 100) : 0,
+      mapped_cwes: mappedCwes,
+      unmapped_cwes: unmappedCwes,
+    };
+  }
+
+  return mcpJson({
+    total_findings: findings.length,
+    frameworks: status,
+  });
+}
+
+async function handleSuggestFix({ cwe_id, rule_id, finding_file }) {
+  // If finding_file provided, extract cwe_id and rule_id from it
+  let effectiveCwe = cwe_id;
+  let effectiveRule = rule_id;
+
+  if (finding_file) {
+    const finding = readJsonFile(finding_file);
+    if (finding) {
+      effectiveCwe =
+        effectiveCwe || finding.cwe_id || finding.findings?.[0]?.cwe_id;
+      effectiveRule =
+        effectiveRule || finding.rule_id || finding.findings?.[0]?.rule_id;
+    }
+  }
+
+  if (!effectiveCwe && !effectiveRule) {
+    return mcpError(
+      "Could not determine CWE or rule ID. Provide cwe_id, rule_id, or a valid finding_file.",
+    );
+  }
+
+  const suggestions = {
+    cwe_id: effectiveCwe,
+    rule_id: effectiveRule,
+    remediation: [],
+  };
+
+  // Look up CWE in OWASP mapping for category context
+  if (effectiveCwe) {
+    const owaspMap = readJsonFile(resolve(MAPPINGS_DIR, "cwe-to-owasp.json"));
+    if (owaspMap?.mappings?.[effectiveCwe]) {
+      suggestions.owasp = owaspMap.mappings[effectiveCwe];
+    }
+    const nistMap = readJsonFile(resolve(MAPPINGS_DIR, "cwe-to-nist.json"));
+    if (nistMap?.mappings?.[effectiveCwe]) {
+      suggestions.nist = nistMap.mappings[effectiveCwe];
+    }
+  }
+
+  // Check if rule is from custom rules — load fix from rules YAML
+  if (effectiveRule) {
+    const ruleFiles = [
+      "a01-access-control-rules.yml",
+      "a03-injection-rules.yml",
+      "a09-logging-rules.yml",
+      "a10-ssrf-rules.yml",
+    ];
+    for (const rf of ruleFiles) {
+      const rulePath = resolve(ROOT_DIR, "rules", rf);
+      if (existsSync(rulePath)) {
+        try {
+          const content = readFileSync(rulePath, "utf-8");
+          // Simple YAML parse — find the rule by id and extract fix
+          const ruleMatch = content.match(
+            new RegExp(`id:\\s*${effectiveRule}[\\s\\S]*?(?=\\n  - id:|$)`),
+          );
+          if (ruleMatch) {
+            const fixMatch = ruleMatch[0].match(
+              /fix:\s*\|\n([\s\S]*?)(?=\n\s{4}\w|\n  - id:|$)/,
+            );
+            if (fixMatch) {
+              suggestions.remediation.push({
+                source: rf,
+                fix: fixMatch[1].trim(),
+              });
+            }
+            const msgMatch = ruleMatch[0].match(
+              /message:\s*>\n\s*([\s\S]*?)(?=\n\s{4}\w)/,
+            );
+            if (msgMatch) {
+              suggestions.description = msgMatch[1]
+                .trim()
+                .replace(/\n\s+/g, " ");
+            }
+          }
+        } catch {
+          /* skip */
+        }
+      }
+    }
+  }
+
+  // Check reference files for broader guidance
+  const refDir = resolve(ROOT_DIR, "skills", "references");
+  if (existsSync(refDir)) {
+    const refFiles = readdirSync(refDir).filter((f) => f.endsWith(".md"));
+    suggestions.reference_files = refFiles;
+  }
+
+  return mcpJson(suggestions);
+}
+
 // ─── Zod Schemas ───
 
 const ScanSchema = z.object({
@@ -450,6 +708,25 @@ const ComplianceSchema = z.object({
 });
 
 const StatusSchema = z.object({}).passthrough();
+
+const CompareSchema = z.object({
+  baseline_file: z.string().min(1),
+  current_file: z.string().min(1),
+});
+
+const ComplianceStatusSchema = z.object({
+  findings_file: z.string().min(1),
+});
+
+const SuggestFixSchema = z
+  .object({
+    cwe_id: z.string().optional(),
+    rule_id: z.string().optional(),
+    finding_file: z.string().optional(),
+  })
+  .refine((data) => data.cwe_id || data.rule_id || data.finding_file, {
+    message: "At least one of cwe_id, rule_id, or finding_file is required",
+  });
 
 function validateInput(schema, args) {
   const result = schema.safeParse(args || {});
@@ -511,6 +788,21 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
     case "devsecops_status": {
       validateInput(StatusSchema, args);
       return handleStatus();
+    }
+    case "devsecops_compare": {
+      const v = validateInput(CompareSchema, args);
+      if (!v.valid) return v.error;
+      return handleCompare(v.data);
+    }
+    case "devsecops_compliance_status": {
+      const v = validateInput(ComplianceStatusSchema, args);
+      if (!v.valid) return v.error;
+      return handleComplianceStatus(v.data);
+    }
+    case "devsecops_suggest_fix": {
+      const v = validateInput(SuggestFixSchema, args);
+      if (!v.valid) return v.error;
+      return handleSuggestFix(v.data);
     }
     default:
       return {

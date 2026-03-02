@@ -1,0 +1,100 @@
+{
+  "findings": [
+    {
+      "id": "BASE-001",
+      "source_tool": "semgrep",
+      "scan_type": "sast",
+      "rule_id": "a03-sql-injection",
+      "severity": "ERROR",
+      "title": "SQL injection in user query",
+      "cwe_id": "CWE-89",
+      "owasp": "A03:2021",
+      "location": {
+        "file": "src/db/queries.py",
+        "line_start": 15,
+        "line_end": 15
+      },
+      "message": "SQL injection detected",
+      "status": "open"
+    },
+    {
+      "id": "BASE-002",
+      "source_tool": "semgrep",
+      "scan_type": "sast",
+      "rule_id": "a01-path-traversal",
+      "severity": "ERROR",
+      "title": "Path traversal in file upload",
+      "cwe_id": "CWE-22",
+      "owasp": "A01:2021",
+      "location": {
+        "file": "src/uploads/handler.py",
+        "line_start": 42,
+        "line_end": 42
+      },
+      "message": "Path traversal detected",
+      "status": "open"
+    },
+    {
+      "id": "BASE-003",
+      "source_tool": "semgrep",
+      "scan_type": "sast",
+      "rule_id": "a09-catch-without-logging",
+      "severity": "WARNING",
+      "title": "Silent exception in payment flow",
+      "cwe_id": "CWE-390",
+      "owasp": "A09:2021",
+      "location": {
+        "file": "src/payments/processor.py",
+        "line_start": 88,
+        "line_end": 91
+      },
+      "message": "Exception caught but not logged",
+      "status": "open"
+    },
+    {
+      "id": "BASE-004",
+      "source_tool": "semgrep",
+      "scan_type": "sast",
+      "rule_id": "a03-xss-dom",
+      "severity": "ERROR",
+      "title": "DOM XSS via innerHTML",
+      "cwe_id": "CWE-79",
+      "owasp": "A03:2021",
+      "location": {
+        "file": "src/components/Comment.jsx",
+        "line_start": 22,
+        "line_end": 22
+      },
+      "message": "XSS via innerHTML",
+      "status": "open"
+    },
+    {
+      "id": "BASE-005",
+      "source_tool": "semgrep",
+      "scan_type": "sast",
+      "rule_id": "a10-ssrf-user-url-python",
+      "severity": "ERROR",
+      "title": "SSRF via user URL",
+      "cwe_id": "CWE-918",
+      "owasp": "A10:2021",
+      "location": {
+        "file": "src/api/proxy.py",
+        "line_start": 35,
+        "line_end": 35
+      },
+      "message": "SSRF detected",
+      "status": "open"
+    }
+  ],
+  "summary": {
+    "total": 5,
+    "critical": 0,
+    "high": 0,
+    "medium": 0,
+    "low": 0,
+    "info": 0,
+    "warning": 1,
+    "error": 4
+  },
+  "metadata": { "scan_date": "2026-02-15T10:00:00Z", "scan_type": "sast" }
+}

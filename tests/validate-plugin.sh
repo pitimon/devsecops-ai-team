@@ -242,7 +242,7 @@ fi
 
 if [ -f "$ROOT_DIR/mcp/server.mjs" ]; then
   TOOL_COUNT=$(python3 -c "import re; c=open('$ROOT_DIR/mcp/server.mjs').read(); print(len(set(re.findall(r'name:\s*\"(devsecops_\w+)\"', c))))" 2>/dev/null || echo 0)
-  [ "$TOOL_COUNT" -eq 5 ] && pass "MCP server defines 5 tools" || fail "MCP server has $TOOL_COUNT tools (expected 5)"
+  [ "$TOOL_COUNT" -eq 8 ] && pass "MCP server defines 8 tools" || fail "MCP server has $TOOL_COUNT tools (expected 8)"
   grep -q "StdioServerTransport" "$ROOT_DIR/mcp/server.mjs" && pass "Uses stdio transport" || fail "Missing stdio transport"
 fi
 

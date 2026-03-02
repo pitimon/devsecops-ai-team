@@ -447,6 +447,208 @@ TESTEOF
 2>/dev/null)
 [ "$RESULT" = "PASS" ] && pass "Policy: default_role is developer" || fail "Policy: default_role wrong"
 
+# ═══════════════════════════════════════════
+# ComplianceStatus Handler Tests
+# ═══════════════════════════════════════════
+echo ""
+echo "--- ComplianceStatus Handler ---"
+
+# Test: ComplianceStatus maps findings to all 4 frameworks
+RESULT=$(node --input-type=module << TESTEOF
+import { readFileSync, existsSync } from "node:fs";
+import { resolve } from "node:path";
+
+function readJsonFile(p) { try { return JSON.parse(readFileSync(p, "utf-8")); } catch { return null; } }
+
+const MAPPINGS_DIR = "$ROOT_DIR/mappings";
+const findings = [
+  { cwe_id: "CWE-89", rule_id: "a03-sql-injection" },
+  { cwe_id: "CWE-79", rule_id: "a03-xss-dom" },
+  { cwe_id: null, rule_id: "no-cwe" },
+];
+const frameworks = ["owasp", "nist", "mitre", "ncsa"];
+const mappings = {};
+for (const fw of frameworks) {
+  const file = resolve(MAPPINGS_DIR, "cwe-to-" + fw + ".json");
+  if (existsSync(file)) mappings[fw] = readJsonFile(file) || {};
+}
+
+let allHaveAvailable = true;
+for (const fw of frameworks) {
+  const mapping = mappings[fw];
+  if (!mapping) { allHaveAvailable = false; continue; }
+  const mappingData = mapping.mappings || mapping;
+  let mapped = 0;
+  for (const f of findings) {
+    if (!f.cwe_id) continue;
+    if (mappingData[f.cwe_id]) mapped++;
+  }
+  if (mapped === 0) allHaveAvailable = false;
+}
+// CWE-89 and CWE-79 should be in OWASP mapping at minimum
+const owaspData = mappings["owasp"]?.mappings || {};
+const has89 = !!owaspData["CWE-89"];
+const has79 = !!owaspData["CWE-79"];
+console.log(allHaveAvailable && has89 && has79 ? "PASS" : "FAIL");
+TESTEOF
+2>/dev/null)
+[ "$RESULT" = "PASS" ] && pass "ComplianceStatus: maps CWE-89 and CWE-79 across frameworks" || fail "ComplianceStatus: mapping failed"
+
+# Test: ComplianceStatus coverage_pct calculation
+RESULT=$(node --input-type=module << 'TESTEOF'
+const findings = [
+  { cwe_id: "CWE-89" }, { cwe_id: "CWE-79" }, { cwe_id: null }, { cwe_id: "CWE-99999" },
+];
+const mappingData = { "CWE-89": {}, "CWE-79": {} };
+let mapped = 0;
+let unmapped = 0;
+for (const f of findings) {
+  if (!f.cwe_id) { unmapped++; continue; }
+  if (mappingData[f.cwe_id]) { mapped++; } else { unmapped++; }
+}
+const coverage_pct = findings.length > 0 ? Math.round((mapped / findings.length) * 100) : 0;
+console.log(mapped === 2 && unmapped === 2 && coverage_pct === 50 ? "PASS" : `FAIL:mapped=${mapped},unmapped=${unmapped},pct=${coverage_pct}`);
+TESTEOF
+2>/dev/null)
+[ "$RESULT" = "PASS" ] && pass "ComplianceStatus: coverage_pct = 50% for 2/4 mapped" || fail "ComplianceStatus: coverage_pct wrong ($RESULT)"
+
+# Test: ComplianceStatus handles empty findings
+RESULT=$(node --input-type=module << 'TESTEOF'
+const findings = [];
+const coverage_pct = findings.length > 0 ? Math.round((0 / findings.length) * 100) : 0;
+console.log(coverage_pct === 0 ? "PASS" : "FAIL");
+TESTEOF
+2>/dev/null)
+[ "$RESULT" = "PASS" ] && pass "ComplianceStatus: empty findings gives 0% coverage" || fail "ComplianceStatus: empty findings should give 0%"
+
+# Test: ComplianceStatusSchema valid input accepted
+RESULT=$(run_node_zod << 'TESTEOF'
+import { z } from "zod";
+const ComplianceStatusSchema = z.object({
+  findings_file: z.string().min(1),
+});
+const r = ComplianceStatusSchema.safeParse({ findings_file: "/tmp/f.json" });
+console.log(r.success ? "PASS" : "FAIL");
+TESTEOF
+2>/dev/null)
+[ "$RESULT" = "PASS" ] && pass "ComplianceStatus: schema accepts valid input" || fail "ComplianceStatus: schema rejected valid input"
+
+# ═══════════════════════════════════════════
+# SuggestFix Handler Tests
+# ═══════════════════════════════════════════
+echo ""
+echo "--- SuggestFix Handler ---"
+
+# Test: SuggestFix looks up CWE in OWASP mapping
+RESULT=$(node --input-type=module << TESTEOF
+import { readFileSync } from "node:fs";
+const owaspMap = JSON.parse(readFileSync("$ROOT_DIR/mappings/cwe-to-owasp.json", "utf-8"));
+const entry = owaspMap.mappings?.["CWE-89"];
+console.log(entry && entry.owasp ? "PASS" : "FAIL");
+TESTEOF
+2>/dev/null)
+[ "$RESULT" = "PASS" ] && pass "SuggestFix: CWE-89 found in OWASP mapping" || fail "SuggestFix: CWE-89 lookup failed"
+
+# Test: SuggestFix looks up CWE in NIST mapping
+RESULT=$(node --input-type=module << TESTEOF
+import { readFileSync } from "node:fs";
+const nistMap = JSON.parse(readFileSync("$ROOT_DIR/mappings/cwe-to-nist.json", "utf-8"));
+const entry = nistMap.mappings?.["CWE-89"];
+console.log(entry ? "PASS" : "FAIL");
+TESTEOF
+2>/dev/null)
+[ "$RESULT" = "PASS" ] && pass "SuggestFix: CWE-89 found in NIST mapping" || fail "SuggestFix: CWE-89 NIST lookup failed"
+
+# Test: SuggestFix lists reference files
+RESULT=$(node --input-type=module << TESTEOF
+import { existsSync, readdirSync } from "node:fs";
+import { resolve } from "node:path";
+const refDir = resolve("$ROOT_DIR", "skills", "references");
+if (existsSync(refDir)) {
+  const refFiles = readdirSync(refDir).filter(f => f.endsWith(".md"));
+  console.log(refFiles.length >= 12 ? "PASS" : "FAIL:" + refFiles.length);
+} else {
+  console.log("FAIL:nodir");
+}
+TESTEOF
+2>/dev/null)
+[ "$RESULT" = "PASS" ] && pass "SuggestFix: lists 12+ reference files" || fail "SuggestFix: reference files listing failed ($RESULT)"
+
+# Test: SuggestFixSchema accepts cwe_id only
+RESULT=$(run_node_zod << 'TESTEOF'
+import { z } from "zod";
+const SuggestFixSchema = z.object({
+  cwe_id: z.string().optional(),
+  rule_id: z.string().optional(),
+  finding_file: z.string().optional(),
+}).refine(data => data.cwe_id || data.rule_id || data.finding_file, {
+  message: "At least one required",
+});
+const r = SuggestFixSchema.safeParse({ cwe_id: "CWE-89" });
+console.log(r.success ? "PASS" : "FAIL");
+TESTEOF
+2>/dev/null)
+[ "$RESULT" = "PASS" ] && pass "SuggestFix: schema accepts cwe_id only" || fail "SuggestFix: schema should accept cwe_id only"
+
+# ═══════════════════════════════════════════
+# Compare Handler Tests (inline fixtures)
+# ═══════════════════════════════════════════
+echo ""
+echo "--- Compare Handler (inline) ---"
+
+# Test: Compare with degrading trend
+RESULT=$(node --input-type=module << 'TESTEOF'
+const baseFindings = [{ rule_id: "r1", location: { file: "a.py", line_start: 1 } }];
+const currFindings = [
+  { rule_id: "r1", location: { file: "a.py", line_start: 1 } },
+  { rule_id: "r2", location: { file: "b.py", line_start: 2 } },
+  { rule_id: "r3", location: { file: "c.py", line_start: 3 } },
+];
+const trend = currFindings.length < baseFindings.length ? "improving" :
+              currFindings.length > baseFindings.length ? "degrading" : "stable";
+const delta = currFindings.length - baseFindings.length;
+console.log(trend === "degrading" && delta === 2 ? "PASS" : "FAIL");
+TESTEOF
+2>/dev/null)
+[ "$RESULT" = "PASS" ] && pass "Compare: degrading trend detected (1 → 3)" || fail "Compare: degrading trend failed"
+
+# Test: Compare with improving trend
+RESULT=$(node --input-type=module << 'TESTEOF'
+const baseFindings = [
+  { rule_id: "r1", location: { file: "a.py", line_start: 1 } },
+  { rule_id: "r2", location: { file: "b.py", line_start: 2 } },
+  { rule_id: "r3", location: { file: "c.py", line_start: 3 } },
+];
+const currFindings = [{ rule_id: "r1", location: { file: "a.py", line_start: 1 } }];
+const trend = currFindings.length < baseFindings.length ? "improving" :
+              currFindings.length > baseFindings.length ? "degrading" : "stable";
+const delta = currFindings.length - baseFindings.length;
+console.log(trend === "improving" && delta === -2 ? "PASS" : "FAIL");
+TESTEOF
+2>/dev/null)
+[ "$RESULT" = "PASS" ] && pass "Compare: improving trend detected (3 → 1)" || fail "Compare: improving trend failed"
+
+# Test: Compare — finding key uses rule_id + file + line_start
+RESULT=$(node --input-type=module << 'TESTEOF'
+// Same rule_id but different file should be treated as different
+const baseFindings = [{ rule_id: "r1", location: { file: "a.py", line_start: 1 } }];
+const currFindings = [{ rule_id: "r1", location: { file: "b.py", line_start: 1 } }];
+const baseKeys = new Set(baseFindings.map(f => `${f.rule_id}:${f.location?.file}:${f.location?.line_start}`));
+const currKeys = new Set(currFindings.map(f => `${f.rule_id}:${f.location?.file}:${f.location?.line_start}`));
+const newFindings = currFindings.filter(f => !baseKeys.has(`${f.rule_id}:${f.location?.file}:${f.location?.line_start}`));
+const fixedFindings = baseFindings.filter(f => !currKeys.has(`${f.rule_id}:${f.location?.file}:${f.location?.line_start}`));
+console.log(newFindings.length === 1 && fixedFindings.length === 1 ? "PASS" : "FAIL");
+TESTEOF
+2>/dev/null)
+[ "$RESULT" = "PASS" ] && pass "Compare: same rule_id different file treated as distinct" || fail "Compare: key identity logic failed"
+
+# Test: Compare — handler function exists in server
+if grep -q "async function handleCompare" "$SERVER"; then
+  pass "handleCompare function exists in server.mjs"
+else
+  fail "handleCompare function missing from server.mjs"
+fi
+
 # ─── Summary ───
 echo ""
 echo "============================================"
