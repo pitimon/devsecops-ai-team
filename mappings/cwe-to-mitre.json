@@ -7,419 +7,627 @@
   },
   "mappings": {
     "CWE-20": {
-      "techniques": ["T1059"],
+      "techniques": [
+        "T1059"
+      ],
       "tactic": "Execution",
       "name": "Command and Scripting Interpreter"
     },
     "CWE-22": {
-      "techniques": ["T1083"],
+      "techniques": [
+        "T1083"
+      ],
       "tactic": "Discovery",
       "name": "File and Directory Discovery"
     },
     "CWE-77": {
-      "techniques": ["T1059"],
+      "techniques": [
+        "T1059"
+      ],
       "tactic": "Execution",
       "name": "Command and Scripting Interpreter"
     },
     "CWE-78": {
-      "techniques": ["T1059.004"],
+      "techniques": [
+        "T1059.004"
+      ],
       "tactic": "Execution",
       "name": "Unix Shell"
     },
     "CWE-79": {
-      "techniques": ["T1189"],
+      "techniques": [
+        "T1189"
+      ],
       "tactic": "Initial Access",
       "name": "Drive-by Compromise"
     },
     "CWE-89": {
-      "techniques": ["T1190"],
+      "techniques": [
+        "T1190"
+      ],
       "tactic": "Initial Access",
       "name": "Exploit Public-Facing Application"
     },
     "CWE-94": {
-      "techniques": ["T1059"],
+      "techniques": [
+        "T1059"
+      ],
       "tactic": "Execution",
       "name": "Command and Scripting Interpreter"
     },
     "CWE-200": {
-      "techniques": ["T1005"],
+      "techniques": [
+        "T1005"
+      ],
       "tactic": "Collection",
       "name": "Data from Local System"
     },
     "CWE-250": {
-      "techniques": ["T1068"],
+      "techniques": [
+        "T1068"
+      ],
       "tactic": "Privilege Escalation",
       "name": "Exploitation for Privilege Escalation"
     },
     "CWE-256": {
-      "techniques": ["T1552.001"],
+      "techniques": [
+        "T1552.001"
+      ],
       "tactic": "Credential Access",
       "name": "Credentials In Files"
     },
     "CWE-269": {
-      "techniques": ["T1068"],
+      "techniques": [
+        "T1068"
+      ],
       "tactic": "Privilege Escalation",
       "name": "Exploitation for Privilege Escalation"
     },
     "CWE-284": {
-      "techniques": ["T1078"],
+      "techniques": [
+        "T1078"
+      ],
       "tactic": "Defense Evasion",
       "name": "Valid Accounts"
     },
     "CWE-287": {
-      "techniques": ["T1078"],
+      "techniques": [
+        "T1078"
+      ],
       "tactic": "Initial Access",
       "name": "Valid Accounts"
     },
     "CWE-311": {
-      "techniques": ["T1557"],
+      "techniques": [
+        "T1557"
+      ],
       "tactic": "Credential Access",
       "name": "Adversary-in-the-Middle"
     },
     "CWE-312": {
-      "techniques": ["T1552"],
+      "techniques": [
+        "T1552"
+      ],
       "tactic": "Credential Access",
       "name": "Unsecured Credentials"
     },
     "CWE-327": {
-      "techniques": ["T1557"],
+      "techniques": [
+        "T1557"
+      ],
       "tactic": "Credential Access",
       "name": "Adversary-in-the-Middle"
     },
     "CWE-352": {
-      "techniques": ["T1185"],
+      "techniques": [
+        "T1185"
+      ],
       "tactic": "Collection",
       "name": "Browser Session Hijacking"
     },
     "CWE-434": {
-      "techniques": ["T1505.003"],
+      "techniques": [
+        "T1505.003"
+      ],
       "tactic": "Persistence",
       "name": "Web Shell"
     },
     "CWE-502": {
-      "techniques": ["T1059"],
+      "techniques": [
+        "T1059"
+      ],
       "tactic": "Execution",
       "name": "Command and Scripting Interpreter"
     },
     "CWE-522": {
-      "techniques": ["T1552"],
+      "techniques": [
+        "T1552"
+      ],
       "tactic": "Credential Access",
       "name": "Unsecured Credentials"
     },
     "CWE-798": {
-      "techniques": ["T1552.001"],
+      "techniques": [
+        "T1552.001"
+      ],
       "tactic": "Credential Access",
       "name": "Credentials In Files"
     },
     "CWE-862": {
-      "techniques": ["T1078"],
+      "techniques": [
+        "T1078"
+      ],
       "tactic": "Privilege Escalation",
       "name": "Valid Accounts"
     },
     "CWE-918": {
-      "techniques": ["T1190"],
+      "techniques": [
+        "T1190"
+      ],
       "tactic": "Initial Access",
       "name": "Exploit Public-Facing Application"
     },
     "CWE-119": {
-      "techniques": ["T1203"],
+      "techniques": [
+        "T1203"
+      ],
       "tactic": "Execution",
       "name": "Exploitation for Client Execution"
     },
     "CWE-121": {
-      "techniques": ["T1203"],
+      "techniques": [
+        "T1203"
+      ],
       "tactic": "Execution",
       "name": "Exploitation for Client Execution"
     },
     "CWE-122": {
-      "techniques": ["T1203"],
+      "techniques": [
+        "T1203"
+      ],
       "tactic": "Execution",
       "name": "Exploitation for Client Execution"
     },
     "CWE-125": {
-      "techniques": ["T1005"],
+      "techniques": [
+        "T1005"
+      ],
       "tactic": "Collection",
       "name": "Data from Local System"
     },
     "CWE-129": {
-      "techniques": ["T1190"],
+      "techniques": [
+        "T1190"
+      ],
       "tactic": "Initial Access",
       "name": "Exploit Public-Facing Application"
     },
     "CWE-189": {
-      "techniques": ["T1203"],
+      "techniques": [
+        "T1203"
+      ],
       "tactic": "Execution",
       "name": "Exploitation for Client Execution"
     },
     "CWE-190": {
-      "techniques": ["T1203"],
+      "techniques": [
+        "T1203"
+      ],
       "tactic": "Execution",
       "name": "Exploitation for Client Execution"
     },
     "CWE-191": {
-      "techniques": ["T1203"],
+      "techniques": [
+        "T1203"
+      ],
       "tactic": "Execution",
       "name": "Exploitation for Client Execution"
     },
     "CWE-264": {
-      "techniques": ["T1068"],
+      "techniques": [
+        "T1068"
+      ],
       "tactic": "Privilege Escalation",
       "name": "Exploitation for Privilege Escalation"
     },
     "CWE-362": {
-      "techniques": ["T1068"],
+      "techniques": [
+        "T1068"
+      ],
       "tactic": "Privilege Escalation",
       "name": "Exploitation for Privilege Escalation"
     },
     "CWE-369": {
-      "techniques": ["T1499"],
+      "techniques": [
+        "T1499"
+      ],
       "tactic": "Impact",
       "name": "Endpoint Denial of Service"
     },
     "CWE-399": {
-      "techniques": ["T1499"],
+      "techniques": [
+        "T1499"
+      ],
       "tactic": "Impact",
       "name": "Endpoint Denial of Service"
     },
     "CWE-401": {
-      "techniques": ["T1499"],
+      "techniques": [
+        "T1499"
+      ],
       "tactic": "Impact",
       "name": "Endpoint Denial of Service"
     },
     "CWE-415": {
-      "techniques": ["T1203"],
+      "techniques": [
+        "T1203"
+      ],
       "tactic": "Execution",
       "name": "Exploitation for Client Execution"
     },
     "CWE-416": {
-      "techniques": ["T1203"],
+      "techniques": [
+        "T1203"
+      ],
       "tactic": "Execution",
       "name": "Exploitation for Client Execution"
     },
     "CWE-476": {
-      "techniques": ["T1499"],
+      "techniques": [
+        "T1499"
+      ],
       "tactic": "Impact",
       "name": "Endpoint Denial of Service"
     },
     "CWE-617": {
-      "techniques": ["T1499"],
+      "techniques": [
+        "T1499"
+      ],
       "tactic": "Impact",
       "name": "Endpoint Denial of Service"
     },
     "CWE-674": {
-      "techniques": ["T1499"],
+      "techniques": [
+        "T1499"
+      ],
       "tactic": "Impact",
       "name": "Endpoint Denial of Service"
     },
     "CWE-682": {
-      "techniques": ["T1203"],
+      "techniques": [
+        "T1203"
+      ],
       "tactic": "Execution",
       "name": "Exploitation for Client Execution"
     },
     "CWE-754": {
-      "techniques": ["T1499"],
+      "techniques": [
+        "T1499"
+      ],
       "tactic": "Impact",
       "name": "Endpoint Denial of Service"
     },
     "CWE-755": {
-      "techniques": ["T1499"],
+      "techniques": [
+        "T1499"
+      ],
       "tactic": "Impact",
       "name": "Endpoint Denial of Service"
     },
     "CWE-770": {
-      "techniques": ["T1499"],
+      "techniques": [
+        "T1499"
+      ],
       "tactic": "Impact",
       "name": "Endpoint Denial of Service"
     },
     "CWE-787": {
-      "techniques": ["T1203"],
+      "techniques": [
+        "T1203"
+      ],
       "tactic": "Execution",
       "name": "Exploitation for Client Execution"
     },
     "CWE-835": {
-      "techniques": ["T1499"],
+      "techniques": [
+        "T1499"
+      ],
       "tactic": "Impact",
       "name": "Endpoint Denial of Service"
     },
     "CWE-843": {
-      "techniques": ["T1203"],
+      "techniques": [
+        "T1203"
+      ],
       "tactic": "Execution",
       "name": "Exploitation for Client Execution"
     },
     "CWE-16": {
-      "techniques": ["T1562"],
+      "techniques": [
+        "T1562"
+      ],
       "tactic": "Defense Evasion",
       "name": "Impair Defenses"
     },
     "CWE-209": {
-      "techniques": ["T1005"],
+      "techniques": [
+        "T1005"
+      ],
       "tactic": "Collection",
       "name": "Data from Local System"
     },
     "CWE-223": {
-      "techniques": ["T1070"],
+      "techniques": [
+        "T1070"
+      ],
       "tactic": "Defense Evasion",
       "name": "Indicator Removal"
     },
     "CWE-252": {
-      "techniques": ["T1499"],
+      "techniques": [
+        "T1499"
+      ],
       "tactic": "Impact",
       "name": "Endpoint Denial of Service"
     },
     "CWE-259": {
-      "techniques": ["T1552.001"],
+      "techniques": [
+        "T1552.001"
+      ],
       "tactic": "Credential Access",
       "name": "Credentials In Files"
     },
     "CWE-276": {
-      "techniques": ["T1222"],
+      "techniques": [
+        "T1222"
+      ],
       "tactic": "Defense Evasion",
       "name": "File and Directory Permissions Modification"
     },
     "CWE-290": {
-      "techniques": ["T1078"],
+      "techniques": [
+        "T1078"
+      ],
       "tactic": "Initial Access",
       "name": "Valid Accounts"
     },
     "CWE-306": {
-      "techniques": ["T1078"],
+      "techniques": [
+        "T1078"
+      ],
       "tactic": "Initial Access",
       "name": "Valid Accounts"
     },
     "CWE-308": {
-      "techniques": ["T1078"],
+      "techniques": [
+        "T1078"
+      ],
       "tactic": "Initial Access",
       "name": "Valid Accounts"
     },
     "CWE-319": {
-      "techniques": ["T1557"],
+      "techniques": [
+        "T1557"
+      ],
       "tactic": "Credential Access",
       "name": "Adversary-in-the-Middle"
     },
     "CWE-345": {
-      "techniques": ["T1565"],
+      "techniques": [
+        "T1565"
+      ],
       "tactic": "Impact",
       "name": "Data Manipulation"
     },
     "CWE-353": {
-      "techniques": ["T1565"],
+      "techniques": [
+        "T1565"
+      ],
       "tactic": "Impact",
       "name": "Data Manipulation"
     },
     "CWE-384": {
-      "techniques": ["T1185"],
+      "techniques": [
+        "T1185"
+      ],
       "tactic": "Collection",
       "name": "Browser Session Hijacking"
     },
     "CWE-639": {
-      "techniques": ["T1078"],
+      "techniques": [
+        "T1078"
+      ],
       "tactic": "Privilege Escalation",
       "name": "Valid Accounts"
     },
     "CWE-778": {
-      "techniques": ["T1070"],
+      "techniques": [
+        "T1070"
+      ],
       "tactic": "Defense Evasion",
       "name": "Indicator Removal"
     },
     "CWE-829": {
-      "techniques": ["T1195"],
+      "techniques": [
+        "T1195"
+      ],
       "tactic": "Initial Access",
       "name": "Supply Chain Compromise"
     },
     "CWE-942": {
-      "techniques": ["T1189"],
+      "techniques": [
+        "T1189"
+      ],
       "tactic": "Initial Access",
       "name": "Drive-by Compromise"
     },
     "CWE-1035": {
-      "techniques": ["T1190"],
+      "techniques": [
+        "T1190"
+      ],
       "tactic": "Initial Access",
       "name": "Exploit Public-Facing Application"
     },
     "CWE-1333": {
-      "techniques": ["T1499"],
+      "techniques": [
+        "T1499"
+      ],
       "tactic": "Impact",
       "name": "Endpoint Denial of Service"
     },
     "CWE-1336": {
-      "techniques": ["T1059"],
+      "techniques": [
+        "T1059"
+      ],
       "tactic": "Execution",
       "name": "Command and Scripting Interpreter"
     },
     "CWE-95": {
-      "techniques": ["T1059"],
+      "techniques": [
+        "T1059"
+      ],
       "tactic": "Execution",
       "name": "Command and Scripting Interpreter"
     },
     "CWE-120": {
-      "techniques": ["T1203"],
+      "techniques": [
+        "T1203"
+      ],
       "tactic": "Execution",
       "name": "Exploitation for Client Execution"
     },
     "CWE-400": {
-      "techniques": ["T1499"],
+      "techniques": [
+        "T1499"
+      ],
       "tactic": "Impact",
       "name": "Endpoint Denial of Service"
     },
     "CWE-489": {
-      "techniques": ["T1082"],
+      "techniques": [
+        "T1082"
+      ],
       "tactic": "Discovery",
       "name": "System Information Discovery"
     },
     "CWE-524": {
-      "techniques": ["T1005"],
+      "techniques": [
+        "T1005"
+      ],
       "tactic": "Collection",
       "name": "Data from Local System"
     },
     "CWE-539": {
-      "techniques": ["T1539"],
+      "techniques": [
+        "T1539"
+      ],
       "tactic": "Credential Access",
       "name": "Steal Web Session Cookie"
     },
     "CWE-601": {
-      "techniques": ["T1566"],
+      "techniques": [
+        "T1566"
+      ],
       "tactic": "Initial Access",
       "name": "Phishing"
     },
     "CWE-665": {
-      "techniques": ["T1068"],
+      "techniques": [
+        "T1068"
+      ],
       "tactic": "Privilege Escalation",
       "name": "Exploitation for Privilege Escalation"
     },
     "CWE-668": {
-      "techniques": ["T1005"],
+      "techniques": [
+        "T1005"
+      ],
       "tactic": "Collection",
       "name": "Data from Local System"
     },
     "CWE-669": {
-      "techniques": ["T1048"],
+      "techniques": [
+        "T1048"
+      ],
       "tactic": "Exfiltration",
       "name": "Exfiltration Over Alternative Protocol"
     },
     "CWE-670": {
-      "techniques": ["T1068"],
+      "techniques": [
+        "T1068"
+      ],
       "tactic": "Privilege Escalation",
       "name": "Exploitation for Privilege Escalation"
     },
     "CWE-680": {
-      "techniques": ["T1203"],
+      "techniques": [
+        "T1203"
+      ],
       "tactic": "Execution",
       "name": "Exploitation for Client Execution"
     },
     "CWE-693": {
-      "techniques": ["T1190"],
+      "techniques": [
+        "T1190"
+      ],
       "tactic": "Initial Access",
       "name": "Exploit Public-Facing Application"
     },
     "CWE-704": {
-      "techniques": ["T1203"],
+      "techniques": [
+        "T1203"
+      ],
       "tactic": "Execution",
       "name": "Exploitation for Client Execution"
     },
     "CWE-732": {
-      "techniques": ["T1222"],
+      "techniques": [
+        "T1222"
+      ],
       "tactic": "Defense Evasion",
       "name": "File and Directory Permissions Modification"
+    },
+    "CWE-117": {
+      "techniques": [
+        "T1070"
+      ],
+      "tactic": "Defense Evasion",
+      "name": "Indicator Removal"
+    },
+    "CWE-390": {
+      "techniques": [
+        "T1562"
+      ],
+      "tactic": "Defense Evasion",
+      "name": "Impair Defenses"
+    },
+    "CWE-779": {
+      "techniques": [
+        "T1070"
+      ],
+      "tactic": "Defense Evasion",
+      "name": "Indicator Removal"
+    },
+    "CWE-494": {
+      "techniques": [
+        "T1195"
+      ],
+      "tactic": "Initial Access",
+      "name": "Supply Chain Compromise"
+    },
+    "CWE-915": {
+      "techniques": [
+        "T1565"
+      ],
+      "tactic": "Impact",
+      "name": "Data Manipulation"
+    },
+    "CWE-1104": {
+      "techniques": [
+        "T1195"
+      ],
+      "tactic": "Initial Access",
+      "name": "Supply Chain Compromise"
     }
   }
 }

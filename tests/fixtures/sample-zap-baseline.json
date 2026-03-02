@@ -1,0 +1,114 @@
+{
+  "@version": "2.15.0",
+  "@generated": "2026-03-02T10:00:00+07:00",
+  "site": [
+    {
+      "@name": "http://testapp.local:8080",
+      "@host": "testapp.local",
+      "@port": "8080",
+      "@ssl": "false",
+      "alerts": [
+        {
+          "pluginid": "10038",
+          "alertRef": "10038",
+          "alert": "Content Security Policy (CSP) Header Not Set",
+          "name": "Content Security Policy (CSP) Header Not Set",
+          "riskcode": "2",
+          "confidence": "3",
+          "riskdesc": "Medium (High)",
+          "desc": "Content Security Policy header is not set.",
+          "instances": [
+            { "uri": "http://testapp.local:8080/", "method": "GET" },
+            { "uri": "http://testapp.local:8080/login", "method": "GET" },
+            { "uri": "http://testapp.local:8080/dashboard", "method": "GET" }
+          ],
+          "count": "3",
+          "solution": "Set CSP header with appropriate directives.",
+          "cweid": "693",
+          "wascid": "15"
+        },
+        {
+          "pluginid": "10017",
+          "alertRef": "10017",
+          "alert": "Cross-Domain JavaScript Source File Inclusion",
+          "name": "Cross-Domain JavaScript Source File Inclusion",
+          "riskcode": "1",
+          "confidence": "2",
+          "riskdesc": "Low (Medium)",
+          "desc": "The page includes one or more script files from a third-party domain.",
+          "instances": [
+            {
+              "uri": "http://testapp.local:8080/",
+              "method": "GET",
+              "evidence": "https://cdn.example.com/lib.js"
+            }
+          ],
+          "count": "1",
+          "solution": "Ensure JavaScript source files are loaded from only trusted sources.",
+          "cweid": "829",
+          "wascid": "15"
+        },
+        {
+          "pluginid": "10021",
+          "alertRef": "10021",
+          "alert": "X-Content-Type-Options Header Missing",
+          "name": "X-Content-Type-Options Header Missing",
+          "riskcode": "1",
+          "confidence": "2",
+          "riskdesc": "Low (Medium)",
+          "desc": "The Anti-MIME-Sniffing header X-Content-Type-Options was not set to 'nosniff'.",
+          "instances": [
+            { "uri": "http://testapp.local:8080/", "method": "GET" },
+            { "uri": "http://testapp.local:8080/api/data", "method": "GET" }
+          ],
+          "count": "2",
+          "solution": "Set X-Content-Type-Options header to 'nosniff'.",
+          "cweid": "693",
+          "wascid": "15"
+        },
+        {
+          "pluginid": "10016",
+          "alertRef": "10016",
+          "alert": "Web Browser XSS Protection Not Enabled",
+          "name": "Web Browser XSS Protection Not Enabled",
+          "riskcode": "1",
+          "confidence": "2",
+          "riskdesc": "Low (Medium)",
+          "desc": "Web Browser XSS Protection is not enabled.",
+          "instances": [
+            {
+              "uri": "http://testapp.local:8080/",
+              "method": "GET",
+              "param": "X-XSS-Protection"
+            }
+          ],
+          "count": "1",
+          "solution": "Set X-XSS-Protection header.",
+          "cweid": "933",
+          "wascid": "14"
+        },
+        {
+          "pluginid": "10098",
+          "alertRef": "10098",
+          "alert": "Cross-Domain Misconfiguration",
+          "name": "Cross-Domain Misconfiguration",
+          "riskcode": "2",
+          "confidence": "2",
+          "riskdesc": "Medium (Medium)",
+          "desc": "CORS misconfiguration allows access from any origin.",
+          "instances": [
+            {
+              "uri": "http://testapp.local:8080/api/data",
+              "method": "GET",
+              "evidence": "Access-Control-Allow-Origin: *"
+            }
+          ],
+          "count": "1",
+          "solution": "Configure CORS to only allow trusted origins.",
+          "cweid": "942",
+          "wascid": "14"
+        }
+      ]
+    }
+  ]
+}

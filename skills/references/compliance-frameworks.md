@@ -70,18 +70,18 @@ Reference: https://csrc.nist.gov/publications/detail/sp/800-53/rev-5/final
 
 Reference: https://owasp.org/Top10/ (2021 edition)
 
-| Rank | ID     | Category                           | CWE Examples     | Detection Method          |
-| ---- | ------ | ---------------------------------- | ---------------- | ------------------------- |
-| A01  | A01:21 | Broken Access Control              | CWE-200, CWE-284 | DAST, code review         |
-| A02  | A02:21 | Cryptographic Failures             | CWE-259, CWE-327 | SAST, config audit        |
-| A03  | A03:21 | Injection                          | CWE-79, CWE-89   | SAST, DAST, IAST          |
-| A04  | A04:21 | Insecure Design                    | CWE-209, CWE-256 | Threat modeling, review   |
-| A05  | A05:21 | Security Misconfiguration          | CWE-16, CWE-611  | IaC scan, CIS benchmarks  |
-| A06  | A06:21 | Vulnerable Components              | CWE-1035         | SCA, SBOM analysis        |
-| A07  | A07:21 | Auth & Identification Failures     | CWE-287, CWE-384 | DAST, penetration testing |
-| A08  | A08:21 | Software & Data Integrity Failures | CWE-502, CWE-829 | SCA, supply chain audit   |
-| A09  | A09:21 | Security Logging & Monitoring Gaps | CWE-778          | Log audit, SIEM review    |
-| A10  | A10:21 | Server-Side Request Forgery (SSRF) | CWE-918          | DAST, code review         |
+| Rank | ID     | Category                           | CWE Examples                                                   | Detection Method                    |
+| ---- | ------ | ---------------------------------- | -------------------------------------------------------------- | ----------------------------------- |
+| A01  | A01:21 | Broken Access Control              | CWE-200, CWE-284                                               | DAST, code review                   |
+| A02  | A02:21 | Cryptographic Failures             | CWE-259, CWE-327                                               | SAST, config audit                  |
+| A03  | A03:21 | Injection                          | CWE-79, CWE-89                                                 | SAST, DAST, IAST                    |
+| A04  | A04:21 | Insecure Design                    | CWE-209, CWE-256                                               | Threat modeling, review             |
+| A05  | A05:21 | Security Misconfiguration          | CWE-16, CWE-611                                                | IaC scan, CIS benchmarks            |
+| A06  | A06:21 | Vulnerable Components              | CWE-1035                                                       | SCA, SBOM analysis                  |
+| A07  | A07:21 | Auth & Identification Failures     | CWE-287, CWE-384                                               | DAST, penetration testing           |
+| A08  | A08:21 | Software & Data Integrity Failures | CWE-345, CWE-353, CWE-494, CWE-502, CWE-829, CWE-915, CWE-1104 | SCA, SBOM, supply chain audit, SAST |
+| A09  | A09:21 | Security Logging & Monitoring Gaps | CWE-117, CWE-223, CWE-390, CWE-532, CWE-778, CWE-779           | SAST, log audit, SIEM review        |
+| A10  | A10:21 | Server-Side Request Forgery (SSRF) | CWE-918                                                        | DAST, code review                   |
 
 ### 2.1 OWASP Detection Coverage by Tool Type
 
