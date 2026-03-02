@@ -30,7 +30,7 @@
 - **7 Security Tools, 1 Command** — `/full-pipeline` รันทุกเครื่องมือแบบ parallel, deduplicate ผลข้าม tools, สร้าง unified report ในคำสั่งเดียว
 - **Real-Time Protection** — บล็อก commits ที่มี CRITICAL findings, ตรวจจับ secrets (AWS keys, GitHub tokens, JWT) ก่อนเขียนลง disk — ทำงานใน 500ms
 - **CVSS v4.0 Prioritization** — ไม่ใช่แค่ severity labels — วิเคราะห์ business impact, exploitability (Weaponized → None), กำหนด SLA tiers (P1: 24 ชม. → P4: backlog)
-- **96 CWE Compliance Mappings** — Auto-map ผลสแกนไปยัง OWASP Top 10 (96 CWEs), NIST 800-53 (90 CWEs), MITRE ATT&CK (83 CWEs)
+- **102 CWE Compliance Mappings** — Auto-map ผลสแกนไปยัง OWASP Top 10 (102 CWEs), NIST 800-53 (96 CWEs), MITRE ATT&CK (89 CWEs)
 - **MCP Server** — 5 composable tools (`devsecops_scan`, `devsecops_gate`, ...) สำหรับ programmatic integration กับ MCP-compatible clients
 
 ---
@@ -438,7 +438,7 @@ bash formatters/dedup-findings.sh --inputs semgrep.json,grype.json,trivy.json --
 
 ## Compliance Mapping
 
-Plugin นี้ map ผลลัพธ์จาก CWE ไปยัง compliance frameworks อัตโนมัติ — **96 CWEs** mapped to OWASP, **90 CWEs** to NIST, **83 CWEs** to MITRE, **52 CWEs** to NCSA:
+Plugin นี้ map ผลลัพธ์จาก CWE ไปยัง compliance frameworks อัตโนมัติ — **102 CWEs** mapped to OWASP, **96 CWEs** to NIST, **89 CWEs** to MITRE, **55 CWEs** to NCSA:
 
 | Framework             | Version | ใช้ทำอะไร                                   |
 | --------------------- | ------- | ------------------------------------------- |
@@ -590,7 +590,7 @@ devsecops-ai-team/
 │   ├── experts/             #   4 expert agents (compliance, threat, triage, remediation)
 │   └── core-team/           #   4 core team agents (reviewer, IR, report, guardian)
 ├── skills/                  # 13 skill definitions (SKILL.md)
-│   └── references/          # 10 domain knowledge files (~500-800 lines each)
+│   └── references/          # 12 domain knowledge files (~500-800 lines each)
 ├── runner/                  # Sidecar Runner (Dockerfile, compose, dispatcher, collector)
 ├── formatters/              # SARIF, Markdown, HTML, JSON normalizer, dedup (v2.0)
 ├── mcp/                     # MCP server — 5 tools (v2.0)

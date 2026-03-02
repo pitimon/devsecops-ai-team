@@ -59,3 +59,4 @@ bash ${CLAUDE_PLUGIN_ROOT}/runner/job-dispatcher.sh \
 ```
 
 Load `${CLAUDE_PLUGIN_ROOT}/skills/references/sca-supply-chain.md` for SBOM analysis context.
+Load `${CLAUDE_PLUGIN_ROOT}/skills/references/software-integrity.md` for A08 integrity verification patterns.
