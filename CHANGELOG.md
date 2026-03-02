@@ -5,6 +5,40 @@ All notable changes to the DevSecOps AI Team plugin will be documented in this f
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.3.0] - 2026-03-02
+
+### Added
+
+- **`/auto-fix` skill** (Issue #7 Phase 2) — automated security remediation ที่อ่าน scan results, generate patches, present for approval, apply edits, แล้ว re-scan verify:
+  - `skills/auto-fix/SKILL.md` — 8-step On-the-Loop workflow (AI เสนอ fix, มนุษย์อนุมัติ)
+  - Flags: `--dry-run`, `--severity`, `--file`, `--cwe` สำหรับ targeted fixing
+  - Delegates to `@agent-remediation-advisor` พร้อม framework detection อัตโนมัติ
+  - `agents/experts/remediation-advisor.md` — เพิ่ม `Edit` tool + Section 6 "Apply Fixes"
+  - `agents/orchestrators/devsecops-lead.md` — เพิ่ม auto-fix routing entry
+- **A08/A09 reference files** — ปิด compliance coverage gaps:
+  - `skills/references/software-integrity.md` — OWASP A08 patterns: CI/CD pipeline integrity, Sigstore/cosign, SLSA, SRI, unsafe deserialization (CWE-502), mass assignment (CWE-915)
+  - `skills/references/logging-monitoring.md` — OWASP A09 patterns: security event taxonomy, structured logging, log injection (CWE-117), SIEM integration, sensitive data in logs (CWE-532)
+- **DAST integration tests** — `tests/test-dast-integration.sh` (22 tests): ZAP fixture validation, normalizer integration, job-dispatcher config, conditional Docker live scan
+- **MCP Docker integration tests** — `tests/test-mcp-integration.sh` (37 tests): Docker availability, tool images, MCP handler logic, runner infrastructure, conditional functional test
+- **ZAP baseline fixture** — `tests/fixtures/sample-zap-baseline.json` with 5 alerts across mixed severity levels (Medium + Low)
+- **Auto-fix tests** — `tests/test-auto-fix.sh` (37 tests): SKILL.md structure, process steps, arguments, agent config, orchestrator routing, bilingual output
+- **NCSA Session/Error coverage expansion** — `cwe-to-ncsa.json` expanded 52→62 CWEs:
+  - Session Management (4.x): +6 CWEs covering items 4.1-4.5 (CWE-613, CWE-1004, CWE-614, CWE-330, CWE-331)
+  - Error Handling (6.x): +4 CWEs covering items 6.1-6.4 (CWE-489, CWE-754, CWE-755, updated CWE-223)
+- **13 CWEs เพิ่มเติมใน cross-mappings** — sync ข้าม 4 ไฟล์:
+  - `cwe-to-owasp.json`: 96 → 105 CWEs (+9: A07 session, A08 integrity, A09 logging)
+  - `cwe-to-nist.json`: 90 → 100 CWEs (+10: AC-12, SC-23, SC-13, AU families)
+  - `cwe-to-mitre.json`: 83 → 93 CWEs (+10: T1539, T1557, T1110, T1082 techniques)
+
+### Changed
+
+- **Skills count**: 12 → 13 (added `/auto-fix`)
+- **Reference files count**: 10 → 12 (added `software-integrity.md`, `logging-monitoring.md`)
+- **Test suites**: 6 → 9 (added `test-auto-fix.sh`, `test-dast-integration.sh`, `test-mcp-integration.sh`)
+- **Total tests**: 354 → 457 (+103 tests)
+- **`compliance-frameworks.md`** — expanded A08/A09 OWASP table rows with full CWE lists; NCSA Session 5→11 CWEs, Error 4→10 CWEs
+- **`sbom-generate/SKILL.md`** — loads `software-integrity.md` reference for A08 verification
+
 ## [2.2.1] - 2026-03-02
 
 ### Added
