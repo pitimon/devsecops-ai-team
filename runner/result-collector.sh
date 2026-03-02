@@ -4,7 +4,7 @@ set -euo pipefail
 # DevSecOps AI Team — Result Collector
 # Collects, normalizes, and formats scan results
 #
-# Usage: result-collector.sh --job-id <id> [--format sarif|json|markdown|html]
+# Usage: result-collector.sh --job-id <id> [--format sarif|json|markdown|html|pdf|csv]
 
 JOB_ID=""
 OUTPUT_FORMAT="json"
@@ -20,7 +20,7 @@ while [[ $# -gt 0 ]]; do
   esac
 done
 
-[ -z "$JOB_ID" ] && { echo "Usage: $0 --job-id <id> [--format sarif|json|markdown|html]"; exit 1; }
+[ -z "$JOB_ID" ] && { echo "Usage: $0 --job-id <id> [--format sarif|json|markdown|html|pdf|csv]"; exit 1; }
 
 RESULTS_DIR="/results/${JOB_ID}"
 
@@ -82,6 +82,18 @@ format_output() {
       if [ -n "$FORMATTER_DIR" ] && [ -f "$FORMATTER_DIR/html-formatter.sh" ]; then
         bash "$FORMATTER_DIR/html-formatter.sh" --input "$NORMALIZED" --output "$RESULTS_DIR/results.html"
         echo "[collector] HTML output: $RESULTS_DIR/results.html"
+      fi
+      ;;
+    pdf)
+      if [ -n "$FORMATTER_DIR" ] && [ -f "$FORMATTER_DIR/pdf-formatter.sh" ]; then
+        bash "$FORMATTER_DIR/pdf-formatter.sh" --input "$NORMALIZED" --output "$RESULTS_DIR/results.pdf"
+        echo "[collector] PDF output: $RESULTS_DIR/results.pdf"
+      fi
+      ;;
+    csv)
+      if [ -n "$FORMATTER_DIR" ] && [ -f "$FORMATTER_DIR/csv-formatter.sh" ]; then
+        bash "$FORMATTER_DIR/csv-formatter.sh" --input "$NORMALIZED" --output "$RESULTS_DIR/results.csv"
+        echo "[collector] CSV output: $RESULTS_DIR/results.csv"
       fi
       ;;
     json)

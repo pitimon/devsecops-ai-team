@@ -1,7 +1,7 @@
 <p align="center">
   <img src="https://img.shields.io/badge/Claude_Code-Plugin-blueviolet?style=for-the-badge&logo=anthropic" alt="Claude Code Plugin">
-  <img src="https://img.shields.io/badge/Version-2.4.0-brightgreen?style=for-the-badge" alt="v2.4.0">
-  <img src="https://img.shields.io/badge/Tests-587%2F587-success?style=for-the-badge" alt="Tests">
+  <img src="https://img.shields.io/badge/Version-2.5.0-brightgreen?style=for-the-badge" alt="v2.5.0">
+  <img src="https://img.shields.io/badge/Tests-700%2B-success?style=for-the-badge" alt="Tests">
   <img src="https://img.shields.io/badge/License-MIT-yellow?style=for-the-badge" alt="MIT License">
 </p>
 
@@ -9,7 +9,7 @@
   <img src="https://img.shields.io/badge/Agents-18-blue?style=flat-square" alt="18 Agents">
   <img src="https://img.shields.io/badge/Skills-13-green?style=flat-square" alt="13 Skills">
   <img src="https://img.shields.io/badge/Tools-7-orange?style=flat-square" alt="7 Tools">
-  <img src="https://img.shields.io/badge/MCP-5_Tools-purple?style=flat-square" alt="MCP">
+  <img src="https://img.shields.io/badge/MCP-8_Tools-purple?style=flat-square" alt="MCP">
   <img src="https://img.shields.io/badge/OWASP_Top_10-10%2F10-critical?style=flat-square" alt="OWASP 10/10">
   <img src="https://img.shields.io/badge/CWE_Mappings-360-informational?style=flat-square" alt="360 CWEs">
   <img src="https://img.shields.io/badge/Frameworks-4-blueviolet?style=flat-square" alt="4 Compliance Frameworks">
@@ -37,7 +37,7 @@
 - [Executive Summary](#executive-summary)
 - [Key Highlights](#key-highlights)
 - [OWASP Top 10 Coverage](#owasp-top-10-coverage)
-- [What's New (v2.4.0)](#whats-new)
+- [What's New (v2.5.0)](#whats-new)
 - [Use Cases](#use-cases)
 - [Quick Start](#quick-start)
 - [Architecture Overview](#architecture-overview)
@@ -71,14 +71,14 @@
 | **AI Agents**             | 18 agents across 4 groups (Orchestrators, Specialists, Experts, Core Team)                     |
 | **Skills (Commands)**     | 13 slash commands (/sast-scan, /dast-scan, /full-pipeline, ...)                                |
 | **Security Tools**        | 7 open-source tools in Docker containers (Semgrep, ZAP, Grype, Trivy, Checkov, GitLeaks, Syft) |
-| **MCP Tools**             | 5 composable tools for programmatic integration                                                |
+| **MCP Tools**             | 8 composable tools for programmatic integration                                                |
 | **Compliance Frameworks** | 4 frameworks — OWASP Top 10, NIST 800-53, MITRE ATT&CK, NCSA Web Security                      |
 | **CWE Mappings**          | 360 total (OWASP 105 + NIST 100 + MITRE 93 + NCSA 62)                                          |
 | **OWASP Top 10 Coverage** | 10/10 categories (100%)                                                                        |
-| **Tests**                 | 587 checks across 15 suites — all passing                                                      |
+| **Tests**                 | 700+ checks across 19 suites — all passing                                                     |
 | **QA Rounds**             | 8 rounds, 54/54 latest (cumulative 950+ checks)                                                |
 | **ROI**                   | 10,222% — 3,100 THB actual vs 320,000 THB equivalent (133x speed)                              |
-| **Version**               | 2.4.0 (2026-03-02)                                                                             |
+| **Version**               | 2.5.0 (2026-03-03)                                                                             |
 
 ---
 
@@ -90,8 +90,9 @@
 - **CVSS v4.0 Prioritization** — วิเคราะห์ business impact, exploitability (Weaponized → None), กำหนด SLA tiers (P1: 24 ชม. → P4: backlog)
 - **360 CWE Compliance Mappings** — Auto-map ผลสแกนไปยัง OWASP Top 10 (105), NIST 800-53 (100), MITRE ATT&CK (93), NCSA (62)
 - **NCSA Web Security Standard** — รองรับมาตรฐานความมั่นคงปลอดภัยเว็บไซต์ สพธอ. (HTTP Headers, TLS, Session Management)
-- **MCP Server** — 5 composable tools สำหรับ programmatic integration กับ MCP-compatible clients
-- **A09 Active Detection** — 7 custom Semgrep rules ตรวจจับ logging/monitoring anti-patterns (CWE-117/390/532/778)
+- **MCP Server** — 8 composable tools สำหรับ programmatic integration กับ MCP-compatible clients (compare, compliance_status, suggest_fix)
+- **Custom OWASP Rules** — 33 custom Semgrep rules for A01 (access control), A03 (injection), A09 (logging), A10 (SSRF)
+- **6 Output Formats** — SARIF, JSON, Markdown, HTML, PDF, CSV
 
 ---
 
@@ -99,35 +100,42 @@
 
 ครอบคลุม OWASP Top 10 (2021) ทั้ง 10 categories ด้วย tools และ rules ที่เหมาะสม:
 
-| #   | Category                  | Tools                    | Detection Method                                                                         |
-| --- | ------------------------- | ------------------------ | ---------------------------------------------------------------------------------------- |
-| A01 | Broken Access Control     | Semgrep, ZAP             | SAST rules + DAST crawl                                                                  |
-| A02 | Cryptographic Failures    | Semgrep, GitLeaks        | Weak crypto patterns + exposed secrets                                                   |
-| A03 | Injection                 | Semgrep, ZAP             | SQLi/XSS/SSRF patterns + active fuzzing                                                  |
-| A04 | Insecure Design           | Checkov, Semgrep         | IaC misconfig + design pattern rules                                                     |
-| A05 | Security Misconfiguration | Trivy, Checkov, ZAP      | Container/IaC/header misconfiguration                                                    |
-| A06 | Vulnerable Components     | Grype, Syft              | CVE matching + SBOM dependency analysis                                                  |
-| A07 | Auth Failures             | Semgrep, ZAP             | Auth bypass patterns + session testing                                                   |
-| A08 | Data Integrity Failures   | Semgrep, Trivy           | Deserialization + unsigned image detection                                               |
-| A09 | Logging Failures          | **Custom Semgrep rules** | 7 rules: missing auth logs, silent catch, PII in logs, log injection, rate-limit logging |
-| A10 | SSRF                      | Semgrep, ZAP             | URL validation patterns + DAST probing                                                   |
+| #   | Category                  | Tools                         | Detection Method                                                                                  |
+| --- | ------------------------- | ----------------------------- | ------------------------------------------------------------------------------------------------- |
+| A01 | Broken Access Control     | **Custom Semgrep rules**, ZAP | 8 rules: missing authz, IDOR, path traversal, CORS, privilege escalation (CWE-862/639/22/942/269) |
+| A02 | Cryptographic Failures    | Semgrep, GitLeaks             | Weak crypto patterns + exposed secrets                                                            |
+| A03 | Injection                 | **Custom Semgrep rules**, ZAP | 11 rules: SQLi, command injection, XSS, LDAP injection, template injection (CWE-89/78/79/90/1336) |
+| A04 | Insecure Design           | Checkov, Semgrep              | IaC misconfig + design pattern rules                                                              |
+| A05 | Security Misconfiguration | Trivy, Checkov, ZAP           | Container/IaC/header misconfiguration                                                             |
+| A06 | Vulnerable Components     | Grype, Syft                   | CVE matching + SBOM dependency analysis                                                           |
+| A07 | Auth Failures             | Semgrep, ZAP                  | Auth bypass patterns + session testing                                                            |
+| A08 | Data Integrity Failures   | Semgrep, Trivy                | Deserialization + unsigned image detection                                                        |
+| A09 | Logging Failures          | **Custom Semgrep rules**      | 7 rules: missing auth logs, silent catch, PII in logs, log injection, rate-limit logging          |
+| A10 | SSRF                      | **Custom Semgrep rules**, ZAP | 7 rules: cloud metadata, DNS rebinding, private IP detection (CWE-918)                            |
 
 ---
 
 ## What's New
 
-> ดู [CHANGELOG.md](CHANGELOG.md) สำหรับรายละเอียดทั้งหมด (v1.0.0 → v2.4.0)
+> ดู [CHANGELOG.md](CHANGELOG.md) สำหรับรายละเอียดทั้งหมด (v1.0.0 → v2.5.0)
 
-### v2.4.0 — DAST Infrastructure, A09 Detection & NCSA Validation (Latest)
+### v2.5.0 — Custom OWASP Rules (A01/A03/A10), 3 New MCP Tools, PDF/CSV (Latest)
+
+- **A01/A03/A10 Custom Semgrep Rules** — 26 new rules ตรวจจับ access control, injection, SSRF anti-patterns
+- **3 New MCP Tools** — `devsecops_compare` (trend diff), `devsecops_compliance_status` (aggregate compliance), `devsecops_suggest_fix` (remediation)
+- **PDF/CSV Formatters** — enterprise PDF export (pandoc), spreadsheet CSV export
+- **700+ tests** across 19 suites (was 587)
+
+<details>
+<summary>Previous versions</summary>
+
+### v2.4.0 — DAST Infrastructure, A09 Detection & NCSA Validation
 
 - **A09 Custom Semgrep Rules** — 7 rules (5 categories) ตรวจจับ OWASP A09:2021 anti-patterns (CWE-117/390/532/778) ใน Python + JS/TS
 - **ZAP Multi-Mode Dispatcher** — 3 modes: `baseline` (passive, 120s), `full` (active, 1800s), `api` (OpenAPI, 600s) + authenticated scanning
 - **NCSA Website Security Validator** — ตรวจ HTTP Security Headers (1.x), Transport Security (2.x), Session Management (4.x) ตามมาตรฐาน สพธอ.
 - **DAST Live Testing** — conditional test suite สำหรับ live ZAP scan (ต้องตั้ง `DAST_TARGET`)
 - **587 tests** across 15 suites (was 461)
-
-<details>
-<summary>Previous versions</summary>
 
 ### v2.3.0 — NCSA Compliance Mapping
 
@@ -513,13 +521,16 @@ Claude Code / MCP Client ---- stdio ----> mcp/server.mjs
 
 ### MCP Tools
 
-| MCP Tool               | Input                     | Output                       | ทำอะไร                                      |
-| ---------------------- | ------------------------- | ---------------------------- | ------------------------------------------- |
-| `devsecops_scan`       | tool, target, rules       | job_id + normalized findings | รัน security scan (เลือก tool ได้)          |
-| `devsecops_results`    | job_id, format            | formatted results            | ดึงผลลัพธ์ scan ในรูปแบบที่ต้องการ          |
-| `devsecops_gate`       | results_file, policy      | PASS/FAIL + violations       | ประเมิน pass/fail ตาม severity policy       |
-| `devsecops_compliance` | findings_file, frameworks | cross-walk matrix            | Map findings ไปยัง OWASP/NIST/MITRE/NCSA    |
-| `devsecops_status`     | (none)                    | runner + images status       | ตรวจสอบ Docker + tool images ที่พร้อมใช้งาน |
+| MCP Tool                      | Input                         | Output                       | ทำอะไร                                      |
+| ----------------------------- | ----------------------------- | ---------------------------- | ------------------------------------------- |
+| `devsecops_scan`              | tool, target, rules           | job_id + normalized findings | รัน security scan (เลือก tool ได้)          |
+| `devsecops_results`           | job_id, format                | formatted results            | ดึงผลลัพธ์ scan ในรูปแบบที่ต้องการ          |
+| `devsecops_gate`              | results_file, policy          | PASS/FAIL + violations       | ประเมิน pass/fail ตาม severity policy       |
+| `devsecops_compliance`        | findings_file, frameworks     | cross-walk matrix            | Map findings ไปยัง OWASP/NIST/MITRE/NCSA    |
+| `devsecops_status`            | (none)                        | runner + images status       | ตรวจสอบ Docker + tool images ที่พร้อมใช้งาน |
+| `devsecops_compare`           | baseline_file, current_file   | new/fixed/unchanged + trend  | เปรียบเทียบ 2 ผลสแกน (trend analysis)       |
+| `devsecops_compliance_status` | findings_file                 | per-framework coverage       | สรุป compliance ข้าม 4 frameworks           |
+| `devsecops_suggest_fix`       | cwe_id, rule_id, finding_file | remediation suggestions      | แนะนำวิธีแก้ไขจาก CWE/rule knowledge        |
 
 ### ติดตั้ง MCP
 
@@ -529,6 +540,7 @@ cd mcp && npm install
 # ตรวจสอบ
 node --check mcp/server.mjs
 bash tests/test-mcp-server.sh   # 23 tests
+bash tests/test-mcp-compare.sh  # 22 compare tests
 ```
 
 MCP server จะถูก load อัตโนมัติผ่าน `.mcp.json` — ไม่ต้องตั้งค่าเพิ่มเติม
@@ -575,7 +587,7 @@ Plugin นี้ map ผลลัพธ์จาก CWE ไปยัง complian
 
 ## Output Formats
 
-ผลลัพธ์จากทุก scan สามารถ export ได้ 4 รูปแบบ:
+ผลลัพธ์จากทุก scan สามารถ export ได้ 6 รูปแบบ:
 
 | Format           | ใช้ทำอะไร                                 | ตัวอย่าง        |
 | ---------------- | ----------------------------------------- | --------------- |
@@ -583,6 +595,8 @@ Plugin นี้ map ผลลัพธ์จาก CWE ไปยัง complian
 | **JSON**         | ใช้กับ CI/CD pipeline หรือ custom tooling | `results.json`  |
 | **Markdown**     | แปะเป็น PR comment                        | `results.md`    |
 | **HTML**         | Executive dashboard สำหรับผู้บริหาร       | `results.html`  |
+| **PDF**          | Enterprise report สำหรับ audit / mgmt     | `results.pdf`   |
+| **CSV**          | Import ลง spreadsheet / SIEM              | `results.csv`   |
 
 ### Unified Finding Schema
 
@@ -712,10 +726,10 @@ bash scripts/install-runner.sh --mode full
 
 ## Testing & Quality
 
-### Test Results (587/587)
+### Test Results (700+)
 
 ```
-Validation:       234/234 structural checks (plugin structure, skills, agents, mappings)
+Validation:       236/236 structural checks (plugin structure, skills, agents, mappings)
 Normalizer:        41/41  severity mapping + multi-array + null safety
 MCP Server:        23/23  config + syntax + tool definitions
 MCP Handlers:      25/25  Zod validation + gate logic + compliance crosswalk + NCSA
@@ -724,14 +738,18 @@ Dedup:             15/15  cross-tool deduplication
 Auto-Fix:          37/37  SKILL.md structure + agent config + routing
 DAST Integration:  22/22  ZAP fixture + normalizer + dispatcher
 MCP Integration:   38/38  Docker availability + handler logic + runner
-A09 Rules:         28/28  rule YAML + metadata + CWE cross-ref + semgrep --validate
+A01 Rules:         29/29  A01 access control rule YAML + metadata + CWE cross-ref
+A03 Rules:         32/32  A03 injection rule YAML + metadata + CWE cross-ref
+A09 Rules:         28/28  A09 logging rule YAML + metadata + CWE cross-ref + semgrep --validate
+A10 Rules:         23/23  A10 SSRF rule YAML + metadata + CWE cross-ref
 ZAP Modes:         34/34  mode parsing + timeout + Docker commands + fixtures
 NCSA Validator:    24/24  script structure + header checks + output format
+MCP Compare:       22/22  compare + compliance_status + suggest_fix tools
 DAST Live:          0/0   conditional (requires DAST_TARGET env var)
-Formatters:        11/11  SARIF + JSON + Markdown + HTML formatter validation
+Formatters:        16/16  SARIF + JSON + Markdown + HTML + CSV + PDF formatter validation
 Runner:            28/28  job-dispatcher + result-collector + Docker orchestration
 --------------------------------------------------------------
-Total:            587/587 checks passed (15 suites)
+Total:            700+ checks passed (19 suites)
 ```
 
 ### QA History
@@ -754,7 +772,7 @@ Total:            587/587 checks passed (15 suites)
 for f in tests/validate-plugin.sh tests/test-*.sh; do bash "$f"; done
 
 # Or individually
-bash tests/validate-plugin.sh          # 234 structural checks
+bash tests/validate-plugin.sh          # 236 structural checks
 bash tests/test-normalizer.sh          # 41 normalizer unit tests
 bash tests/test-mcp-server.sh          # 23 MCP server tests
 bash tests/test-mcp-handlers.sh        # 25 MCP handler logic tests
@@ -763,11 +781,15 @@ bash tests/test-dedup.sh               # 15 dedup tests
 bash tests/test-auto-fix.sh            # 37 auto-fix skill tests
 bash tests/test-dast-integration.sh    # 22 DAST integration tests
 bash tests/test-mcp-integration.sh     # 38 MCP Docker integration tests
+bash tests/test-a01-rules.sh           # 29 A01 access control rules tests
+bash tests/test-a03-rules.sh           # 32 A03 injection rules tests
 bash tests/test-a09-rules.sh           # 28 A09 custom rules tests
+bash tests/test-a10-rules.sh           # 23 A10 SSRF rules tests
+bash tests/test-mcp-compare.sh         # 22 MCP compare tests
 bash tests/test-zap-modes.sh           # 34 ZAP multi-mode tests
 bash tests/test-ncsa-validator.sh      # 24 NCSA validator tests
 bash tests/test-dast-live.sh           # conditional (needs DAST_TARGET)
-bash tests/test-formatters.sh          # 11 formatter tests
+bash tests/test-formatters.sh          # 16 formatter tests
 bash tests/test-runner.sh              # 28 runner tests
 ```
 
@@ -796,18 +818,18 @@ bash tests/test-runner.sh              # 28 runner tests
 
 ### Value Delivered
 
-| Deliverable                  | Quantity                                                |
-| ---------------------------- | ------------------------------------------------------- |
-| AI Agents                    | 18 (fully configured with routing + delegation)         |
-| Security Skills              | 13 (7 scanning + 6 orchestration)                       |
-| Docker Tool Integrations     | 7 (Semgrep, ZAP, Grype, Trivy, Checkov, GitLeaks, Syft) |
-| MCP Tools                    | 5 (scan, results, gate, compliance, status)             |
-| CWE Compliance Mappings      | 360 across 4 frameworks                                 |
-| Custom Security Rules        | 7 (OWASP A09 Semgrep rules)                             |
-| Automated Tests              | 587 across 15 suites                                    |
-| Reference Documents          | 16 domain knowledge files (~500-800 lines each)         |
-| Hooks (Real-time Protection) | 3 (session-start, scan-on-write, pre-commit-gate)       |
-| Output Formatters            | 4 (SARIF, JSON, Markdown, HTML)                         |
+| Deliverable                  | Quantity                                                                             |
+| ---------------------------- | ------------------------------------------------------------------------------------ |
+| AI Agents                    | 18 (fully configured with routing + delegation)                                      |
+| Security Skills              | 13 (7 scanning + 6 orchestration)                                                    |
+| Docker Tool Integrations     | 7 (Semgrep, ZAP, Grype, Trivy, Checkov, GitLeaks, Syft)                              |
+| MCP Tools                    | 8 (scan, results, gate, compliance, status, compare, compliance_status, suggest_fix) |
+| CWE Compliance Mappings      | 360 across 4 frameworks                                                              |
+| Custom Security Rules        | 33 (OWASP A01/A03/A09/A10 Semgrep rules)                                             |
+| Automated Tests              | 700+ across 19 suites                                                                |
+| Reference Documents          | 16 domain knowledge files (~500-800 lines each)                                      |
+| Hooks (Real-time Protection) | 3 (session-start, scan-on-write, pre-commit-gate)                                    |
+| Output Formatters            | 6 (SARIF, JSON, Markdown, HTML, PDF, CSV)                                            |
 
 ---
 
@@ -828,8 +850,8 @@ bash tests/test-runner.sh              # 28 runner tests
 | **NCSA Compliance**    | Built-in          | —                        | —                | —            |
 | **Offline/Air-gapped** | Full support      | Partial                  | —                | Self-hosted  |
 | **Data Privacy**       | 100% local        | Cloud                    | Cloud            | Self-hosted  |
-| **Custom Rules**       | A09 Semgrep       | Custom CodeQL            | —                | Custom rules |
-| **MCP Integration**    | 5 tools           | —                        | —                | —            |
+| **Custom Rules**       | A01/A03/A09/A10   | Custom CodeQL            | —                | Custom rules |
+| **MCP Integration**    | 8 tools           | —                        | —                | —            |
 
 > **Note**: DevSecOps AI Team ใช้ open-source tools ทั้งหมด — ไม่มี vendor lock-in, source code ไม่ออกจากเครื่อง
 
@@ -850,16 +872,16 @@ devsecops-ai-team/
 +-- skills/                  # 13 skill definitions (SKILL.md)
 |   +-- references/          # 16 domain knowledge files (~500-800 lines each)
 +-- runner/                  # Sidecar Runner (Dockerfile, compose, dispatcher, collector)
-+-- formatters/              # SARIF, Markdown, HTML, JSON normalizer, dedup
-+-- mcp/                     # MCP server -- 5 tools
++-- formatters/              # SARIF, Markdown, HTML, PDF, CSV, JSON normalizer, dedup
++-- mcp/                     # MCP server -- 8 tools
 |   +-- server.mjs           #   ESM module, stdio transport
 |   +-- package.json         #   @modelcontextprotocol/sdk + zod
 +-- mappings/                # CWE->OWASP, CWE->NIST, CWE->MITRE, CWE->NCSA, severity policy
-+-- rules/                   # Custom Semgrep rules (A09 logging/monitoring)
++-- rules/                   # Custom Semgrep rules (A01, A03, A09, A10)
 +-- templates/               # Report templates (HTML, Markdown)
 +-- hooks/                   # 3 hooks (session-start, scan-on-write, pre-commit-gate)
 +-- scripts/                 # install-runner, install-rules, check-prerequisites, NCSA validator
-+-- tests/                   # 587 tests across 15 suites
++-- tests/                   # 700+ tests across 19 suites
 +-- docs/                    # INSTALL, TROUBLESHOOTING, AGENT-CATALOG, RUNBOOK, MANDAY
 +-- examples/                # Rules, policies, DOMAIN.md, Semgrep rules
 +-- frameworks.json          # 16 tracked security frameworks with version info
@@ -878,7 +900,7 @@ devsecops-ai-team/
 | [FRAMEWORK-UPDATE-RUNBOOK.md](docs/FRAMEWORK-UPDATE-RUNBOOK.md) | ขั้นตอนอัพเดท framework versions                   |
 | [MANDAY-ESTIMATION.md](docs/MANDAY-ESTIMATION.md)               | ROI analysis + cost comparison (10,222% ROI)       |
 | [CLAUDE.md](CLAUDE.md)                                          | Architecture + contributing guidelines             |
-| [CHANGELOG.md](CHANGELOG.md)                                    | Version history (v1.0.0 → v2.4.0)                  |
+| [CHANGELOG.md](CHANGELOG.md)                                    | Version history (v1.0.0 → v2.5.0)                  |
 | [SECURITY.md](SECURITY.md)                                      | Vulnerability reporting policy                     |
 
 ---
@@ -949,8 +971,8 @@ claude-governance (base)          devsecops-ai-team (extends)
 | v2.1.0  | Released    | Security fixes, RBAC gate, Zod validation, 15 CWEs added             |
 | v2.2.0  | Released    | Framework remediation (Django/React/Express/Spring), Syft normalizer |
 | v2.3.0  | Released    | NCSA compliance (62 CWEs), auto-fix skill, session/error coverage    |
-| v2.4.0  | **Current** | A09 detection (7 rules), ZAP multi-mode (3 modes), NCSA validator    |
-| v2.5.0  | Planned     | GitHub Actions integration, SARIF auto-upload, PR comment bot        |
+| v2.4.0  | Released    | A09 detection (7 rules), ZAP multi-mode (3 modes), NCSA validator    |
+| v2.5.0  | **Current** | A01/A03/A10 rules (26 new), 3 MCP tools, PDF/CSV formatters          |
 | v3.0.0  | Planned     | Multi-language custom rules, cloud-native scanning, dashboard UI     |
 
 ---
@@ -963,7 +985,7 @@ MIT License — see [LICENSE](LICENSE)
 
 <p align="center">
   <strong>DevSecOps AI Team</strong> — Enterprise Security Plugin for Claude Code<br>
-  <sub>18 AI Agents | 13 Skills | 7 Tools | 360 CWE Mappings | OWASP 10/10</sub><br>
+  <sub>18 AI Agents | 13 Skills | 7 Tools | 8 MCP Tools | 6 Output Formats | 360 CWE Mappings | OWASP 10/10</sub><br>
   <sub>Built with <a href="https://claude.ai/claude-code">Claude Code</a> | Powered by Open Source Security Tools</sub>
 </p>
 

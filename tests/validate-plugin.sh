@@ -142,6 +142,9 @@ for f in sarif-formatter.sh markdown-formatter.sh html-formatter.sh json-normali
   [ -f "$ROOT_DIR/formatters/$f" ] && pass "$f exists" || fail "$f missing"
 done
 
+[ -f "$ROOT_DIR/formatters/pdf-formatter.sh" ] && pass "pdf-formatter.sh exists" || fail "pdf-formatter.sh missing"
+[ -f "$ROOT_DIR/formatters/csv-formatter.sh" ] && pass "csv-formatter.sh exists" || fail "csv-formatter.sh missing"
+
 # ─── Section 8: Mappings ───
 echo ""
 echo "--- Section 8: Compliance Mappings ---"

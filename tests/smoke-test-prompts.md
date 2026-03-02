@@ -82,6 +82,23 @@ Manual functional test scenarios for each skill and agent.
 2. "Auto-fix the SAST findings"
 3. "Apply security patches --dry-run"
 
+### MCP Tools (v2.5.0)
+
+1. "Compare my baseline scan results with the current scan"
+2. "Show compliance status across OWASP, NIST, MITRE, NCSA"
+3. "Suggest a fix for CWE-89 SQL injection"
+
+### Output Formats (v2.5.0)
+
+1. "Export scan results as PDF"
+2. "Export scan results as CSV"
+
+### Custom OWASP Rules (v2.5.0)
+
+1. "Run SAST scan with A01 access control rules"
+2. "Scan for SSRF vulnerabilities using A10 rules"
+3. "Check for injection vulnerabilities with A03 rules"
+
 ## Agents (trigger keywords)
 
 ### Orchestrators

@@ -80,6 +80,41 @@ else
   fail "HTML formatter failed"
 fi
 
+# ─── CSV Formatter ───
+echo ""
+echo "--- CSV Formatter ---"
+
+CSV_OUT="$TMPDIR/results.csv"
+if bash "$ROOT_DIR/formatters/csv-formatter.sh" --input "$NORMALIZED" --output "$CSV_OUT" 2>/dev/null; then
+  pass "CSV formatter executed"
+  [ -s "$CSV_OUT" ] && pass "CSV output not empty" || fail "CSV output empty"
+  head -1 "$CSV_OUT" | grep -q "id,source_tool" && pass "CSV has correct headers" || fail "CSV missing headers"
+  # Count data rows (total lines minus header)
+  CSV_ROWS=$(( $(wc -l < "$CSV_OUT") - 1 ))
+  [ "$CSV_ROWS" -gt 0 ] && pass "CSV has $CSV_ROWS data rows" || fail "CSV has no data rows"
+else
+  fail "CSV formatter failed"
+fi
+
+# ─── PDF Formatter ───
+echo ""
+echo "--- PDF Formatter ---"
+
+# PDF requires pandoc — test conditionally
+if command -v pandoc &>/dev/null; then
+  PDF_OUT="$TMPDIR/results.pdf"
+  if bash "$ROOT_DIR/formatters/pdf-formatter.sh" --input "$NORMALIZED" --output "$PDF_OUT" 2>/dev/null; then
+    pass "PDF formatter executed"
+    [ -s "$PDF_OUT" ] && pass "PDF output not empty" || fail "PDF output empty"
+  else
+    fail "PDF formatter failed"
+  fi
+else
+  echo "  [SKIP] pandoc not available — skipping PDF formatter test"
+  # Still verify the script exists and handles missing pandoc gracefully
+  [ -f "$ROOT_DIR/formatters/pdf-formatter.sh" ] && pass "PDF formatter script exists" || fail "PDF formatter script missing"
+fi
+
 echo ""
 echo "============================================"
 echo "Results: $PASS passed / $FAIL failed"

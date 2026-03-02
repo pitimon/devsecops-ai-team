@@ -9,7 +9,7 @@
     {
       "name": "devsecops-ai-team",
       "description": "Enterprise DevSecOps AI Team — 18 specialized agents + 12 skills for full-pipeline security scanning using open-source tools in Docker containers. Bilingual Thai+English output.",
-      "version": "2.4.0",
+      "version": "2.5.0",
       "author": {
         "name": "P.Itarun"
       },

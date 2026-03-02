@@ -7,6 +7,30 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [2.5.0] — 2026-03-03
+
+### Added
+
+- **A01 Broken Access Control** — 8 custom Semgrep rules (CWE-862, CWE-639, CWE-22, CWE-942, CWE-269)
+- **A03 Injection** — 11 custom Semgrep rules (CWE-89, CWE-78, CWE-79, CWE-90, CWE-1336)
+- **A10 SSRF** — 7 custom Semgrep rules (CWE-918) with cloud metadata, DNS rebinding, private IP detection
+- **MCP compare tool** (`devsecops_compare`) — diff two scans showing new/fixed/unchanged findings with trend
+- **MCP compliance_status tool** (`devsecops_compliance_status`) — aggregate compliance across 4 frameworks
+- **MCP suggest_fix tool** (`devsecops_suggest_fix`) — remediation suggestions from CWE/rule knowledge
+- **PDF formatter** (`formatters/pdf-formatter.sh`) — enterprise PDF export via pandoc
+- **CSV formatter** (`formatters/csv-formatter.sh`) — spreadsheet-compatible CSV export
+- 4 new test suites: test-a01-rules.sh (29), test-a03-rules.sh (32), test-a10-rules.sh (23), test-mcp-compare.sh (22)
+- 6 new test fixtures for A01, A03, A10 findings and compare baseline/current
+
+### Changed
+
+- Custom OWASP rule coverage expanded from 1/10 (A09) to 4/10 (A01, A03, A09, A10)
+- MCP server tools expanded from 5 to 8
+- Output formats expanded from 4 to 6 (added PDF, CSV)
+- Job dispatcher now loads A01, A03, A10 custom rules alongside A09
+- SAST patterns reference expanded with A01, A03, A10 rule documentation
+- Total test count: ~700+ (was 587)
+
 ### Fixed
 
 - DAST specialist agent now references NCSA validator step (QA Round 8 issue #28)

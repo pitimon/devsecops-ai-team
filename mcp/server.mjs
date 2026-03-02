@@ -114,7 +114,7 @@ const TOOLS = [
         },
         format: {
           type: "string",
-          enum: ["json", "sarif", "markdown", "html"],
+          enum: ["json", "sarif", "markdown", "html", "pdf", "csv"],
           description: "Output format (default: json)",
         },
       },
@@ -134,7 +134,7 @@ const TOOLS = [
         },
         format: {
           type: "string",
-          enum: ["json", "sarif", "markdown", "html"],
+          enum: ["json", "sarif", "markdown", "html", "pdf", "csv"],
           description: "Output format (default: json)",
         },
       },
@@ -301,6 +301,8 @@ const FORMAT_EXT_MAP = {
   sarif: "results.sarif",
   markdown: "results.md",
   html: "results.html",
+  pdf: "results.pdf",
+  csv: "results.csv",
 };
 
 async function handleResults({ job_id, format }) {
@@ -688,12 +690,16 @@ const ScanSchema = z.object({
   ]),
   target: z.string().optional(),
   rules: z.string().optional(),
-  format: z.enum(["json", "sarif", "markdown", "html"]).optional(),
+  format: z
+    .enum(["json", "sarif", "markdown", "html", "pdf", "csv"])
+    .optional(),
 });
 
 const ResultsSchema = z.object({
   job_id: z.string().min(1),
-  format: z.enum(["json", "sarif", "markdown", "html"]).optional(),
+  format: z
+    .enum(["json", "sarif", "markdown", "html", "pdf", "csv"])
+    .optional(),
 });
 
 const GateSchema = z.object({
@@ -753,7 +759,7 @@ function validateInput(schema, args) {
 // ─── Server Setup ───
 
 const server = new Server(
-  { name: "devsecops-mcp-server", version: "2.4.0" },
+  { name: "devsecops-mcp-server", version: "2.5.0" },
   { capabilities: { tools: {} } },
 );
 

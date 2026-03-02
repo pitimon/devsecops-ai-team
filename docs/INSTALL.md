@@ -40,7 +40,7 @@ claude plugin install devsecops-ai-team@pitimon-devsecops
 3. แตกไฟล์และติดตั้ง:
 
 ```bash
-tar xzf devsecops-ai-team-v2.4.0.tar.gz
+tar xzf devsecops-ai-team-v2.5.0.tar.gz
 claude plugin marketplace add ./devsecops-ai-team
 claude plugin install devsecops-ai-team@pitimon-devsecops
 ```
