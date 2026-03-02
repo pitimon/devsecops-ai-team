@@ -1,0 +1,307 @@
+rules:
+  # ==========================================================================
+  # A09:2021 Security Logging & Monitoring Failures — Custom Semgrep Rules
+  # DevSecOps AI Team v2.4.0
+  #
+  # 7 rules (5 categories) targeting A09 anti-patterns
+  # Languages: Python (5 rules), JavaScript/TypeScript (2 rules)
+  # Reference: skills/references/logging-monitoring.md
+  # ==========================================================================
+
+  # -------------------------------------------------------------------------
+  # Category 1: Missing Authentication Logging (CWE-778)
+  # -------------------------------------------------------------------------
+  - id: a09-missing-auth-logging
+    patterns:
+      - pattern: |
+          def $FUNC(...):
+              ...
+      - metavariable-regex:
+          metavariable: $FUNC
+          regex: (login|logout|authenticate|sign_in|sign_out|verify_password|reset_password)
+      - pattern-not: |
+          def $FUNC(...):
+              ...
+              logger.$METHOD(...)
+              ...
+      - pattern-not: |
+          def $FUNC(...):
+              ...
+              logging.$METHOD(...)
+              ...
+      - pattern-not: |
+          def $FUNC(...):
+              ...
+              audit_log(...)
+              ...
+    message: >
+      Authentication function '$FUNC' does not produce audit logs.
+      Security-relevant events (login, logout, password reset) MUST be logged
+      per OWASP A09:2021 and NIST AU-2. Add structured logging for both
+      success and failure outcomes.
+    languages:
+      - python
+    severity: WARNING
+    metadata:
+      cwe:
+        - "CWE-778"
+      owasp:
+        - "A09:2021"
+      nist:
+        - "AU-2"
+        - "AU-3"
+      confidence: MEDIUM
+      impact: MEDIUM
+      likelihood: HIGH
+      category: security
+      technology:
+        - python
+      references:
+        - https://owasp.org/Top10/A09_2021-Security_Logging_and_Monitoring_Failures/
+        - https://cwe.mitre.org/data/definitions/778.html
+      fix: |
+        Add structured logging to authentication functions:
+          logger.info("auth_event", action="login", outcome="success", user_id=user.id)
+
+  # -------------------------------------------------------------------------
+  # Category 2: Catch Without Logging (CWE-390) — Python
+  # -------------------------------------------------------------------------
+  - id: a09-catch-without-logging
+    pattern-either:
+      - pattern: |
+          try:
+              ...
+          except:
+              pass
+      - pattern: |
+          try:
+              ...
+          except $EX:
+              pass
+      - pattern: |
+          try:
+              ...
+          except $EX as $E:
+              pass
+    message: >
+      Exception caught but not logged. Silent error swallowing (CWE-390)
+      prevents detection of security incidents and operational failures.
+      Log the exception with context before handling or re-raising.
+    languages:
+      - python
+    severity: WARNING
+    metadata:
+      cwe:
+        - "CWE-390"
+        - "CWE-223"
+      owasp:
+        - "A09:2021"
+      nist:
+        - "AU-6"
+        - "SI-4"
+      confidence: HIGH
+      impact: MEDIUM
+      likelihood: HIGH
+      category: security
+      references:
+        - https://cwe.mitre.org/data/definitions/390.html
+        - https://cwe.mitre.org/data/definitions/223.html
+      fix: |
+        Log exceptions before handling:
+          logger.error("operation_failed", error=str(e), exc_info=True)
+
+  # -------------------------------------------------------------------------
+  # Category 2: Catch Without Logging (CWE-390) — JavaScript/TypeScript
+  # -------------------------------------------------------------------------
+  - id: a09-catch-without-logging-js
+    pattern: |
+      try { ... } catch ($E) { }
+    message: >
+      Empty catch block — exception caught but not logged (CWE-390).
+      Silent error swallowing prevents detection of security incidents.
+      Log the exception with context.
+    languages:
+      - javascript
+      - typescript
+    severity: WARNING
+    metadata:
+      cwe:
+        - "CWE-390"
+        - "CWE-223"
+      owasp:
+        - "A09:2021"
+      nist:
+        - "AU-6"
+        - "SI-4"
+      confidence: HIGH
+      impact: MEDIUM
+      likelihood: HIGH
+      category: security
+      references:
+        - https://cwe.mitre.org/data/definitions/390.html
+        - https://cwe.mitre.org/data/definitions/223.html
+      fix: |
+        Log exceptions before handling:
+          logger.error({ err: e }, "operation_failed")
+
+  # -------------------------------------------------------------------------
+  # Category 3: Sensitive Data in Log Statements (CWE-532) — Python
+  # -------------------------------------------------------------------------
+  - id: a09-sensitive-data-in-log
+    pattern-either:
+      - patterns:
+          - pattern-either:
+              - pattern: logger.$METHOD(f"...{$VAR}...")
+              - pattern: logging.$METHOD(f"...{$VAR}...")
+          - metavariable-regex:
+              metavariable: $VAR
+              regex: (password|passwd|secret|token|api_key|apikey|api_secret|auth_token|access_token|refresh_token|private_key|credit_card|ssn|social_security)
+      - patterns:
+          - pattern-either:
+              - pattern: logger.$METHOD("..." % $VAR)
+              - pattern: logging.$METHOD("..." % $VAR)
+          - metavariable-regex:
+              metavariable: $VAR
+              regex: (password|passwd|secret|token|api_key|apikey|api_secret|auth_token|access_token|refresh_token|private_key|credit_card|ssn|social_security)
+    message: >
+      Sensitive data '$VAR' is being written to log output (CWE-532).
+      Credentials, PII, and secrets MUST NOT appear in logs. Use redaction
+      middleware or log only non-sensitive identifiers.
+    languages:
+      - python
+    severity: ERROR
+    metadata:
+      cwe:
+        - "CWE-532"
+      owasp:
+        - "A09:2021"
+      nist:
+        - "AU-3"
+        - "SI-4"
+      confidence: HIGH
+      impact: HIGH
+      likelihood: MEDIUM
+      category: security
+      references:
+        - https://cwe.mitre.org/data/definitions/532.html
+        - https://owasp.org/Top10/A09_2021-Security_Logging_and_Monitoring_Failures/
+      fix: |
+        Remove sensitive data from logs:
+          logger.info("user_authenticated", user_id=user.id)  # NOT password
+
+  # -------------------------------------------------------------------------
+  # Category 3: Sensitive Data in Log Statements (CWE-532) — JavaScript/TS
+  # -------------------------------------------------------------------------
+  - id: a09-sensitive-data-in-log-js
+    pattern-either:
+      - patterns:
+          - pattern-either:
+              - pattern: logger.$METHOD(`...${$VAR}...`)
+              - pattern: console.$METHOD(`...${$VAR}...`)
+          - metavariable-regex:
+              metavariable: $VAR
+              regex: (password|passwd|secret|token|apiKey|apiSecret|authToken|accessToken|refreshToken|privateKey|creditCard|ssn)
+    message: >
+      Sensitive data '$VAR' is being written to log output (CWE-532).
+      Credentials, PII, and secrets MUST NOT appear in logs. Use redaction
+      middleware or log only non-sensitive identifiers.
+    languages:
+      - javascript
+      - typescript
+    severity: ERROR
+    metadata:
+      cwe:
+        - "CWE-532"
+      owasp:
+        - "A09:2021"
+      nist:
+        - "AU-3"
+        - "SI-4"
+      confidence: HIGH
+      impact: HIGH
+      likelihood: MEDIUM
+      category: security
+      references:
+        - https://cwe.mitre.org/data/definitions/532.html
+        - https://owasp.org/Top10/A09_2021-Security_Logging_and_Monitoring_Failures/
+      fix: |
+        Remove sensitive data from logs:
+          logger.info({ userId }, "authenticated")  // NOT token
+
+  # -------------------------------------------------------------------------
+  # Category 4: Log Injection (CWE-117) — Python
+  # -------------------------------------------------------------------------
+  - id: a09-log-injection
+    pattern-either:
+      - pattern: logger.$METHOD(f"...{request.$ATTR}...")
+      - pattern: logging.$METHOD(f"...{request.$ATTR}...")
+      - pattern: logger.$METHOD(f"...{req.$ATTR}...")
+      - pattern: logging.$METHOD(f"...{req.$ATTR}...")
+    message: >
+      Unsanitized user input from request object in log statement (CWE-117).
+      Attackers can inject fake log entries via newline characters. Use
+      structured logging or sanitize input before logging.
+    languages:
+      - python
+    severity: WARNING
+    metadata:
+      cwe:
+        - "CWE-117"
+      owasp:
+        - "A09:2021"
+      nist:
+        - "AU-9"
+        - "SI-10"
+      confidence: MEDIUM
+      impact: MEDIUM
+      likelihood: HIGH
+      category: security
+      references:
+        - https://cwe.mitre.org/data/definitions/117.html
+        - https://owasp.org/Top10/A09_2021-Security_Logging_and_Monitoring_Failures/
+      fix: |
+        Use structured logging:
+          logger.info("login_attempt", username=sanitize(username))
+
+  # -------------------------------------------------------------------------
+  # Category 5: Missing Rate Limit Logging (CWE-778) — Python
+  # -------------------------------------------------------------------------
+  - id: a09-missing-rate-limit-logging
+    patterns:
+      - pattern: |
+          if $RATE_CHECK:
+              ...
+              return $RESP
+      - metavariable-regex:
+          metavariable: $RATE_CHECK
+          regex: .*(rate_limit|throttle|too_many_requests|is_rate_limited).*
+      - pattern-not: |
+          if $RATE_CHECK:
+              ...
+              logger.$METHOD(...)
+              ...
+              return $RESP
+    message: >
+      Rate limiting event not logged. When requests are throttled, log the
+      event with client IP and request details for security monitoring.
+      Rate limit violations may indicate brute-force or DoS attempts.
+    languages:
+      - python
+    severity: INFO
+    metadata:
+      cwe:
+        - "CWE-778"
+      owasp:
+        - "A09:2021"
+      nist:
+        - "AU-2"
+        - "SI-4"
+      confidence: LOW
+      impact: LOW
+      likelihood: MEDIUM
+      category: security
+      references:
+        - https://cwe.mitre.org/data/definitions/778.html
+      fix: |
+        Log rate limit events with context:
+          logger.warn("rate_limited", ip=request.remote_addr, path=request.path)

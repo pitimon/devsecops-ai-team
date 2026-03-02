@@ -356,7 +356,40 @@ action:
 
 ---
 
-## 8. Remediation Priority Matrix
+## 8. Custom Semgrep Rules for A09 Detection
+
+The DevSecOps AI Team includes custom Semgrep rules targeting A09 anti-patterns at `rules/a09-logging-rules.yml`. These rules are automatically loaded by `job-dispatcher.sh` when running SAST scans.
+
+### Rule Inventory (7 rules, 5 categories)
+
+| Rule ID                          | CWE     | Severity | Languages | Pattern                                |
+| -------------------------------- | ------- | -------- | --------- | -------------------------------------- |
+| `a09-missing-auth-logging`       | CWE-778 | WARNING  | Python    | Auth functions without audit log calls |
+| `a09-catch-without-logging`      | CWE-390 | WARNING  | Python    | try/except that swallow errors         |
+| `a09-catch-without-logging-js`   | CWE-390 | WARNING  | JS/TS     | Empty try/catch blocks                 |
+| `a09-sensitive-data-in-log`      | CWE-532 | ERROR    | Python    | PII/secrets in f-string/% logs         |
+| `a09-sensitive-data-in-log-js`   | CWE-532 | ERROR    | JS/TS     | PII/secrets in template literal logs   |
+| `a09-log-injection`              | CWE-117 | WARNING  | Python    | Request data in f-string logs          |
+| `a09-missing-rate-limit-logging` | CWE-778 | INFO     | Python    | Rate limit events without logging      |
+
+### Languages Covered
+
+- **Python** — 5 rules (structlog, logging module patterns)
+- **JavaScript/TypeScript** — 2 rules (catch-without-logging, sensitive-data-in-log)
+
+### Running A09 Rules Only
+
+```bash
+# Run only A09 custom rules
+bash runner/job-dispatcher.sh --tool semgrep --target /path/to/code --rules /rules/a09-logging-rules.yml
+
+# A09 rules are also included automatically with default SAST scans
+bash runner/job-dispatcher.sh --tool semgrep --target /path/to/code
+```
+
+---
+
+## 9. Remediation Priority Matrix
 
 | CWE     | Effort | Auto-fixable? | Priority |
 | ------- | ------ | ------------- | -------- |
