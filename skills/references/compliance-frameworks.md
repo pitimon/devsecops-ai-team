@@ -288,9 +288,9 @@ NCSA (National Cyber Security Agency — สำนักงานคณะกร
 | 1        | 1.x      | HTTP Security      | ความมั่นคงปลอดภัย HTTP             | 7         |
 | 2        | 2.x      | Transport Security | ความมั่นคงปลอดภัยในการรับส่งข้อมูล | 6         |
 | 3        | 3.x      | Authentication     | การยืนยันตัวตน                     | 8         |
-| 4        | 4.x      | Session Management | การจัดการ Session                  | 5         |
+| 4        | 4.x      | Session Management | การจัดการ Session                  | 11        |
 | 5        | 5.x      | Input Validation   | การตรวจสอบข้อมูลนำเข้า             | 15        |
-| 6        | 6.x      | Error Handling     | การจัดการข้อผิดพลาด                | 4         |
+| 6        | 6.x      | Error Handling     | การจัดการข้อผิดพลาด                | 10        |
 | 7        | 7.x      | Access Control     | การควบคุมการเข้าถึง                | 7         |
 
 ### 8.2 Key Requirements / ข้อกำหนดสำคัญ

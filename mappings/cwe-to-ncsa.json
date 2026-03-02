@@ -109,7 +109,8 @@
     },
     "CWE-330": {
       "ncsa": [
-        "2.4"
+        "2.4",
+        "4.2"
       ],
       "category": "Transport Security",
       "name": "Use of Insufficiently Random Values"
@@ -412,6 +413,55 @@
       ],
       "category": "Error Handling",
       "name": "Logging of Excessive Data"
+    },
+    "CWE-613": {
+      "ncsa": [
+        "4.5"
+      ],
+      "category": "Session Management",
+      "name": "Insufficient Session Expiration"
+    },
+    "CWE-1004": {
+      "ncsa": [
+        "4.3"
+      ],
+      "category": "Session Management",
+      "name": "Sensitive Cookie Without HttpOnly Flag"
+    },
+    "CWE-331": {
+      "ncsa": [
+        "4.2"
+      ],
+      "category": "Session Management",
+      "name": "Insufficient Entropy in Session Token"
+    },
+    "CWE-489": {
+      "ncsa": [
+        "6.4"
+      ],
+      "category": "Error Handling",
+      "name": "Active Debug Code"
+    },
+    "CWE-754": {
+      "ncsa": [
+        "6.1"
+      ],
+      "category": "Error Handling",
+      "name": "Improper Check for Unusual or Exceptional Conditions"
+    },
+    "CWE-755": {
+      "ncsa": [
+        "6.1"
+      ],
+      "category": "Error Handling",
+      "name": "Improper Handling of Exceptional Conditions"
+    },
+    "CWE-223": {
+      "ncsa": [
+        "6.3"
+      ],
+      "category": "Error Handling",
+      "name": "Omission of Security-relevant Information"
     }
   }
 }

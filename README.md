@@ -30,7 +30,7 @@
 - **7 Security Tools, 1 Command** — `/full-pipeline` รันทุกเครื่องมือแบบ parallel, deduplicate ผลข้าม tools, สร้าง unified report ในคำสั่งเดียว
 - **Real-Time Protection** — บล็อก commits ที่มี CRITICAL findings, ตรวจจับ secrets (AWS keys, GitHub tokens, JWT) ก่อนเขียนลง disk — ทำงานใน 500ms
 - **CVSS v4.0 Prioritization** — ไม่ใช่แค่ severity labels — วิเคราะห์ business impact, exploitability (Weaponized → None), กำหนด SLA tiers (P1: 24 ชม. → P4: backlog)
-- **102 CWE Compliance Mappings** — Auto-map ผลสแกนไปยัง OWASP Top 10 (102 CWEs), NIST 800-53 (96 CWEs), MITRE ATT&CK (89 CWEs)
+- **105 CWE Compliance Mappings** — Auto-map ผลสแกนไปยัง OWASP Top 10 (105 CWEs), NIST 800-53 (100 CWEs), MITRE ATT&CK (93 CWEs)
 - **MCP Server** — 5 composable tools (`devsecops_scan`, `devsecops_gate`, ...) สำหรับ programmatic integration กับ MCP-compatible clients
 
 ---
@@ -41,7 +41,7 @@
 
 ### v2.2.1 — NCSA Compliance Mapping
 
-- **NCSA Website Security Standard v1.0** — 52 CWE mappings across 7 categories (มาตรฐานความมั่นคงปลอดภัยเว็บไซต์ สพธอ.)
+- **NCSA Website Security Standard v1.0** — 62 CWE mappings across 7 categories (มาตรฐานความมั่นคงปลอดภัยเว็บไซต์ สพธอ.)
 - **MCP `ncsa` framework support** — `devsecops_compliance` รองรับ NCSA framework
 - **Issue #13 fixes** — แก้ไขตัวเลขเก่าใน README (test count, CWE counts)
 - **354 tests** across 6 suites (was 352)
@@ -438,7 +438,7 @@ bash formatters/dedup-findings.sh --inputs semgrep.json,grype.json,trivy.json --
 
 ## Compliance Mapping
 
-Plugin นี้ map ผลลัพธ์จาก CWE ไปยัง compliance frameworks อัตโนมัติ — **102 CWEs** mapped to OWASP, **96 CWEs** to NIST, **89 CWEs** to MITRE, **55 CWEs** to NCSA:
+Plugin นี้ map ผลลัพธ์จาก CWE ไปยัง compliance frameworks อัตโนมัติ — **105 CWEs** mapped to OWASP, **100 CWEs** to NIST, **93 CWEs** to MITRE, **62 CWEs** to NCSA:
 
 | Framework             | Version | ใช้ทำอะไร                                   |
 | --------------------- | ------- | ------------------------------------------- |
