@@ -1,0 +1,123 @@
+{
+  "findings": [
+    {
+      "id": "FINDING-A03-001",
+      "source_tool": "semgrep",
+      "scan_type": "sast",
+      "rule_id": "a03-sql-injection",
+      "severity": "ERROR",
+      "title": "SQL injection via f-string in execute()",
+      "cwe_id": "CWE-89",
+      "owasp": "A03:2021",
+      "location": {
+        "file": "src/db/queries.py",
+        "line_start": 15,
+        "line_end": 16
+      },
+      "message": "SQL query built with string interpolation (CWE-89). User-controlled values in SQL queries enable injection attacks. Use parameterized queries.",
+      "status": "open"
+    },
+    {
+      "id": "FINDING-A03-002",
+      "source_tool": "semgrep",
+      "scan_type": "sast",
+      "rule_id": "a03-command-injection",
+      "severity": "ERROR",
+      "title": "Command injection via os.system()",
+      "cwe_id": "CWE-78",
+      "owasp": "A03:2021",
+      "location": {
+        "file": "src/utils/process.py",
+        "line_start": 28,
+        "line_end": 28
+      },
+      "message": "OS command execution with potential user input (CWE-78). Using os.system() allows command injection. Use subprocess with shell=False.",
+      "status": "open"
+    },
+    {
+      "id": "FINDING-A03-003",
+      "source_tool": "semgrep",
+      "scan_type": "sast",
+      "rule_id": "a03-xss-dom",
+      "severity": "ERROR",
+      "title": "DOM XSS via innerHTML assignment",
+      "cwe_id": "CWE-79",
+      "owasp": "A03:2021",
+      "location": {
+        "file": "src/components/comment.js",
+        "line_start": 42,
+        "line_end": 42
+      },
+      "message": "DOM XSS via innerHTML (CWE-79). Assigning user-controlled data to innerHTML enables script injection. Use textContent or DOMPurify.",
+      "status": "open"
+    },
+    {
+      "id": "FINDING-A03-004",
+      "source_tool": "semgrep",
+      "scan_type": "sast",
+      "rule_id": "a03-xss-reflected",
+      "severity": "WARNING",
+      "title": "Reflected XSS via Jinja2 Markup()",
+      "cwe_id": "CWE-79",
+      "owasp": "A03:2021",
+      "location": {
+        "file": "src/views/profile.py",
+        "line_start": 56,
+        "line_end": 56
+      },
+      "message": "Potential reflected XSS via Jinja2 Markup() (CWE-79). Marking user-controlled data as safe bypasses auto-escaping.",
+      "status": "open"
+    },
+    {
+      "id": "FINDING-A03-005",
+      "source_tool": "semgrep",
+      "scan_type": "sast",
+      "rule_id": "a03-ldap-injection",
+      "severity": "ERROR",
+      "title": "LDAP injection via f-string in search filter",
+      "cwe_id": "CWE-90",
+      "owasp": "A03:2021",
+      "location": {
+        "file": "src/auth/ldap_auth.py",
+        "line_start": 33,
+        "line_end": 34
+      },
+      "message": "LDAP query built with string interpolation (CWE-90). User-controlled input in LDAP filters enables injection.",
+      "status": "open"
+    },
+    {
+      "id": "FINDING-A03-006",
+      "source_tool": "semgrep",
+      "scan_type": "sast",
+      "rule_id": "a03-template-injection",
+      "severity": "ERROR",
+      "title": "Server-side template injection via Jinja2 Template()",
+      "cwe_id": "CWE-1336",
+      "owasp": "A03:2021",
+      "location": {
+        "file": "src/render/dynamic.py",
+        "line_start": 21,
+        "line_end": 22
+      },
+      "message": "Server-side template injection (SSTI) via Jinja2 Template with user-controlled input (CWE-1336). SSTI can lead to remote code execution.",
+      "status": "open"
+    }
+  ],
+  "summary": {
+    "total": 6,
+    "critical": 0,
+    "high": 0,
+    "medium": 0,
+    "low": 0,
+    "info": 0,
+    "warning": 1,
+    "error": 5
+  },
+  "metadata": {
+    "rules_file": "rules/a03-injection-rules.yml",
+    "rule_count": 11,
+    "scan_type": "sast",
+    "owasp_category": "A03:2021",
+    "cwe_coverage": ["CWE-78", "CWE-79", "CWE-89", "CWE-90", "CWE-1336"]
+  }
+}

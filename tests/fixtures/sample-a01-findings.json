@@ -1,0 +1,106 @@
+{
+  "findings": [
+    {
+      "id": "FINDING-A01-001",
+      "source_tool": "semgrep",
+      "scan_type": "sast",
+      "rule_id": "a01-missing-auth-decorator",
+      "severity": "ERROR",
+      "title": "Flask route '/admin/users' has no authentication decorator",
+      "cwe_id": "CWE-862",
+      "owasp": "A01:2021",
+      "location": {
+        "file": "src/admin/views.py",
+        "line_start": 24,
+        "line_end": 35
+      },
+      "message": "Flask route handler 'list_users' has no authentication decorator. All endpoints handling sensitive data MUST use @login_required to enforce access control per OWASP A01:2021.",
+      "status": "open"
+    },
+    {
+      "id": "FINDING-A01-002",
+      "source_tool": "semgrep",
+      "scan_type": "sast",
+      "rule_id": "a01-direct-object-reference",
+      "severity": "WARNING",
+      "title": "IDOR in user profile endpoint",
+      "cwe_id": "CWE-639",
+      "owasp": "A01:2021",
+      "location": {
+        "file": "src/api/users.py",
+        "line_start": 42,
+        "line_end": 43
+      },
+      "message": "Object retrieved by user-supplied ID without ownership verification. An attacker can modify the ID parameter to access other users' data (IDOR).",
+      "status": "open"
+    },
+    {
+      "id": "FINDING-A01-003",
+      "source_tool": "semgrep",
+      "scan_type": "sast",
+      "rule_id": "a01-path-traversal",
+      "severity": "ERROR",
+      "title": "Path traversal in file download handler",
+      "cwe_id": "CWE-22",
+      "owasp": "A01:2021",
+      "location": {
+        "file": "src/files/download.py",
+        "line_start": 18,
+        "line_end": 19
+      },
+      "message": "User-supplied input used directly in file path operation without validation. Attacker can use '../' sequences to access arbitrary files (CWE-22).",
+      "status": "open"
+    },
+    {
+      "id": "FINDING-A01-004",
+      "source_tool": "semgrep",
+      "scan_type": "sast",
+      "rule_id": "a01-cors-wildcard",
+      "severity": "WARNING",
+      "title": "CORS configured with wildcard origin",
+      "cwe_id": "CWE-942",
+      "owasp": "A01:2021",
+      "location": {
+        "file": "src/app.py",
+        "line_start": 12,
+        "line_end": 12
+      },
+      "message": "CORS configured with wildcard origin '*'. This allows any website to make cross-origin requests to your API. Use an explicit allowlist of trusted origins.",
+      "status": "open"
+    },
+    {
+      "id": "FINDING-A01-005",
+      "source_tool": "semgrep",
+      "scan_type": "sast",
+      "rule_id": "a01-privilege-escalation",
+      "severity": "ERROR",
+      "title": "Direct role modification without authorization check",
+      "cwe_id": "CWE-269",
+      "owasp": "A01:2021",
+      "location": {
+        "file": "src/admin/roles.py",
+        "line_start": 31,
+        "line_end": 32
+      },
+      "message": "Direct role/permission modification 'user.is_admin' without authorization check. An attacker could escalate privileges by modifying role assignments.",
+      "status": "open"
+    }
+  ],
+  "summary": {
+    "total": 5,
+    "critical": 0,
+    "high": 0,
+    "medium": 0,
+    "low": 0,
+    "info": 0,
+    "warning": 2,
+    "error": 3
+  },
+  "metadata": {
+    "rules_file": "rules/a01-access-control-rules.yml",
+    "rule_count": 8,
+    "scan_type": "sast",
+    "owasp_category": "A01:2021",
+    "cwe_coverage": ["CWE-22", "CWE-269", "CWE-639", "CWE-862", "CWE-942"]
+  }
+}

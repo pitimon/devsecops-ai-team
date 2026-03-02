@@ -1,0 +1,382 @@
+rules:
+  # ==========================================================================
+  # A01:2021 Broken Access Control — Custom Semgrep Rules
+  # DevSecOps AI Team v2.5.0
+  #
+  # 8 rules (8 categories) targeting A01 anti-patterns
+  # Languages: Python (4 rules), JavaScript/TypeScript (3 rules), Java (1 rule)
+  # Reference: skills/references/sast-patterns.md
+  # ==========================================================================
+
+  # -------------------------------------------------------------------------
+  # Category 1: Missing Authentication Decorator (CWE-862) — Python
+  # -------------------------------------------------------------------------
+  - id: a01-missing-auth-decorator
+    patterns:
+      - pattern: |
+          @app.route(...)
+          def $FUNC(...):
+              ...
+      - pattern-not: |
+          @app.route(...)
+          @login_required
+          def $FUNC(...):
+              ...
+      - pattern-not: |
+          @app.route(...)
+          @auth_required
+          def $FUNC(...):
+              ...
+      - pattern-not: |
+          @login_required
+          @app.route(...)
+          def $FUNC(...):
+              ...
+      - pattern-not: |
+          @auth_required
+          @app.route(...)
+          def $FUNC(...):
+              ...
+    message: >
+      Flask/Django route handler '$FUNC' has no authentication decorator.
+      All endpoints handling sensitive data MUST use @login_required or
+      @auth_required to enforce access control per OWASP A01:2021.
+    languages:
+      - python
+    severity: ERROR
+    metadata:
+      cwe:
+        - "CWE-862"
+      owasp:
+        - "A01:2021"
+      nist:
+        - "AC-3"
+        - "AC-6"
+      confidence: MEDIUM
+      impact: HIGH
+      likelihood: HIGH
+      category: security
+      technology:
+        - python
+      references:
+        - https://owasp.org/Top10/A01_2021-Broken_Access_Control/
+        - https://cwe.mitre.org/data/definitions/862.html
+      fix: |
+        Add authentication decorator to route handler:
+          @app.route("/admin")
+          @login_required
+          def admin_panel():
+              ...
+
+  # -------------------------------------------------------------------------
+  # Category 2: Missing Auth Middleware (CWE-862) — JavaScript/TypeScript
+  # -------------------------------------------------------------------------
+  - id: a01-missing-auth-middleware-js
+    patterns:
+      - pattern: |
+          app.$METHOD($PATH, (req, res) => { ... })
+      - pattern-not: |
+          app.$METHOD($PATH, $AUTH, (req, res) => { ... })
+      - metavariable-regex:
+          metavariable: $PATH
+          regex: .*(admin|dashboard|settings|user|profile|account|manage).*
+    message: >
+      Express route for sensitive path '$PATH' has no auth middleware.
+      Routes handling user data or admin functions MUST include
+      authentication middleware per OWASP A01:2021.
+    languages:
+      - javascript
+      - typescript
+    severity: ERROR
+    metadata:
+      cwe:
+        - "CWE-862"
+      owasp:
+        - "A01:2021"
+      nist:
+        - "AC-3"
+        - "AC-6"
+      confidence: MEDIUM
+      impact: HIGH
+      likelihood: HIGH
+      category: security
+      technology:
+        - javascript
+        - typescript
+      references:
+        - https://owasp.org/Top10/A01_2021-Broken_Access_Control/
+        - https://cwe.mitre.org/data/definitions/862.html
+      fix: |
+        Add auth middleware to Express route:
+          app.get("/admin", authMiddleware, (req, res) => { ... })
+
+  # -------------------------------------------------------------------------
+  # Category 3: Missing Auth Annotation (CWE-862) — Java
+  # -------------------------------------------------------------------------
+  - id: a01-missing-auth-annotation-java
+    patterns:
+      - pattern: |
+          @$MAPPING(...)
+          public $RET $FUNC(...) { ... }
+      - pattern-not: |
+          @PreAuthorize(...)
+          @$MAPPING(...)
+          public $RET $FUNC(...) { ... }
+      - pattern-not: |
+          @Secured(...)
+          @$MAPPING(...)
+          public $RET $FUNC(...) { ... }
+      - pattern-not: |
+          @$MAPPING(...)
+          @PreAuthorize(...)
+          public $RET $FUNC(...) { ... }
+      - pattern-not: |
+          @$MAPPING(...)
+          @Secured(...)
+          public $RET $FUNC(...) { ... }
+      - metavariable-regex:
+          metavariable: $MAPPING
+          regex: (GetMapping|PostMapping|PutMapping|DeleteMapping|PatchMapping|RequestMapping)
+    message: >
+      Spring endpoint '$FUNC' missing @PreAuthorize or @Secured annotation.
+      Endpoints MUST enforce authorization per OWASP A01:2021.
+    languages:
+      - java
+    severity: ERROR
+    metadata:
+      cwe:
+        - "CWE-862"
+      owasp:
+        - "A01:2021"
+      nist:
+        - "AC-3"
+        - "AC-6"
+      confidence: MEDIUM
+      impact: HIGH
+      likelihood: HIGH
+      category: security
+      technology:
+        - java
+      references:
+        - https://owasp.org/Top10/A01_2021-Broken_Access_Control/
+        - https://cwe.mitre.org/data/definitions/862.html
+      fix: |
+        Add authorization annotation to Spring endpoint:
+          @PreAuthorize("hasRole('ADMIN')")
+          @GetMapping("/admin/users")
+          public List<User> getUsers() { ... }
+
+  # -------------------------------------------------------------------------
+  # Category 4: Insecure Direct Object Reference (CWE-639) — Python
+  # -------------------------------------------------------------------------
+  - id: a01-direct-object-reference
+    pattern-either:
+      - pattern: |
+          $OBJ = $MODEL.query.get(request.$ATTR[$KEY])
+      - pattern: |
+          $OBJ = $MODEL.objects.get(id=request.$ATTR[$KEY])
+      - pattern: |
+          $OBJ = $MODEL.objects.get(pk=request.$ATTR[$KEY])
+    message: >
+      Object retrieved by user-supplied ID without ownership verification.
+      An attacker can modify the ID parameter to access other users' data
+      (IDOR). Add ownership checks per OWASP A01:2021.
+    languages:
+      - python
+    severity: WARNING
+    metadata:
+      cwe:
+        - "CWE-639"
+      owasp:
+        - "A01:2021"
+      nist:
+        - "AC-3"
+        - "AC-4"
+      confidence: MEDIUM
+      impact: MEDIUM
+      likelihood: HIGH
+      category: security
+      technology:
+        - python
+      references:
+        - https://owasp.org/Top10/A01_2021-Broken_Access_Control/
+        - https://cwe.mitre.org/data/definitions/639.html
+      fix: |
+        Add ownership verification after fetching:
+          obj = Model.objects.get(pk=request.data["id"])
+          if obj.owner_id != request.user.id:
+              raise PermissionDenied("Not authorized")
+
+  # -------------------------------------------------------------------------
+  # Category 5: Insecure Direct Object Reference (CWE-639) — JS/TS
+  # -------------------------------------------------------------------------
+  - id: a01-direct-object-reference-js
+    pattern-either:
+      - pattern: |
+          $OBJ = await $MODEL.findById(req.params.$ID)
+      - pattern: |
+          $OBJ = await $MODEL.findByPk(req.params.$ID)
+      - pattern: |
+          $OBJ = await $MODEL.findOne({_id: req.params.$ID})
+    message: >
+      Object retrieved by user-supplied ID without ownership verification.
+      An attacker can modify the ID parameter to access other users' data
+      (IDOR). Add ownership checks per OWASP A01:2021.
+    languages:
+      - javascript
+      - typescript
+    severity: WARNING
+    metadata:
+      cwe:
+        - "CWE-639"
+      owasp:
+        - "A01:2021"
+      nist:
+        - "AC-3"
+        - "AC-4"
+      confidence: MEDIUM
+      impact: MEDIUM
+      likelihood: HIGH
+      category: security
+      technology:
+        - javascript
+        - typescript
+      references:
+        - https://owasp.org/Top10/A01_2021-Broken_Access_Control/
+        - https://cwe.mitre.org/data/definitions/639.html
+      fix: |
+        Add ownership verification after fetching:
+          const obj = await Model.findById(req.params.id);
+          if (obj.ownerId !== req.user.id) throw new ForbiddenError();
+
+  # -------------------------------------------------------------------------
+  # Category 6: Path Traversal (CWE-22) — Python/JS/TS
+  # -------------------------------------------------------------------------
+  - id: a01-path-traversal
+    pattern-either:
+      - pattern: open(request.$ATTR[$KEY])
+      - pattern: open(f"...{request.$ATTR[$KEY]}...")
+      - pattern: os.path.join(..., request.$ATTR[$KEY])
+    message: >
+      User-supplied input used directly in file path operation without
+      validation. Attacker can use '../' sequences to access arbitrary
+      files (CWE-22). Validate and resolve paths to a safe base directory.
+    languages:
+      - python
+    severity: ERROR
+    metadata:
+      cwe:
+        - "CWE-22"
+      owasp:
+        - "A01:2021"
+      nist:
+        - "AC-3"
+        - "SI-10"
+      confidence: HIGH
+      impact: HIGH
+      likelihood: HIGH
+      category: security
+      technology:
+        - python
+      references:
+        - https://owasp.org/Top10/A01_2021-Broken_Access_Control/
+        - https://cwe.mitre.org/data/definitions/22.html
+      fix: |
+        Validate and resolve path to safe base directory:
+          base = Path("/uploads").resolve()
+          target = (base / user_filename).resolve()
+          if not str(target).startswith(str(base)):
+              raise ValueError("Path traversal detected")
+
+  # -------------------------------------------------------------------------
+  # Category 7: CORS Wildcard Origin (CWE-942) — Python/JS/TS
+  # -------------------------------------------------------------------------
+  - id: a01-cors-wildcard
+    pattern-either:
+      - pattern: |
+          $CORS(..., origins="*", ...)
+      - pattern: |
+          $CORS(..., resources={..., "origins": "*", ...}, ...)
+      - pattern: |
+          Access-Control-Allow-Origin: "*"
+    message: >
+      CORS configured with wildcard origin '*'. This allows any website
+      to make cross-origin requests to your API. Use an explicit allowlist
+      of trusted origins per OWASP A01:2021.
+    languages:
+      - python
+    severity: WARNING
+    metadata:
+      cwe:
+        - "CWE-942"
+      owasp:
+        - "A01:2021"
+      nist:
+        - "AC-3"
+        - "SC-23"
+      confidence: HIGH
+      impact: MEDIUM
+      likelihood: MEDIUM
+      category: security
+      technology:
+        - python
+      references:
+        - https://owasp.org/Top10/A01_2021-Broken_Access_Control/
+        - https://cwe.mitre.org/data/definitions/942.html
+      fix: |
+        Use explicit origin allowlist:
+          CORS(app, origins=["https://app.example.com"])
+
+  # -------------------------------------------------------------------------
+  # Category 8: Privilege Escalation (CWE-269) — Python
+  # -------------------------------------------------------------------------
+  - id: a01-privilege-escalation
+    patterns:
+      - pattern: |
+          $USER.$ROLE = $VALUE
+      - metavariable-regex:
+          metavariable: $ROLE
+          regex: (role|is_admin|is_superuser|is_staff|permission|permissions|group|groups)
+      - pattern-not-inside: |
+          @login_required
+          def $FUNC(...):
+              ...
+      - pattern-not-inside: |
+          @admin_required
+          def $FUNC(...):
+              ...
+      - pattern-not-inside: |
+          if $CHECK:
+              ...
+    message: >
+      Direct role/permission modification '$USER.$ROLE' without
+      authorization check. An attacker could escalate privileges by
+      modifying role assignments. Require admin authorization per
+      OWASP A01:2021.
+    languages:
+      - python
+    severity: ERROR
+    metadata:
+      cwe:
+        - "CWE-269"
+      owasp:
+        - "A01:2021"
+      nist:
+        - "AC-6"
+        - "AC-2"
+      confidence: MEDIUM
+      impact: HIGH
+      likelihood: MEDIUM
+      category: security
+      technology:
+        - python
+      references:
+        - https://owasp.org/Top10/A01_2021-Broken_Access_Control/
+        - https://cwe.mitre.org/data/definitions/269.html
+      fix: |
+        Require admin authorization for role changes:
+          @admin_required
+          def change_role(request, user_id):
+              if not request.user.has_perm('auth.change_user'):
+                  raise PermissionDenied()
+              ...

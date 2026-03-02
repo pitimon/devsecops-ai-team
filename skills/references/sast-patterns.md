@@ -405,7 +405,50 @@ Phase 3 (Release — <60 min): All tools + manual review of CRITICAL/HIGH
 
 ---
 
-## 8. Quick Reference — Detection Rule Priority
+## 8. Custom OWASP Detection Rules
+
+## กฎตรวจจับ OWASP แบบกำหนดเอง
+
+### A01:2021 Broken Access Control — Custom Rules
+
+The plugin includes 8 custom Semgrep rules targeting A01 anti-patterns:
+
+| Rule ID                          | CWE     | Severity | Languages | Description                      |
+| -------------------------------- | ------- | -------- | --------- | -------------------------------- |
+| a01-missing-auth-decorator       | CWE-862 | ERROR    | Python    | Missing authentication decorator |
+| a01-missing-auth-middleware-js   | CWE-862 | ERROR    | JS/TS     | Missing auth middleware          |
+| a01-missing-auth-annotation-java | CWE-862 | ERROR    | Java      | Missing @PreAuthorize            |
+| a01-direct-object-reference      | CWE-639 | WARNING  | Python    | IDOR without ownership check     |
+| a01-direct-object-reference-js   | CWE-639 | WARNING  | JS/TS     | IDOR without ownership check     |
+| a01-path-traversal               | CWE-22  | ERROR    | Python    | User input in file paths         |
+| a01-cors-wildcard                | CWE-942 | WARNING  | Python    | CORS origin: \*                  |
+| a01-privilege-escalation         | CWE-269 | ERROR    | Python    | Unprotected role modification    |
+
+Rules file: `rules/a01-access-control-rules.yml`
+
+### A03:2021 Injection — Custom Rules
+
+11 custom Semgrep rules targeting A03 injection patterns:
+
+| Rule ID                   | CWE      | Severity | Languages | Description                 |
+| ------------------------- | -------- | -------- | --------- | --------------------------- |
+| a03-sql-injection         | CWE-89   | ERROR    | Python    | SQL with f-strings          |
+| a03-sql-injection-js      | CWE-89   | ERROR    | JS/TS     | SQL with template literals  |
+| a03-sql-injection-java    | CWE-89   | ERROR    | Java      | SQL string concatenation    |
+| a03-command-injection     | CWE-78   | ERROR    | Python    | os.system/subprocess        |
+| a03-command-injection-js  | CWE-78   | ERROR    | JS/TS     | child_process.exec          |
+| a03-xss-dom               | CWE-79   | ERROR    | JS/TS     | innerHTML from user input   |
+| a03-xss-reflected         | CWE-79   | WARNING  | Python    | Jinja2 Markup/safe          |
+| a03-xss-reflected-java    | CWE-79   | WARNING  | Java      | Direct response.write       |
+| a03-ldap-injection        | CWE-90   | ERROR    | Python    | LDAP filter with user input |
+| a03-template-injection    | CWE-1336 | ERROR    | Python    | Jinja2/Mako SSTI            |
+| a03-template-injection-js | CWE-1336 | ERROR    | JS/TS     | eval/Function constructor   |
+
+Rules file: `rules/a03-injection-rules.yml`
+
+---
+
+## 9. Quick Reference — Detection Rule Priority
 
 ## อ้างอิงด่วน — ลำดับความสำคัญกฎตรวจจับ
 

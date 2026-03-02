@@ -1,0 +1,438 @@
+rules:
+  # ==========================================================================
+  # A03:2021 Injection — Custom Semgrep Rules
+  # DevSecOps AI Team v2.5.0
+  #
+  # 11 rules (9 categories) targeting A03 injection anti-patterns
+  # Languages: Python (5 rules), JavaScript/TypeScript (4 rules), Java (2 rules)
+  # Reference: skills/references/sast-patterns.md
+  # ==========================================================================
+
+  # -------------------------------------------------------------------------
+  # Category 1: SQL Injection (CWE-89) — Python
+  # -------------------------------------------------------------------------
+  - id: a03-sql-injection
+    pattern-either:
+      - pattern: |
+          $CURSOR.execute(f"...{$VAR}...")
+      - pattern: |
+          $CURSOR.execute("..." + $VAR + "...")
+      - pattern: |
+          $CURSOR.execute("...%s..." % $VAR)
+    message: >
+      SQL query built with string interpolation or concatenation (CWE-89).
+      User-controlled values in SQL queries enable injection attacks.
+      Use parameterized queries or ORM methods.
+    languages:
+      - python
+    severity: ERROR
+    metadata:
+      cwe:
+        - "CWE-89"
+      owasp:
+        - "A03:2021"
+      nist:
+        - "SI-10"
+        - "SC-18"
+      confidence: HIGH
+      impact: HIGH
+      likelihood: HIGH
+      category: security
+      technology:
+        - python
+      references:
+        - https://owasp.org/Top10/A03_2021-Injection/
+        - https://cwe.mitre.org/data/definitions/89.html
+      fix: |
+        Use parameterized queries:
+          cursor.execute("SELECT * FROM users WHERE id = %s", (user_id,))
+
+  # -------------------------------------------------------------------------
+  # Category 1: SQL Injection (CWE-89) — JavaScript/TypeScript
+  # -------------------------------------------------------------------------
+  - id: a03-sql-injection-js
+    pattern-either:
+      - pattern: |
+          $DB.query(`...${$VAR}...`)
+      - pattern: |
+          $DB.query("..." + $VAR + "...")
+    message: >
+      SQL query built with template literal or concatenation (CWE-89).
+      User-controlled values in SQL queries enable injection attacks.
+      Use parameterized queries or ORM methods.
+    languages:
+      - javascript
+      - typescript
+    severity: ERROR
+    metadata:
+      cwe:
+        - "CWE-89"
+      owasp:
+        - "A03:2021"
+      nist:
+        - "SI-10"
+        - "SC-18"
+      confidence: HIGH
+      impact: HIGH
+      likelihood: HIGH
+      category: security
+      technology:
+        - javascript
+        - typescript
+      references:
+        - https://owasp.org/Top10/A03_2021-Injection/
+        - https://cwe.mitre.org/data/definitions/89.html
+      fix: |
+        Use parameterized queries:
+          db.query("SELECT * FROM users WHERE id = $1", [userId])
+
+  # -------------------------------------------------------------------------
+  # Category 1: SQL Injection (CWE-89) — Java
+  # -------------------------------------------------------------------------
+  - id: a03-sql-injection-java
+    pattern-either:
+      - pattern: |
+          $STMT.execute("..." + $VAR + "...")
+      - pattern: |
+          $STMT.executeQuery("..." + $VAR + "...")
+      - pattern: |
+          $STMT.executeUpdate("..." + $VAR + "...")
+    message: >
+      SQL query built with string concatenation in Statement (CWE-89).
+      User-controlled values in SQL queries enable injection attacks.
+      Use PreparedStatement with parameterized queries.
+    languages:
+      - java
+    severity: ERROR
+    metadata:
+      cwe:
+        - "CWE-89"
+      owasp:
+        - "A03:2021"
+      nist:
+        - "SI-10"
+        - "SC-18"
+      confidence: HIGH
+      impact: HIGH
+      likelihood: HIGH
+      category: security
+      technology:
+        - java
+      references:
+        - https://owasp.org/Top10/A03_2021-Injection/
+        - https://cwe.mitre.org/data/definitions/89.html
+      fix: |
+        Use PreparedStatement:
+          PreparedStatement ps = conn.prepareStatement("SELECT * FROM users WHERE id = ?");
+          ps.setString(1, userId);
+
+  # -------------------------------------------------------------------------
+  # Category 2: Command Injection (CWE-78) — Python
+  # -------------------------------------------------------------------------
+  - id: a03-command-injection
+    pattern-either:
+      - pattern: os.system($CMD)
+      - pattern: os.popen($CMD)
+      - pattern: subprocess.call($CMD, shell=True, ...)
+      - pattern: subprocess.run($CMD, shell=True, ...)
+      - pattern: subprocess.Popen($CMD, shell=True, ...)
+    message: >
+      OS command execution with potential user input (CWE-78).
+      Using os.system() or subprocess with shell=True allows command
+      injection. Use subprocess with shell=False and argument lists.
+    languages:
+      - python
+    severity: ERROR
+    metadata:
+      cwe:
+        - "CWE-78"
+      owasp:
+        - "A03:2021"
+      nist:
+        - "SI-10"
+        - "SC-18"
+      confidence: HIGH
+      impact: HIGH
+      likelihood: HIGH
+      category: security
+      technology:
+        - python
+      references:
+        - https://owasp.org/Top10/A03_2021-Injection/
+        - https://cwe.mitre.org/data/definitions/78.html
+      fix: |
+        Use subprocess with shell=False and argument list:
+          subprocess.run(["ls", "-la", user_dir], shell=False)
+
+  # -------------------------------------------------------------------------
+  # Category 2: Command Injection (CWE-78) — JavaScript/TypeScript
+  # -------------------------------------------------------------------------
+  - id: a03-command-injection-js
+    pattern-either:
+      - pattern: $CP.exec($CMD)
+      - pattern: $CP.exec($CMD, ...)
+      - pattern: child_process.exec($CMD)
+      - pattern: child_process.exec($CMD, ...)
+    message: >
+      OS command execution via child_process.exec() (CWE-78).
+      exec() passes input to a shell, enabling command injection.
+      Use execFile() or spawn() with argument arrays instead.
+    languages:
+      - javascript
+      - typescript
+    severity: ERROR
+    metadata:
+      cwe:
+        - "CWE-78"
+      owasp:
+        - "A03:2021"
+      nist:
+        - "SI-10"
+        - "SC-18"
+      confidence: HIGH
+      impact: HIGH
+      likelihood: HIGH
+      category: security
+      technology:
+        - javascript
+        - typescript
+      references:
+        - https://owasp.org/Top10/A03_2021-Injection/
+        - https://cwe.mitre.org/data/definitions/78.html
+      fix: |
+        Use execFile() or spawn() with argument arrays:
+          child_process.execFile("ls", ["-la", userDir])
+
+  # -------------------------------------------------------------------------
+  # Category 3: DOM XSS (CWE-79) — JavaScript/TypeScript
+  # -------------------------------------------------------------------------
+  - id: a03-xss-dom
+    pattern-either:
+      - pattern: $EL.innerHTML = $VAR
+      - pattern: $EL.outerHTML = $VAR
+      - pattern: document.write($VAR)
+    message: >
+      DOM XSS via innerHTML/outerHTML/document.write (CWE-79).
+      Assigning user-controlled data to innerHTML enables script injection.
+      Use textContent or sanitize with DOMPurify before rendering.
+    languages:
+      - javascript
+      - typescript
+    severity: ERROR
+    metadata:
+      cwe:
+        - "CWE-79"
+      owasp:
+        - "A03:2021"
+      nist:
+        - "SI-10"
+        - "SC-18"
+      confidence: HIGH
+      impact: HIGH
+      likelihood: HIGH
+      category: security
+      technology:
+        - javascript
+        - typescript
+      references:
+        - https://owasp.org/Top10/A03_2021-Injection/
+        - https://cwe.mitre.org/data/definitions/79.html
+      fix: |
+        Use textContent or sanitize with DOMPurify:
+          element.textContent = userInput;
+          // or: element.innerHTML = DOMPurify.sanitize(userInput);
+
+  # -------------------------------------------------------------------------
+  # Category 4: Reflected XSS (CWE-79) — Python
+  # -------------------------------------------------------------------------
+  - id: a03-xss-reflected
+    pattern-either:
+      - pattern: Markup($VAR)
+      - pattern: Markup(f"...{$VAR}...")
+      - pattern: |
+          return $VAR | safe
+    message: >
+      Potential reflected XSS via Jinja2 Markup() or |safe filter (CWE-79).
+      Marking user-controlled data as safe bypasses auto-escaping.
+      Validate and sanitize user input before marking as safe.
+    languages:
+      - python
+    severity: WARNING
+    metadata:
+      cwe:
+        - "CWE-79"
+      owasp:
+        - "A03:2021"
+      nist:
+        - "SI-10"
+        - "SC-18"
+      confidence: MEDIUM
+      impact: MEDIUM
+      likelihood: MEDIUM
+      category: security
+      technology:
+        - python
+      references:
+        - https://owasp.org/Top10/A03_2021-Injection/
+        - https://cwe.mitre.org/data/definitions/79.html
+      fix: |
+        Let Jinja2 auto-escape handle it:
+          return render_template("page.html", content=user_input)
+
+  # -------------------------------------------------------------------------
+  # Category 4: Reflected XSS (CWE-79) — Java
+  # -------------------------------------------------------------------------
+  - id: a03-xss-reflected-java
+    pattern-either:
+      - pattern: |
+          $RESP.getWriter().write($REQ.getParameter(...))
+      - pattern: |
+          $RESP.getWriter().print($REQ.getParameter(...))
+    message: >
+      Reflected XSS via direct write of request parameter to response
+      (CWE-79). User input written to HTTP response without encoding
+      enables script injection. Use output encoding or a template engine.
+    languages:
+      - java
+    severity: WARNING
+    metadata:
+      cwe:
+        - "CWE-79"
+      owasp:
+        - "A03:2021"
+      nist:
+        - "SI-10"
+        - "SC-18"
+      confidence: HIGH
+      impact: MEDIUM
+      likelihood: MEDIUM
+      category: security
+      technology:
+        - java
+      references:
+        - https://owasp.org/Top10/A03_2021-Injection/
+        - https://cwe.mitre.org/data/definitions/79.html
+      fix: |
+        Use output encoding:
+          String safe = HtmlUtils.htmlEscape(request.getParameter("input"));
+          response.getWriter().write(safe);
+
+  # -------------------------------------------------------------------------
+  # Category 5: LDAP Injection (CWE-90) — Python
+  # -------------------------------------------------------------------------
+  - id: a03-ldap-injection
+    pattern-either:
+      - pattern: |
+          $CONN.search_s($BASE, ..., f"...{$VAR}...", ...)
+      - pattern: |
+          $CONN.search($BASE, ..., f"...{$VAR}...", ...)
+      - pattern: |
+          $FILTER = f"(uid={$VAR})"
+    message: >
+      LDAP query built with string interpolation (CWE-90).
+      User-controlled input in LDAP filters enables injection.
+      Use parameterized LDAP filters or escape special characters.
+    languages:
+      - python
+    severity: ERROR
+    metadata:
+      cwe:
+        - "CWE-90"
+      owasp:
+        - "A03:2021"
+      nist:
+        - "SI-10"
+        - "SC-18"
+      confidence: HIGH
+      impact: HIGH
+      likelihood: MEDIUM
+      category: security
+      technology:
+        - python
+      references:
+        - https://owasp.org/Top10/A03_2021-Injection/
+        - https://cwe.mitre.org/data/definitions/90.html
+      fix: |
+        Use ldap3 escape_filter_chars:
+          from ldap3.utils.conv import escape_filter_chars
+          safe_user = escape_filter_chars(user_input)
+          conn.search(base, f"(uid={safe_user})")
+
+  # -------------------------------------------------------------------------
+  # Category 6: Template Injection (CWE-1336) — Python
+  # -------------------------------------------------------------------------
+  - id: a03-template-injection
+    pattern-either:
+      - pattern: |
+          Template($VAR).render(...)
+      - pattern: |
+          Environment(...).from_string($VAR).render(...)
+      - pattern: |
+          $TEMPLATE = Template($VAR)
+    message: >
+      Server-side template injection (SSTI) via Jinja2/Mako Template
+      with user-controlled input (CWE-1336). SSTI can lead to remote
+      code execution. Use pre-compiled templates, never user-supplied strings.
+    languages:
+      - python
+    severity: ERROR
+    metadata:
+      cwe:
+        - "CWE-1336"
+      owasp:
+        - "A03:2021"
+      nist:
+        - "SI-10"
+        - "SC-18"
+      confidence: HIGH
+      impact: HIGH
+      likelihood: MEDIUM
+      category: security
+      technology:
+        - python
+      references:
+        - https://owasp.org/Top10/A03_2021-Injection/
+        - https://cwe.mitre.org/data/definitions/1336.html
+      fix: |
+        Use pre-compiled templates:
+          return render_template("page.html", content=user_input)
+
+  # -------------------------------------------------------------------------
+  # Category 6: Template Injection (CWE-1336) — JavaScript/TypeScript
+  # -------------------------------------------------------------------------
+  - id: a03-template-injection-js
+    pattern-either:
+      - pattern: eval($VAR)
+      - pattern: new Function($VAR)
+      - pattern: new Function(..., $VAR)
+      - pattern: setTimeout($VAR, ...)
+    message: >
+      Code execution via eval/Function constructor with user input
+      (CWE-1336). Dynamic code execution enables injection of arbitrary
+      code. Use safe alternatives like JSON.parse() or sandboxed evaluation.
+    languages:
+      - javascript
+      - typescript
+    severity: ERROR
+    metadata:
+      cwe:
+        - "CWE-1336"
+      owasp:
+        - "A03:2021"
+      nist:
+        - "SI-10"
+        - "SC-18"
+      confidence: HIGH
+      impact: HIGH
+      likelihood: MEDIUM
+      category: security
+      technology:
+        - javascript
+        - typescript
+      references:
+        - https://owasp.org/Top10/A03_2021-Injection/
+        - https://cwe.mitre.org/data/definitions/1336.html
+      fix: |
+        Avoid eval/Function; use safe alternatives:
+          const data = JSON.parse(userInput);
+          // or use a sandboxed evaluation library
