@@ -474,3 +474,31 @@ Priority 3 (Warn and Track):
   - CWE-327    Weak Cryptography
   - CWE-611    XXE
 ```
+
+---
+
+## 9. A10:2021 Server-Side Request Forgery — Custom Rules
+
+## กฎตรวจจับ SSRF แบบกำหนดเอง
+
+7 custom Semgrep rules targeting SSRF anti-patterns:
+
+| Rule ID                    | CWE     | Severity | Languages | Description                    |
+| -------------------------- | ------- | -------- | --------- | ------------------------------ |
+| a10-ssrf-user-url-python   | CWE-918 | ERROR    | Python    | Unvalidated URL in requests    |
+| a10-ssrf-user-url-js       | CWE-918 | ERROR    | JS/TS     | Unvalidated URL in fetch/axios |
+| a10-ssrf-user-url-java     | CWE-918 | ERROR    | Java      | Unvalidated URL in HttpClient  |
+| a10-ssrf-metadata-endpoint | CWE-918 | ERROR    | Multi     | Cloud metadata endpoint access |
+| a10-ssrf-redirect-follow   | CWE-918 | WARNING  | Python    | Missing redirect control       |
+| a10-ssrf-dns-rebinding     | CWE-918 | WARNING  | Multi     | DNS rebinding risk             |
+| a10-ssrf-internal-ip       | CWE-918 | WARNING  | Multi     | Private IP range in URLs       |
+
+Rules file: `rules/a10-ssrf-rules.yml`
+
+### SSRF Mitigation Checklist
+
+- URL allowlist validation (hostname + scheme)
+- Block private/reserved IP ranges (10.x, 172.16-31.x, 192.168.x, 169.254.x)
+- Disable HTTP redirects or validate redirect targets
+- DNS resolution pinning (resolve once, connect to resolved IP)
+- Network segmentation (outbound firewall rules)

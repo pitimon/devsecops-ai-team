@@ -1,0 +1,106 @@
+{
+  "findings": [
+    {
+      "id": "FINDING-A10-001",
+      "source_tool": "semgrep",
+      "scan_type": "sast",
+      "rule_id": "a10-ssrf-user-url-python",
+      "severity": "ERROR",
+      "title": "Unvalidated user URL passed to requests.get()",
+      "cwe_id": "CWE-918",
+      "owasp": "A10:2021",
+      "location": {
+        "file": "src/api/proxy.py",
+        "line_start": 28,
+        "line_end": 28
+      },
+      "message": "HTTP request with potentially user-controlled URL. Server-Side Request Forgery allows attackers to make requests to internal services or cloud metadata endpoints.",
+      "status": "open"
+    },
+    {
+      "id": "FINDING-A10-002",
+      "source_tool": "semgrep",
+      "scan_type": "sast",
+      "rule_id": "a10-ssrf-metadata-endpoint",
+      "severity": "ERROR",
+      "title": "Hardcoded cloud metadata endpoint 169.254.169.254",
+      "cwe_id": "CWE-918",
+      "owasp": "A10:2021",
+      "location": {
+        "file": "src/cloud/ec2.py",
+        "line_start": 15,
+        "line_end": 15
+      },
+      "message": "Hardcoded cloud metadata endpoint detected. Access to 169.254.169.254 is a primary SSRF exploitation target.",
+      "status": "open"
+    },
+    {
+      "id": "FINDING-A10-003",
+      "source_tool": "semgrep",
+      "scan_type": "sast",
+      "rule_id": "a10-ssrf-redirect-follow",
+      "severity": "WARNING",
+      "title": "HTTP request without redirect control",
+      "cwe_id": "CWE-918",
+      "owasp": "A10:2021",
+      "location": {
+        "file": "src/services/webhook.py",
+        "line_start": 42,
+        "line_end": 42
+      },
+      "message": "HTTP request without allow_redirects=False. Attackers can exploit redirect chains to bypass SSRF protections.",
+      "status": "open"
+    },
+    {
+      "id": "FINDING-A10-004",
+      "source_tool": "semgrep",
+      "scan_type": "sast",
+      "rule_id": "a10-ssrf-dns-rebinding",
+      "severity": "WARNING",
+      "title": "DNS resolution without rebinding protection",
+      "cwe_id": "CWE-918",
+      "owasp": "A10:2021",
+      "location": {
+        "file": "src/utils/resolver.js",
+        "line_start": 12,
+        "line_end": 12
+      },
+      "message": "DNS resolution without rebinding protection. DNS rebinding attacks can bypass hostname-based SSRF validation.",
+      "status": "open"
+    },
+    {
+      "id": "FINDING-A10-005",
+      "source_tool": "semgrep",
+      "scan_type": "sast",
+      "rule_id": "a10-ssrf-internal-ip",
+      "severity": "WARNING",
+      "title": "Hardcoded private IP range in URL",
+      "cwe_id": "CWE-918",
+      "owasp": "A10:2021",
+      "location": {
+        "file": "src/config/services.ts",
+        "line_start": 8,
+        "line_end": 8
+      },
+      "message": "Hardcoded private IP address (192.168.x.x) in URL string. Use service discovery or environment variables instead.",
+      "status": "open"
+    }
+  ],
+  "summary": {
+    "total": 5,
+    "critical": 0,
+    "high": 0,
+    "medium": 0,
+    "low": 0,
+    "info": 0,
+    "warning": 3,
+    "error": 2
+  },
+  "metadata": {
+    "rules_file": "rules/a10-ssrf-rules.yml",
+    "rule_count": 7,
+    "scan_type": "sast",
+    "owasp_category": "A10:2021",
+    "cwe_coverage": ["CWE-918"]
+  }
+}

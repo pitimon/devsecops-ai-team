@@ -1,0 +1,295 @@
+rules:
+  # ==========================================================================
+  # A10:2021 Server-Side Request Forgery — Custom Semgrep Rules
+  # DevSecOps AI Team v2.5.0
+  #
+  # 7 rules targeting SSRF anti-patterns
+  # Languages: Python (4 rules), JavaScript/TypeScript (2 rules), Java (1 rule)
+  # Cross-language rules use pattern-regex (language-agnostic)
+  # Reference: skills/references/sast-patterns.md
+  # ==========================================================================
+
+  # -------------------------------------------------------------------------
+  # Rule 1: Unvalidated URL in Python HTTP requests (CWE-918)
+  # -------------------------------------------------------------------------
+  - id: a10-ssrf-user-url-python
+    pattern-either:
+      - pattern: requests.get($URL, ...)
+      - pattern: requests.post($URL, ...)
+      - pattern: requests.put($URL, ...)
+      - pattern: requests.delete($URL, ...)
+      - pattern: requests.patch($URL, ...)
+      - pattern: urllib.request.urlopen($URL, ...)
+      - pattern: httpx.get($URL, ...)
+      - pattern: httpx.post($URL, ...)
+    message: >
+      HTTP request with potentially user-controlled URL '$URL' (CWE-918).
+      Server-Side Request Forgery allows attackers to make requests to internal
+      services, cloud metadata endpoints, or arbitrary external hosts. Validate
+      the URL against an allowlist of permitted hosts and schemes before making
+      the request.
+    languages:
+      - python
+    severity: ERROR
+    metadata:
+      cwe:
+        - "CWE-918"
+      owasp:
+        - "A10:2021"
+      nist:
+        - "SI-10"
+        - "SC-7"
+      confidence: MEDIUM
+      impact: HIGH
+      likelihood: HIGH
+      category: security
+      technology:
+        - python
+      references:
+        - https://owasp.org/Top10/A10_2021-Server-Side_Request_Forgery_%28SSRF%29/
+        - https://cwe.mitre.org/data/definitions/918.html
+      fix: |
+        Validate URL against an allowlist before making requests:
+          parsed = urlparse(url)
+          if parsed.hostname not in ALLOWED_HOSTS:
+              raise ValueError("Host not allowed")
+
+  # -------------------------------------------------------------------------
+  # Rule 2: Unvalidated URL in JavaScript/TypeScript HTTP requests (CWE-918)
+  # -------------------------------------------------------------------------
+  - id: a10-ssrf-user-url-js
+    pattern-either:
+      - pattern: fetch($URL, ...)
+      - pattern: fetch($URL)
+      - pattern: axios.get($URL, ...)
+      - pattern: axios.post($URL, ...)
+      - pattern: axios.put($URL, ...)
+      - pattern: axios($URL, ...)
+      - pattern: http.get($URL, ...)
+      - pattern: http.request($URL, ...)
+      - pattern: https.get($URL, ...)
+      - pattern: https.request($URL, ...)
+    message: >
+      HTTP request with potentially user-controlled URL '$URL' (CWE-918).
+      Server-Side Request Forgery allows attackers to reach internal services
+      or cloud metadata endpoints. Validate the URL against an allowlist of
+      permitted hosts and block private IP ranges before making the request.
+    languages:
+      - javascript
+      - typescript
+    severity: ERROR
+    metadata:
+      cwe:
+        - "CWE-918"
+      owasp:
+        - "A10:2021"
+      nist:
+        - "SI-10"
+        - "SC-7"
+      confidence: MEDIUM
+      impact: HIGH
+      likelihood: HIGH
+      category: security
+      technology:
+        - javascript
+        - typescript
+      references:
+        - https://owasp.org/Top10/A10_2021-Server-Side_Request_Forgery_%28SSRF%29/
+        - https://cwe.mitre.org/data/definitions/918.html
+      fix: |
+        Validate URL against an allowlist before making requests:
+          const parsed = new URL(url);
+          if (!ALLOWED_HOSTS.includes(parsed.hostname)) throw new Error("Host not allowed");
+
+  # -------------------------------------------------------------------------
+  # Rule 3: Unvalidated URL in Java HTTP requests (CWE-918)
+  # -------------------------------------------------------------------------
+  - id: a10-ssrf-user-url-java
+    pattern-either:
+      - pattern: new URL($URL).openConnection(...)
+      - pattern: new URL($URL).openStream(...)
+      - pattern: |
+          HttpClient.$METHOD(HttpRequest.newBuilder().uri(URI.create($URL)).$BUILD(...), ...)
+      - pattern: (java.net.URL $U).openConnection(...)
+    message: >
+      HTTP request with potentially user-controlled URL '$URL' (CWE-918).
+      Server-Side Request Forgery allows attackers to make requests to internal
+      services or cloud metadata. Validate and sanitize the URL before use.
+    languages:
+      - java
+    severity: ERROR
+    metadata:
+      cwe:
+        - "CWE-918"
+      owasp:
+        - "A10:2021"
+      nist:
+        - "SI-10"
+        - "SC-7"
+      confidence: MEDIUM
+      impact: HIGH
+      likelihood: HIGH
+      category: security
+      technology:
+        - java
+      references:
+        - https://owasp.org/Top10/A10_2021-Server-Side_Request_Forgery_%28SSRF%29/
+        - https://cwe.mitre.org/data/definitions/918.html
+      fix: |
+        Validate URL against an allowlist:
+          URI uri = URI.create(url);
+          if (!ALLOWED_HOSTS.contains(uri.getHost())) throw new SecurityException("Host not allowed");
+
+  # -------------------------------------------------------------------------
+  # Rule 4: Cloud Metadata Endpoint Access (CWE-918) — Multi-language
+  # Uses pattern-regex for cross-language detection
+  # -------------------------------------------------------------------------
+  - id: a10-ssrf-metadata-endpoint
+    pattern-regex: (169\.254\.169\.254|metadata\.google\.internal|100\.100\.100\.200)
+    message: >
+      Hardcoded cloud metadata endpoint detected (CWE-918). Access to cloud
+      metadata services (AWS 169.254.169.254, GCP metadata.google.internal,
+      Alibaba 100.100.100.200) is a primary SSRF exploitation target. If this
+      is a security test, suppress with nosemgrep. Otherwise, remove the
+      hardcoded endpoint and use IAM roles or service accounts instead.
+    languages:
+      - python
+      - javascript
+      - typescript
+    severity: ERROR
+    metadata:
+      cwe:
+        - "CWE-918"
+      owasp:
+        - "A10:2021"
+      nist:
+        - "SI-10"
+        - "SC-7"
+        - "AC-3"
+      confidence: HIGH
+      impact: HIGH
+      likelihood: MEDIUM
+      category: security
+      references:
+        - https://owasp.org/Top10/A10_2021-Server-Side_Request_Forgery_%28SSRF%29/
+        - https://cwe.mitre.org/data/definitions/918.html
+        - https://hackingthe.cloud/aws/exploitation/ec2-metadata-ssrf/
+      fix: |
+        Use IMDSv2 with token requirement or remove metadata access:
+          TOKEN=$(curl -X PUT "http://169.254.169.254/latest/api/token" -H "X-aws-ec2-metadata-token-ttl-seconds: 60")
+
+  # -------------------------------------------------------------------------
+  # Rule 5: HTTP Requests Without Redirect Control (CWE-918) — Python
+  # -------------------------------------------------------------------------
+  - id: a10-ssrf-redirect-follow
+    patterns:
+      - pattern: requests.$METHOD($URL, ...)
+      - pattern-not: requests.$METHOD($URL, ..., allow_redirects=False, ...)
+      - metavariable-regex:
+          metavariable: $METHOD
+          regex: (get|post|put|delete|patch|head|options)
+    message: >
+      HTTP request without redirect control (CWE-918). By default, the requests
+      library follows redirects, which attackers can exploit to bypass SSRF
+      protections. Set allow_redirects=False and validate redirect targets
+      manually to prevent open redirect chains to internal services.
+    languages:
+      - python
+    severity: WARNING
+    metadata:
+      cwe:
+        - "CWE-918"
+      owasp:
+        - "A10:2021"
+      nist:
+        - "SI-10"
+      confidence: LOW
+      impact: MEDIUM
+      likelihood: MEDIUM
+      category: security
+      technology:
+        - python
+      references:
+        - https://owasp.org/Top10/A10_2021-Server-Side_Request_Forgery_%28SSRF%29/
+        - https://cwe.mitre.org/data/definitions/918.html
+      fix: |
+        Disable automatic redirects and validate targets:
+          resp = requests.get(url, allow_redirects=False)
+          if resp.is_redirect:
+              validate_redirect_target(resp.headers["Location"])
+
+  # -------------------------------------------------------------------------
+  # Rule 6: DNS Rebinding Risk (CWE-918) — Multi-language
+  # Uses pattern-regex for cross-language detection
+  # -------------------------------------------------------------------------
+  - id: a10-ssrf-dns-rebinding
+    pattern-regex: (gethostbyname|getaddrinfo|dns\.resolve|dns\.lookup|\.resolve\(\s*['"][^'"]+['"]\s*\))
+    message: >
+      DNS resolution without rebinding protection (CWE-918). DNS rebinding
+      attacks resolve a hostname to a public IP during validation but to an
+      internal IP during the actual request. Pin DNS resolution results and
+      connect directly to the resolved IP, or use a DNS-aware HTTP client
+      that validates the resolved address.
+    languages:
+      - python
+      - javascript
+      - typescript
+    severity: WARNING
+    metadata:
+      cwe:
+        - "CWE-918"
+      owasp:
+        - "A10:2021"
+      nist:
+        - "SI-10"
+        - "SC-7"
+      confidence: LOW
+      impact: MEDIUM
+      likelihood: LOW
+      category: security
+      references:
+        - https://owasp.org/Top10/A10_2021-Server-Side_Request_Forgery_%28SSRF%29/
+        - https://cwe.mitre.org/data/definitions/918.html
+        - https://en.wikipedia.org/wiki/DNS_rebinding
+      fix: |
+        Pin DNS resolution and validate the resolved IP:
+          ip = socket.gethostbyname(hostname)
+          if ipaddress.ip_address(ip).is_private:
+              raise ValueError("Resolved to private IP")
+          requests.get(f"http://{ip}/", headers={"Host": hostname})
+
+  # -------------------------------------------------------------------------
+  # Rule 7: Private/Internal IP Range in URLs (CWE-918) — Multi-language
+  # Uses pattern-regex for cross-language detection
+  # -------------------------------------------------------------------------
+  - id: a10-ssrf-internal-ip
+    pattern-regex: https?://(10\.\d{1,3}\.\d{1,3}\.\d{1,3}|172\.(1[6-9]|2[0-9]|3[01])\.\d{1,3}\.\d{1,3}|192\.168\.\d{1,3}\.\d{1,3})[:/]
+    message: >
+      Hardcoded private/internal IP address in URL string (CWE-918). URLs
+      targeting RFC 1918 private ranges (10.x, 172.16-31.x, 192.168.x)
+      suggest direct internal service access, which is a common SSRF target.
+      Use service discovery, DNS names, or environment variables instead of
+      hardcoded internal IPs.
+    languages:
+      - python
+      - javascript
+      - typescript
+    severity: WARNING
+    metadata:
+      cwe:
+        - "CWE-918"
+      owasp:
+        - "A10:2021"
+      nist:
+        - "SI-10"
+        - "SC-7"
+      confidence: MEDIUM
+      impact: MEDIUM
+      likelihood: MEDIUM
+      category: security
+      references:
+        - https://owasp.org/Top10/A10_2021-Server-Side_Request_Forgery_%28SSRF%29/
+        - https://cwe.mitre.org/data/definitions/918.html
+      fix: |
+        Use environment variables or service discovery instead:
+          SERVICE_URL = os.environ["INTERNAL_SERVICE_URL"]
