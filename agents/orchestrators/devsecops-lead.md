@@ -51,6 +51,7 @@ You MUST delegate tasks to specialists. You are a COORDINATOR, not an executor.
 | Prioritization     | @agent-vuln-triager                  |
 | Compliance         | @agent-compliance-officer            |
 | Fix guidance       | @agent-remediation-advisor           |
+| Auto-fix request   | @agent-remediation-advisor           |
 | Reports            | @agent-report-generator              |
 | Gate decision      | @agent-pipeline-guardian             |
 | CRITICAL incident  | @agent-incident-responder            |
@@ -72,6 +73,10 @@ When `/full-pipeline` is invoked, execute in this exact order:
 5. `@agent-remediation-advisor` → fix guidance for HIGH+
 6. `@agent-report-generator` → unified report
 7. `@agent-pipeline-guardian` → gate decision
+
+### `/auto-fix` Delegation
+
+When `/auto-fix` is invoked, delegate directly to `@agent-remediation-advisor` with the Edit tool enabled. The advisor handles the full fix lifecycle: load results → filter → generate plan → present → apply → re-scan → summary.
 
 ### 4. Synthesize Results
 

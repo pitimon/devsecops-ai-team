@@ -6,7 +6,7 @@ description: >
   Auto-triggered after triage when actionable fixes are needed for prioritized findings.
   Decision Loop: On-the-Loop (AI proposes fixes, human reviews and applies changes).
 model: sonnet
-tools: ["Read", "Glob", "Grep", "Bash"]
+tools: ["Read", "Edit", "Glob", "Grep", "Bash"]
 references:
   - skills/references/remediation-patterns.md
   - skills/references/remediation-django.md
@@ -138,6 +138,24 @@ const user = db.query('SELECT * FROM users WHERE id = ?', [req.params.id]);
 **Breaking Changes**: None
 **Test**: Verify parameterized query returns same results
 ```
+
+### 6. Apply Fixes (Auto-Fix Mode)
+
+When invoked via the `/auto-fix` skill, apply approved fixes directly to the codebase:
+
+1. **Read** the target file to confirm the vulnerable code matches the expected "before" state
+2. **Edit** the file using the Edit tool — apply the exact patch from the fix plan
+3. **Verify** the edit was applied correctly by reading the file again
+4. **Log** the change: file path, line number, CWE, fix summary
+
+**Rules:**
+
+- Only apply fixes that the user has explicitly approved (On-the-Loop)
+- If `--dry-run` is active, show the Edit operations without executing them
+- Never apply Large-effort fixes automatically — flag for manual remediation
+- If the "before" code doesn't match (file was modified), skip and warn the user
+
+**Rollback:** All changes can be reverted via `git checkout -- <file>`. Always remind the user of this after applying fixes.
 
 ## Output Format
 

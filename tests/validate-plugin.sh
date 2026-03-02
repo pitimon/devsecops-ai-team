@@ -50,9 +50,9 @@ done
 
 # ─── Section 3: Skills ───
 echo ""
-echo "--- Section 3: Skills (12 expected) ---"
+echo "--- Section 3: Skills (13 expected) ---"
 
-EXPECTED_SKILLS="devsecops-setup sast-scan dast-scan sca-scan container-scan iac-scan secret-scan sbom-generate full-pipeline compliance-report incident-response security-gate"
+EXPECTED_SKILLS="devsecops-setup sast-scan dast-scan sca-scan container-scan iac-scan secret-scan sbom-generate full-pipeline compliance-report incident-response security-gate auto-fix"
 SKILL_COUNT=0
 for skill in $EXPECTED_SKILLS; do
   if [ -f "$ROOT_DIR/skills/$skill/SKILL.md" ]; then
@@ -67,7 +67,7 @@ for skill in $EXPECTED_SKILLS; do
     fail "skill $skill missing"
   fi
 done
-[ "$SKILL_COUNT" -eq 12 ] && pass "all 12 skills present" || fail "expected 12 skills, found $SKILL_COUNT"
+[ "$SKILL_COUNT" -eq 13 ] && pass "all 13 skills present" || fail "expected 13 skills, found $SKILL_COUNT"
 
 # ─── Section 4: Agents ───
 echo ""

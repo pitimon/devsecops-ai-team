@@ -4,7 +4,7 @@ This file provides guidance to Claude Code when working with this repository.
 
 ## What This Is
 
-A Claude Code **plugin skill pack** (`devsecops-ai-team`) distributed via the `pitimon-devsecops` marketplace. It provides 18 AI agents and 12 skills for enterprise DevSecOps security scanning across the full pipeline (SAST, DAST, SCA, Container, IaC, Secrets, SBOM, Compliance, IR) using open-source tools in Docker containers.
+A Claude Code **plugin skill pack** (`devsecops-ai-team`) distributed via the `pitimon-devsecops` marketplace. It provides 18 AI agents and 13 skills for enterprise DevSecOps security scanning across the full pipeline (SAST, DAST, SCA, Container, IaC, Secrets, SBOM, Compliance, IR) using open-source tools in Docker containers.
 
 There are no build/lint/test commands for source code — this is a pure markdown/JSON/shell skill definition repository.
 
@@ -24,7 +24,7 @@ User prompt → keyword match in SKILL.md frontmatter
 ### Three Layers
 
 1. **Plugin metadata** (`.claude-plugin/`) — Marketplace and plugin identity
-2. **Skills + Agents** (`skills/`, `agents/`) — 12 skills and 18 agents
+2. **Skills + Agents** (`skills/`, `agents/`) — 13 skills and 18 agents
 3. **Sidecar Runner** (`runner/`) — Docker container orchestration for security tools
 
 ### Key Files
@@ -33,7 +33,7 @@ User prompt → keyword match in SKILL.md frontmatter
 | --------------------------------- | -------------------------------------------------- |
 | `.claude-plugin/plugin.json`      | Plugin manifest (name, version, skills path)       |
 | `.claude-plugin/marketplace.json` | Marketplace registry entry                         |
-| `skills/*/SKILL.md`               | Skill definitions (12 skills)                      |
+| `skills/*/SKILL.md`               | Skill definitions (13 skills)                      |
 | `skills/references/*.md`          | On-demand domain knowledge (10 files)              |
 | `agents/*/`                       | Agent definitions (18 agents in 4 groups)          |
 | `hooks/hooks.json`                | Hook registrations (3 hooks)                       |
