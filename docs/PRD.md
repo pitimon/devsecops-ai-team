@@ -30,7 +30,7 @@ DevSecOps AI Team เป็น Claude Code plugin ที่รวม open-source
 | Agents                  | 18     | 4 groups: Orchestrators (3), Specialists (7), Experts (4), Core Team (4)                              |
 | Skills                  | 16     | 12 original + `/auto-fix` (v2.3.0) + `/slsa-assess` (v2.8.0) + `/k8s-scan` + `/graphql-scan` (v3.0.0) |
 | Docker Tools            | 11     | Semgrep, ZAP, Nuclei, Grype, Trivy, Checkov, GitLeaks, Syft, TruffleHog, kube-bench, Nuclei-GraphQL   |
-| MCP Tools               | 10     | scan, normalize, results, triage, enrich, compare, compliance_status, suggest_fix, history, pipeline  |
+| MCP Tools               | 10     | scan, results, gate, compliance, status, compare, compliance_status, suggest_fix, history, pipeline   |
 | Custom Semgrep Rules    | 84     | OWASP A01-A10 (68) + K8s (8) + GraphQL (8) — dual 2021+2025 tagging                                   |
 | OWASP Category Coverage | 10/10  | A01-A10 complete (both 2021 and 2025 versions)                                                        |
 | Compliance Frameworks   | 7      | OWASP (2021+2025), NIST 800-53, MITRE ATT&CK, NCSA, PDPA, SOC 2, ISO 27001                            |

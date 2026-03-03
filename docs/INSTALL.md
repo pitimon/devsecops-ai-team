@@ -165,10 +165,10 @@ MCP tools ที่พร้อมใช้ (10 tools):
 | Tool                          | Description                                        |
 | ----------------------------- | -------------------------------------------------- |
 | `devsecops_scan`              | Run security scans (SAST, DAST, SCA, etc.)         |
-| `devsecops_normalize`         | Normalize scan results to unified schema           |
 | `devsecops_results`           | Query scan results                                 |
-| `devsecops_triage`            | Prioritize findings by severity/exploitability     |
-| `devsecops_enrich`            | Add OWASP/CWE/compliance context to findings       |
+| `devsecops_gate`              | Evaluate severity policy gate (pass/fail)          |
+| `devsecops_compliance`        | Map findings to compliance frameworks              |
+| `devsecops_status`            | Check runner status and available Docker images    |
 | `devsecops_compare`           | Compare scan results between runs                  |
 | `devsecops_compliance_status` | Check compliance framework coverage (7 frameworks) |
 | `devsecops_suggest_fix`       | AI-powered fix suggestions                         |

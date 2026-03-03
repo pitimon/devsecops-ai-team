@@ -36,7 +36,7 @@
 ### dast-specialist
 
 - **Model**: sonnet
-- **Tool**: ZAP
+- **Tool**: ZAP, Nuclei
 - **Auto-trigger**: `/dast-scan`, web app testing
 - **Decision Loop**: In-the-Loop (target approval required)
 - **Role**: Dynamic security testing. Authenticated scanning, API fuzzing, crawl strategy optimization.
@@ -68,7 +68,7 @@
 ### secret-scanner-specialist
 
 - **Model**: sonnet
-- **Tool**: GitLeaks
+- **Tool**: GitLeaks, TruffleHog
 - **Auto-trigger**: `/secret-scan`, credential patterns
 - **Decision Loop**: Out-of-Loop
 - **Role**: Secret detection. Git history analysis, entropy detection, custom regex patterns, rotation guidance.
@@ -88,7 +88,7 @@
 - **Model**: sonnet
 - **Auto-trigger**: After any scan completes
 - **Decision Loop**: On-the-Loop
-- **Role**: Maps findings to NIST 800-53, OWASP Top 10, MITRE ATT&CK, CIS Benchmarks. Generates compliance gap analysis.
+- **Role**: Maps findings to OWASP Top 10 (2021+2025), NIST 800-53, MITRE ATT&CK, NCSA, PDPA, SOC 2, ISO 27001. Generates compliance gap analysis.
 
 ### threat-modeler
 
@@ -132,7 +132,7 @@
 - **Model**: sonnet
 - **Auto-trigger**: After `/full-pipeline`, `/compliance-report`
 - **Decision Loop**: Out-of-Loop
-- **Role**: Produces executive dashboards (HTML), PR comments (MD), GitHub Security (SARIF), machine-readable (JSON).
+- **Role**: Produces executive dashboards (HTML/Dashboard), PR comments (MD), GitHub Security (SARIF), machine-readable (JSON), enterprise reports (PDF/CSV), vulnerability exchange (VEX).
 
 ### pipeline-guardian
 

@@ -38,14 +38,14 @@
 |              Sidecar Runner (Alpine + Docker CLI)                 |
 |      job-dispatcher.sh -> result-collector.sh -> normalize        |
 |                  -> dedup-findings.sh -> format                   |
-+--+------+------+------+------+------+-------+-------+------------+
-   |      |      |      |      |      |       |       |
- +-v-+ +--v--++--v--++--v--++--v--++--v--++--v--++---v---+
- |Sem| |Grype||Trivy||Chek ||GitL || ZAP ||Syft ||Truf  |
- |gre| |     ||     ||ov   ||eaks ||     ||     ||fleHog|
- |p  | | SCA || Con || IaC || Sec ||DAST ||SBOM || Sec  |
- +---+ +-----++-----++-----++-----++-----++-----++------+
-         All tools run locally in Docker containers
++--+------+------+------+------+------+-------+-------+-------+-------+-------+
+   |      |      |      |      |      |       |       |       |       |
+ +-v-+ +--v--++--v--++--v--++--v--++--v--++--v--++---v---++--v---++---v----+
+ |Sem| |Grype||Trivy||Chek ||GitL || ZAP ||Syft ||Truf   ||Nucl  ||kube-  |
+ |gre| |     ||     ||ov   ||eaks ||     ||     ||fleHog ||ei    ||bench  |
+ |p  | | SCA || Con || IaC || Sec ||DAST ||SBOM || Sec   ||DAST  ||K8sCIS |
+ +---+ +-----++-----++-----++-----++-----++-----++-------++------++-------+
+              All tools run locally in Docker containers (11 total)
 ```
 
 ### How It Works
@@ -57,7 +57,7 @@
 5. **json-normalizer.sh** แปลงผลเป็น Unified Finding Schema (severity mapped ถูกต้อง)
 6. **dedup-findings.sh** รวมผลจากหลาย tools แล้วตัด duplicate ออก
 7. **Expert agents** วิเคราะห์: จัดลำดับความสำคัญ, map compliance, แนะนำการแก้ไข
-8. **Report generator** สร้างรายงานในรูปแบบที่ต้องการ (SARIF/JSON/Markdown/HTML)
+8. **Report generator** สร้างรายงานในรูปแบบที่ต้องการ (SARIF/JSON/Markdown/HTML/PDF/CSV/VEX/Dashboard)
 
 ### Full Pipeline Delegation Chain
 
@@ -73,7 +73,7 @@
    +-- @iac-specialist       -> ถ้ามี Terraform/K8s
    +-- @sbom-analyst         -> เสมอ
 3. @vuln-triager             -> deduplicate + prioritize
-4. @compliance-officer       -> map to OWASP/NIST/MITRE/NCSA
+4. @compliance-officer       -> map to OWASP/NIST/MITRE/NCSA/PDPA/SOC2/ISO27001
 5. @remediation-advisor      -> fix guidance (HIGH+)
 6. @report-generator         -> unified report
 7. @pipeline-guardian        -> gate decision (PASS/FAIL)
