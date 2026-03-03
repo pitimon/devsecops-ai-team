@@ -310,7 +310,7 @@ MCP server จะถูก load อัตโนมัติผ่าน `.mcp.js
 
 > **หมายเหตุ**: ทุกเครื่องมือทำงานใน Docker containers บนเครื่อง local — ไม่ส่ง source code ไปที่ไหน
 
-Full installation guide: [docs/INSTALL.md](docs/INSTALL.md)
+Full installation guide: [docs/INSTALL.md](docs/INSTALL.md) | Quick start walkthrough: [docs/QUICK-START.md](docs/QUICK-START.md)
 
 ---
 
@@ -548,6 +548,8 @@ DevSecOps AI Team พร้อมให้บริการ consulting, impleme
 | Document                                                        | เนื้อหา                                            |
 | --------------------------------------------------------------- | -------------------------------------------------- |
 | [**Wiki**](https://github.com/pitimon/devsecops-ai-team/wiki)   | Comprehensive documentation with ASCII diagrams    |
+| [QUICK-START.md](docs/QUICK-START.md)                           | Install to first scan in 5 minutes                 |
+| [FIRST-SCAN-WALKTHROUGH.md](docs/FIRST-SCAN-WALKTHROUGH.md)     | Behind the scenes — agent orchestration explained  |
 | [INSTALL.md](docs/INSTALL.md)                                   | วิธีติดตั้งแบบ standard, manual, air-gapped, MCP   |
 | [ARCHITECTURE.md](docs/ARCHITECTURE.md)                         | Pipeline delegation, decision loop, system design  |
 | [FEATURES.md](docs/FEATURES.md)                                 | Skills, agents, MCP, compliance, output formats    |
