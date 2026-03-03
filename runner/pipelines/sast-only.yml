@@ -1,0 +1,32 @@
+# SAST-only pipeline — quick static analysis with Semgrep
+name: sast-only
+version: "1.0"
+description: "SAST-focused pipeline using Semgrep for quick static analysis"
+
+nodes:
+  semgrep:
+    type: scanner
+    tool: semgrep
+    depends_on: []
+    inputs:
+      target: "${SCAN_TARGET}"
+    outputs:
+      file: "output/semgrep-raw.json"
+    concurrency_group: medium
+
+  normalize:
+    type: normalizer
+    depends_on: [semgrep]
+    inputs:
+      findings: "${DEPS_OUTPUTS}"
+    outputs:
+      file: "output/sast-normalized.json"
+
+  format:
+    type: formatter
+    depends_on: [normalize]
+    inputs:
+      findings: "output/sast-normalized.json"
+      format: "${OUTPUT_FORMAT:-sarif}"
+    outputs:
+      file: "output/sast-report.${OUTPUT_FORMAT:-sarif}"
