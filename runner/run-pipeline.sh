@@ -5,13 +5,35 @@ set -euo pipefail
 # Orchestrates multiple security tools with concurrency groups
 #
 # Usage: run-pipeline.sh --tools "semgrep,grype,trivy" --target /path [--format sarif|json|md]
+#        run-pipeline.sh --pipeline pipeline.yaml --target /path
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 source "$SCRIPT_DIR/ci-adapter.sh"
 
+usage() {
+  cat <<EOF
+Usage: $0 [OPTIONS]
+
+Options:
+  --tools <list>         Comma-separated list of tools to run (e.g. "semgrep,grype,trivy")
+  --target <path>        Target directory or URL to scan (required)
+  --format <fmt>         Output format: json, sarif, md (default: json)
+  --results-dir <dir>    Directory for scan results (default: /tmp/devsecops-results)
+  --concurrency-config   Path to concurrency groups config JSON
+  --pipeline <file>      Use DAG pipeline engine (YAML pipeline definition)
+  --help                 Show this help message
+
+When --pipeline is provided, execution is delegated to pipeline-engine.sh
+and --tools/--format/--concurrency-config are ignored.
+EOF
+  exit 0
+}
+
 TOOLS=""
 TARGET=""
 FORMAT="json"
+PIPELINE=""
+OUTPUT_DIR=""
 RESULTS_DIR="${RESULTS_DIR:-/tmp/devsecops-results}"
 CONCURRENCY_CONFIG="$SCRIPT_DIR/concurrency-groups.json"
 
@@ -20,11 +42,20 @@ while [[ $# -gt 0 ]]; do
     --tools) TOOLS="$2"; shift 2 ;;
     --target) TARGET="$2"; shift 2 ;;
     --format) FORMAT="$2"; shift 2 ;;
-    --results-dir) RESULTS_DIR="$2"; shift 2 ;;
+    --results-dir) RESULTS_DIR="$2"; OUTPUT_DIR="$2"; shift 2 ;;
     --concurrency-config) CONCURRENCY_CONFIG="$2"; shift 2 ;;
+    --pipeline) PIPELINE="$2"; shift 2 ;;
+    --help) usage ;;
     *) echo "Unknown option: $1"; exit 1 ;;
   esac
 done
+
+# DAG pipeline support — delegate to pipeline-engine if --pipeline specified
+if [ -n "${PIPELINE:-}" ]; then
+  exec bash "$SCRIPT_DIR/pipeline-engine.sh" run "$PIPELINE" \
+    ${TARGET:+--target "$TARGET"} \
+    ${OUTPUT_DIR:+--output-dir "$OUTPUT_DIR"}
+fi
 
 [ -z "$TOOLS" ] && { echo "Usage: $0 --tools \"semgrep,grype\" --target /path [--format json]"; exit 1; }
 [ -z "$TARGET" ] && { echo "ERROR: --target is required"; exit 1; }
