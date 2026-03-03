@@ -1,0 +1,72 @@
+{
+  "findings": [
+    {
+      "id": "FINDING-A05-001",
+      "source_tool": "semgrep",
+      "scan_type": "sast",
+      "rule_id": "a05-debug-mode-python",
+      "severity": "ERROR",
+      "title": "Django DEBUG = True in production settings module",
+      "cwe_id": "CWE-489",
+      "owasp": "A05:2021",
+      "location": {
+        "file": "config/settings.py",
+        "line_start": 28,
+        "line_end": 28
+      },
+      "message": "Debug mode is enabled in production-facing code. Django DEBUG = True exposes detailed error pages with stack traces, SQL queries, and environment variables to end users.",
+      "status": "open"
+    },
+    {
+      "id": "FINDING-A05-002",
+      "source_tool": "semgrep",
+      "scan_type": "sast",
+      "rule_id": "a05-default-credentials",
+      "severity": "ERROR",
+      "title": "Hardcoded default password in database configuration",
+      "cwe_id": "CWE-798",
+      "owasp": "A05:2021",
+      "location": {
+        "file": "src/db/connection.js",
+        "line_start": 15,
+        "line_end": 15
+      },
+      "message": "Default or common credentials detected in source code. Hardcoded passwords like 'admin', 'password123', or 'changeme' are trivially guessable and appear in public credential dictionaries.",
+      "status": "open"
+    },
+    {
+      "id": "FINDING-A05-003",
+      "source_tool": "semgrep",
+      "scan_type": "sast",
+      "rule_id": "a05-permissive-cors",
+      "severity": "WARNING",
+      "title": "Permissive CORS allows all origins in API middleware",
+      "cwe_id": "CWE-942",
+      "owasp": "A05:2021",
+      "location": {
+        "file": "src/middleware/cors.js",
+        "line_start": 8,
+        "line_end": 8
+      },
+      "message": "Permissive CORS configuration detected (Access-Control-Allow-Origin: *). Allowing all origins enables any website to make cross-origin requests to your API, potentially exposing sensitive data.",
+      "status": "open"
+    }
+  ],
+  "summary": {
+    "total": 3,
+    "critical": 0,
+    "high": 0,
+    "medium": 0,
+    "low": 0,
+    "info": 0,
+    "warning": 1,
+    "error": 2
+  },
+  "metadata": {
+    "rules_file": "rules/a05-misconfig-rules.yml",
+    "rule_count": 6,
+    "scan_type": "sast",
+    "owasp_category": "A05:2021",
+    "cwe_coverage": ["CWE-209", "CWE-489", "CWE-798", "CWE-942", "CWE-1021"]
+  }
+}

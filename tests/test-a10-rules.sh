@@ -154,6 +154,22 @@ for rule in data['rules']:
 sys.exit(0)
 " && pass "All 7 rules tagged with A10:2021" || fail "Not all rules have A10:2021 tag"
 
+# Check OWASP 2025 dual-tagging
+HAS_2025=$(python3 -c "
+import yaml
+with open('$RULES_FILE') as f:
+    data = yaml.safe_load(f)
+count = 0
+for r in data['rules']:
+    owasp = r.get('metadata', {}).get('owasp', [])
+    if any('2025' in t for t in owasp):
+        count += 1
+print(count)
+")
+[ "$HAS_2025" -eq "$RULE_COUNT" ] \
+  && pass "All $RULE_COUNT rules have OWASP 2025 tags" \
+  || fail "Only $HAS_2025/$RULE_COUNT rules have OWASP 2025 tags"
+
 echo ""
 
 # ═══════════════════════════════════════════
@@ -334,11 +350,93 @@ fi
 echo ""
 
 # ═══════════════════════════════════════════
+# Section 12: A10:2025 Exception Handling Rules
+# ═══════════════════════════════════════════
+echo "--- Section 12: A10:2025 Exception Handling Rules ---"
+
+EXCEPTION_RULES="$ROOT_DIR/rules/a10-exception-rules.yml"
+EXCEPTION_FIXTURE="$ROOT_DIR/tests/fixtures/sample-a10-exception-findings.json"
+
+[ -f "$EXCEPTION_RULES" ] && pass "a10-exception-rules.yml exists" || fail "a10-exception-rules.yml missing"
+
+# Check YAML validity
+python3 -c "
+import yaml, sys
+try:
+    with open('$EXCEPTION_RULES') as f:
+        data = yaml.safe_load(f)
+    if 'rules' not in data:
+        print('ERROR: no rules key', file=sys.stderr)
+        sys.exit(1)
+    sys.exit(0)
+except Exception as e:
+    print(f'ERROR: {e}', file=sys.stderr)
+    sys.exit(1)
+" && pass "Exception rules YAML is valid" || fail "Exception rules YAML is invalid"
+
+# Check rule count
+EXCEPTION_COUNT=$(python3 -c "
+import yaml
+with open('$EXCEPTION_RULES') as f:
+    data = yaml.safe_load(f)
+print(len(data.get('rules', [])))
+")
+[ "$EXCEPTION_COUNT" -eq 4 ] && pass "Contains 4 exception rules" || fail "Expected 4 exception rules, got $EXCEPTION_COUNT"
+
+# All exception rules have required Semgrep fields
+python3 -c "
+import yaml, sys
+with open('$EXCEPTION_RULES') as f:
+    data = yaml.safe_load(f)
+
+required_fields = ['id', 'severity', 'message', 'languages']
+required_metadata = ['cwe', 'owasp', 'category', 'references']
+
+errors = []
+for rule in data['rules']:
+    rid = rule.get('id', 'unknown')
+    for field in required_fields:
+        if field not in rule:
+            errors.append(f'{rid}: missing {field}')
+    has_pattern = any(k in rule for k in ['pattern', 'patterns', 'pattern-either', 'pattern-regex'])
+    if not has_pattern:
+        errors.append(f'{rid}: missing pattern definition')
+    meta = rule.get('metadata', {})
+    for mf in required_metadata:
+        if mf not in meta:
+            errors.append(f'{rid}: missing metadata.{mf}')
+
+if errors:
+    for e in errors:
+        print(f'METADATA_ERROR: {e}', file=sys.stderr)
+    sys.exit(1)
+sys.exit(0)
+" && pass "All exception rules have required Semgrep fields" || fail "Some exception rules missing required fields"
+
+# All exception rules have A10:2025 tag
+A10_2025_COUNT=$(python3 -c "
+import yaml
+with open('$EXCEPTION_RULES') as f:
+    data = yaml.safe_load(f)
+count = sum(1 for r in data['rules'] if 'A10:2025' in r.get('metadata',{}).get('owasp',[]))
+print(count)
+")
+[ "$A10_2025_COUNT" -eq 4 ] && pass "All 4 exception rules tagged A10:2025" || fail "Only $A10_2025_COUNT/4 tagged A10:2025"
+
+# Fixture validation
+[ -f "$EXCEPTION_FIXTURE" ] && pass "A10 exception fixture exists" || fail "A10 exception fixture missing"
+
+EXCEPTION_FINDINGS=$(python3 -c "import json; print(len(json.load(open('$EXCEPTION_FIXTURE'))['findings']))")
+[ "$EXCEPTION_FINDINGS" -eq 3 ] && pass "Exception fixture has 3 findings" || fail "Expected 3 findings, got $EXCEPTION_FINDINGS"
+
+echo ""
+
+# ═══════════════════════════════════════════
 # Summary
 # ═══════════════════════════════════════════
 echo "============================================"
 TOTAL=$((PASS + FAIL))
-echo "A10 Rules Tests: $PASS/$TOTAL passed"
+echo "A10 Rules Tests (SSRF + Exception): $PASS/$TOTAL passed"
 if [ "$FAIL" -gt 0 ]; then
     echo "RESULT: FAIL ($FAIL failures)"
     exit 1

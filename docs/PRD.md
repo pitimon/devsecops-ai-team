@@ -23,20 +23,20 @@ DevSecOps AI Team เป็น Claude Code plugin ที่รวม open-source
 
 ---
 
-## 2. Current State (v2.6.1)
+## 2. Current State (v2.7.0)
 
 | Metric                  | Value | Notes                                                                             |
 | ----------------------- | ----- | --------------------------------------------------------------------------------- |
 | Agents                  | 18    | 4 groups: Orchestrators, Specialists, Experts, Core                               |
 | Skills                  | 13    | 12 original + `/auto-fix`                                                         |
-| Docker Tools            | 7     | Semgrep, ZAP, Grype, Trivy, Checkov, GitLeaks, Syft                               |
+| Docker Tools            | 8     | Semgrep, ZAP, Nuclei, Grype, Trivy, Checkov, GitLeaks, Syft                       |
 | MCP Tools               | 8     | scan, normalize, results, triage, enrich, compare, compliance_status, suggest_fix |
-| Custom Semgrep Rules    | 33    | A01 (8), A03 (11), A09 (7), A10 (7)                                               |
-| OWASP Category Coverage | 4/10  | A01, A03, A09, A10                                                                |
-| Compliance Frameworks   | 4     | OWASP, NIST 800-53, MITRE ATT&CK, NCSA                                            |
-| CWE Mappings            | 360   | Across 4 mapping files                                                            |
+| Custom Semgrep Rules    | 53    | A01 (8), A02 (6), A03 (11), A04 (4), A05 (6), A09 (7), A10 (7+4)                  |
+| OWASP Category Coverage | 7/10  | A01, A02, A03, A04, A05, A09, A10                                                 |
+| Compliance Frameworks   | 5     | OWASP (2021+2025), NIST 800-53, MITRE ATT&CK, NCSA, PDPA                          |
+| CWE Mappings            | 405   | Across 5 mapping files                                                            |
 | Output Formats          | 6     | JSON, SARIF, Markdown, HTML, PDF, CSV                                             |
-| Test Suites             | 22    | 793+ individual tests                                                             |
+| Test Suites             | 28    | 978+ individual tests                                                             |
 | QA Rounds               | 10    | 1,070+ checks passed                                                              |
 
 ### Architecture Summary
@@ -147,9 +147,9 @@ User prompt → keyword match in SKILL.md frontmatter
 | Feature                     | DevSecOps AI Team | Snyk (CLI)  | GitHub Advanced Security | Semgrep App  |
 | --------------------------- | ----------------- | ----------- | ------------------------ | ------------ |
 | AI-powered remediation      | Yes (agents)      | Limited     | Copilot Autofix          | AI rules     |
-| Multi-tool orchestration    | 7 tools           | 3 tools     | CodeQL + Dependabot      | Semgrep only |
-| Custom rule authoring       | Yes (33 rules)    | No          | CodeQL QL                | Yes          |
-| Compliance mapping          | 4 frameworks      | 1 (OWASP)   | None                     | None         |
+| Multi-tool orchestration    | 8 tools           | 3 tools     | CodeQL + Dependabot      | Semgrep only |
+| Custom rule authoring       | Yes (53 rules)    | No          | CodeQL QL                | Yes          |
+| Compliance mapping          | 5 frameworks      | 1 (OWASP)   | None                     | None         |
 | Thai regulatory (NCSA/PDPA) | Yes               | No          | No                       | No           |
 | Open-source tools           | 100%              | Proprietary | Proprietary              | Freemium     |
 | Claude Code native          | Yes               | No          | No                       | No           |
@@ -231,17 +231,17 @@ User prompt → keyword match in SKILL.md frontmatter
 
 ## 7. Success Metrics
 
-| Metric                      | Current (v2.6.1) | v2.8.0 Target  | v3.0.0 Target |
-| --------------------------- | ---------------- | -------------- | ------------- |
-| OWASP custom rules coverage | 4/10             | 10/10          | 10/10         |
-| CWE mappings                | 360              | 400+           | 450+          |
-| Test count                  | 793+             | 900+           | 1000+         |
-| MCP tools                   | 8                | 10+            | 12+           |
-| CI/CD platforms supported   | 3                | 3              | 3+            |
-| Compliance frameworks       | 4                | 6+             | 7+            |
-| Custom Semgrep rules        | 33               | 60+            | 70+           |
-| DAST tools                  | 1 (ZAP)          | 2 (ZAP+Nuclei) | 2+            |
-| Output formats              | 6                | 7+ (VEX)       | 8+            |
+| Metric                      | Current (v2.7.0) | v2.8.0 Target | v3.0.0 Target |
+| --------------------------- | ---------------- | ------------- | ------------- |
+| OWASP custom rules coverage | 7/10             | 10/10         | 10/10         |
+| CWE mappings                | 405              | 450+          | 500+          |
+| Test count                  | 978+             | 1100+         | 1300+         |
+| MCP tools                   | 8                | 10+           | 12+           |
+| CI/CD platforms supported   | 3                | 3             | 3+            |
+| Compliance frameworks       | 5                | 7+            | 8+            |
+| Custom Semgrep rules        | 53               | 65+           | 75+           |
+| DAST tools                  | 2 (ZAP+Nuclei)   | 2+            | 3+            |
+| Output formats              | 6                | 7+ (VEX)      | 8+            |
 
 ---
 
@@ -249,7 +249,7 @@ User prompt → keyword match in SKILL.md frontmatter
 
 ### 8.1 Performance
 
-- Full 7-tool scan MUST complete within 30 minutes for a medium project (100K LOC)
+- Full 8-tool scan MUST complete within 30 minutes for a medium project (100K LOC)
 - Individual tool scan MUST complete within 5 minutes
 - MCP tool responses MUST return within 10 seconds (excluding scan execution)
 - Deduplication MUST process 1,000 findings in under 5 seconds
@@ -309,4 +309,4 @@ User prompt → keyword match in SKILL.md frontmatter
 
 ---
 
-_Document generated: 2026-03-03 | Next review: v2.7.0 release_
+_Document generated: 2026-03-03 | Updated: v2.7.0 release | Next review: v2.8.0 release_

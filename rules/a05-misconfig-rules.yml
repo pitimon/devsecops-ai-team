@@ -1,0 +1,290 @@
+rules:
+  # ==========================================================================
+  # A05:2025 Security Misconfiguration — Custom Semgrep Rules
+  # DevSecOps AI Team v2.7.0
+  #
+  # 6 rules targeting A05 anti-patterns
+  # Languages: Python (3 rules), JavaScript/TypeScript (3 rules)
+  # Reference: skills/references/sast-patterns.md
+  # ==========================================================================
+
+  # -------------------------------------------------------------------------
+  # Rule 1: Debug Mode Enabled (CWE-489) — Python
+  # Detects DEBUG = True in Django/Flask settings
+  # -------------------------------------------------------------------------
+  - id: a05-debug-mode-python
+    pattern-either:
+      - pattern: DEBUG = True
+      - pattern: app.debug = True
+      - pattern: app.config["DEBUG"] = True
+      - pattern: app.config['DEBUG'] = True
+    message: >
+      Debug mode is enabled in production-facing code. Django DEBUG = True
+      exposes detailed error pages with stack traces, SQL queries, and
+      environment variables to end users. Flask app.debug = True enables
+      the interactive debugger allowing remote code execution. Disable
+      debug mode in production per OWASP A05:2025.
+    languages:
+      - python
+    severity: ERROR
+    metadata:
+      cwe:
+        - "CWE-489"
+      owasp:
+        - "A05:2021"
+        - "A05:2025"
+      nist:
+        - "CM-6"
+        - "CM-7"
+      confidence: HIGH
+      impact: HIGH
+      likelihood: HIGH
+      category: security
+      technology:
+        - python
+      references:
+        - https://owasp.org/Top10/A05_2021-Security_Misconfiguration/
+        - https://cwe.mitre.org/data/definitions/489.html
+      fix: |
+        Disable debug mode and use environment variables:
+          # Django
+          DEBUG = os.environ.get("DEBUG", "False").lower() == "true"
+          # Flask
+          app.config["DEBUG"] = os.environ.get("FLASK_DEBUG", "0") == "1"
+        Ensure DEBUG is always False in production deployments.
+
+  # -------------------------------------------------------------------------
+  # Rule 2: Debug Mode Enabled (CWE-489) — JavaScript/TypeScript
+  # Detects Express/Node debug patterns in code
+  # -------------------------------------------------------------------------
+  - id: a05-debug-mode-javascript
+    pattern-regex: >-
+      (NODE_ENV\s*[=:]\s*["']development["']|app\.set\s*\(\s*["']env["']\s*,\s*["']development["']\s*\)|process\.env\.NODE_ENV\s*!==?\s*["']production["'])
+    message: >
+      Node.js/Express environment is set to development mode or explicitly
+      checks against production in application code. Development mode enables
+      verbose error output, stack traces, and debugging endpoints. Ensure
+      NODE_ENV is set to 'production' in deployment and avoid hardcoding
+      environment checks per OWASP A05:2025.
+    languages:
+      - javascript
+      - typescript
+    severity: ERROR
+    metadata:
+      cwe:
+        - "CWE-489"
+      owasp:
+        - "A05:2021"
+        - "A05:2025"
+      nist:
+        - "CM-6"
+        - "CM-7"
+      confidence: MEDIUM
+      impact: HIGH
+      likelihood: MEDIUM
+      category: security
+      technology:
+        - javascript
+        - typescript
+      references:
+        - https://owasp.org/Top10/A05_2021-Security_Misconfiguration/
+        - https://cwe.mitre.org/data/definitions/489.html
+      fix: |
+        Use environment variables for configuration:
+          const isProduction = process.env.NODE_ENV === 'production';
+          app.set('env', process.env.NODE_ENV || 'production');
+        Never hardcode NODE_ENV = 'development' in application code.
+
+  # -------------------------------------------------------------------------
+  # Rule 3: Default Credentials (CWE-798) — Python/JS/Java
+  # Detects hardcoded admin/password/root patterns via pattern-regex
+  # -------------------------------------------------------------------------
+  - id: a05-default-credentials
+    pattern-regex: >-
+      (password|passwd|pwd|admin_pass|root_pass|db_password|default_password)\s*[=:]\s*["'](admin|password|password123|123456|root|default|changeme|admin123|test|qwerty)["']
+    message: >
+      Default or common credentials detected in source code. Hardcoded
+      passwords like 'admin', 'password123', or 'changeme' are trivially
+      guessable and appear in public credential dictionaries. Use
+      environment variables, secret managers (AWS Secrets Manager,
+      HashiCorp Vault), or configuration management per OWASP A05:2025.
+    languages:
+      - python
+      - javascript
+      - java
+    severity: ERROR
+    metadata:
+      cwe:
+        - "CWE-798"
+      owasp:
+        - "A05:2021"
+        - "A05:2025"
+      nist:
+        - "IA-5"
+        - "CM-6"
+      confidence: HIGH
+      impact: HIGH
+      likelihood: HIGH
+      category: security
+      technology:
+        - python
+        - javascript
+        - java
+      references:
+        - https://owasp.org/Top10/A05_2021-Security_Misconfiguration/
+        - https://cwe.mitre.org/data/definitions/798.html
+      fix: |
+        Use environment variables or secret managers:
+          # Python
+          password = os.environ["DB_PASSWORD"]
+          # JavaScript
+          const password = process.env.DB_PASSWORD;
+          # Java
+          String password = System.getenv("DB_PASSWORD");
+        Never commit credentials to source control.
+
+  # -------------------------------------------------------------------------
+  # Rule 4: Permissive CORS Configuration (CWE-942) — Python/JS
+  # Detects Access-Control-Allow-Origin: * patterns via pattern-regex
+  # -------------------------------------------------------------------------
+  - id: a05-permissive-cors
+    pattern-regex: >-
+      (Access-Control-Allow-Origin["']\s*[,:]\s*["']\*|cors\(\s*\)|CORS\(\s*\)|allow_origins\s*=\s*\[?\s*["']\*["']|origin\s*[=:]\s*["']\*["']|allowedOrigins\s*[=:]\s*\[?\s*["']\*["'])
+    message: >
+      Permissive CORS configuration detected (Access-Control-Allow-Origin: *).
+      Allowing all origins enables any website to make cross-origin requests
+      to your API, potentially exposing sensitive data or enabling CSRF-like
+      attacks. Restrict allowed origins to specific trusted domains per
+      OWASP A05:2025.
+    languages:
+      - python
+      - javascript
+    severity: WARNING
+    metadata:
+      cwe:
+        - "CWE-942"
+      owasp:
+        - "A05:2021"
+        - "A05:2025"
+      nist:
+        - "AC-4"
+        - "SC-7"
+      confidence: HIGH
+      impact: MEDIUM
+      likelihood: HIGH
+      category: security
+      technology:
+        - python
+        - javascript
+      references:
+        - https://owasp.org/Top10/A05_2021-Security_Misconfiguration/
+        - https://cwe.mitre.org/data/definitions/942.html
+      fix: |
+        Restrict CORS to specific origins:
+          # Python (Flask-CORS)
+          CORS(app, origins=["https://app.example.com"])
+          # Python (Django)
+          CORS_ALLOWED_ORIGINS = ["https://app.example.com"]
+          # Express.js
+          app.use(cors({ origin: ['https://app.example.com'] }));
+
+  # -------------------------------------------------------------------------
+  # Rule 5: Verbose Error Exposure (CWE-209) — Python
+  # Detects stack trace leakage in HTTP responses
+  # -------------------------------------------------------------------------
+  - id: a05-verbose-errors-python
+    pattern-either:
+      - pattern: |
+          return ...(traceback.format_exc())
+      - pattern: |
+          return ...(traceback.format_exception(...))
+      - pattern: |
+          Response(traceback.format_exc(), ...)
+      - pattern: |
+          jsonify({"error": traceback.format_exc()})
+      - pattern: |
+          jsonify(error=traceback.format_exc())
+    message: >
+      Stack trace returned in HTTP response via traceback.format_exc().
+      Detailed error information including file paths, line numbers, and
+      local variable values aids attackers in mapping application internals.
+      Log errors server-side and return generic error messages to clients
+      per OWASP A05:2025.
+    languages:
+      - python
+    severity: WARNING
+    metadata:
+      cwe:
+        - "CWE-209"
+      owasp:
+        - "A05:2021"
+        - "A05:2025"
+      nist:
+        - "SI-11"
+        - "SC-8"
+      confidence: HIGH
+      impact: MEDIUM
+      likelihood: MEDIUM
+      category: security
+      technology:
+        - python
+      references:
+        - https://owasp.org/Top10/A05_2021-Security_Misconfiguration/
+        - https://cwe.mitre.org/data/definitions/209.html
+      fix: |
+        Log errors server-side and return generic messages:
+          import logging
+          logger = logging.getLogger(__name__)
+          try:
+              result = process_request()
+          except Exception as e:
+              logger.exception("Request processing failed")
+              return jsonify({"error": "Internal server error"}), 500
+
+  # -------------------------------------------------------------------------
+  # Rule 6: Missing Security Headers Middleware (CWE-1021) — JavaScript/TypeScript
+  # Detects missing helmet() or security header configuration
+  # -------------------------------------------------------------------------
+  - id: a05-missing-security-headers
+    pattern-regex: >-
+      (app\.use\s*\(\s*express\.static|app\.listen\s*\()(?![\s\S]*helmet)
+    message: >
+      Express application may be missing security headers middleware
+      (helmet). Without helmet or equivalent middleware, responses lack
+      critical headers such as X-Frame-Options, Content-Security-Policy,
+      X-Content-Type-Options, and Strict-Transport-Security. This exposes
+      the application to clickjacking, MIME-type sniffing, and downgrade
+      attacks per OWASP A05:2025.
+    languages:
+      - javascript
+      - typescript
+    severity: WARNING
+    metadata:
+      cwe:
+        - "CWE-1021"
+      owasp:
+        - "A05:2021"
+        - "A05:2025"
+      nist:
+        - "SC-8"
+        - "SI-11"
+      confidence: MEDIUM
+      impact: MEDIUM
+      likelihood: HIGH
+      category: security
+      technology:
+        - javascript
+        - typescript
+      references:
+        - https://owasp.org/Top10/A05_2021-Security_Misconfiguration/
+        - https://cwe.mitre.org/data/definitions/1021.html
+      fix: |
+        Install and use helmet middleware:
+          const helmet = require('helmet');
+          app.use(helmet());
+          // Or configure individual headers:
+          app.use(helmet({
+            contentSecurityPolicy: true,
+            frameguard: { action: 'deny' },
+            hsts: { maxAge: 31536000, includeSubDomains: true }
+          }));

@@ -1,0 +1,279 @@
+rules:
+  # ==========================================================================
+  # A02:2025 Cryptographic Failures — Custom Semgrep Rules
+  # DevSecOps AI Team v2.7.0
+  #
+  # 6 rules targeting A02 anti-patterns
+  # Languages: Python (3 rules), JavaScript/TypeScript (3 rules)
+  # Reference: skills/references/sast-patterns.md
+  # ==========================================================================
+
+  # -------------------------------------------------------------------------
+  # Rule 1: Weak Hash Algorithm (CWE-328) — Python
+  # Detects MD5/SHA1 usage via hashlib
+  # -------------------------------------------------------------------------
+  - id: a02-weak-hash-python
+    pattern-either:
+      - pattern: hashlib.md5(...)
+      - pattern: hashlib.sha1(...)
+      - pattern: hashlib.new("md5", ...)
+      - pattern: hashlib.new("sha1", ...)
+    message: >
+      Weak hash algorithm (MD5/SHA1) detected via hashlib. MD5 and SHA1
+      are cryptographically broken and MUST NOT be used for password hashing,
+      integrity verification, or digital signatures. Use SHA-256+ or
+      bcrypt/argon2 for passwords per OWASP A02:2025.
+    languages:
+      - python
+    severity: ERROR
+    metadata:
+      cwe:
+        - "CWE-328"
+      owasp:
+        - "A02:2021"
+        - "A02:2025"
+      nist:
+        - "SC-13"
+        - "IA-5"
+      confidence: HIGH
+      impact: HIGH
+      likelihood: HIGH
+      category: security
+      technology:
+        - python
+      references:
+        - https://owasp.org/Top10/A02_2021-Cryptographic_Failures/
+        - https://cwe.mitre.org/data/definitions/328.html
+      fix: |
+        Use SHA-256 or stronger for integrity checks:
+          digest = hashlib.sha256(data).hexdigest()
+        Use bcrypt/argon2 for password hashing:
+          from argon2 import PasswordHasher
+          ph = PasswordHasher()
+          hash = ph.hash(password)
+
+  # -------------------------------------------------------------------------
+  # Rule 2: Weak Hash Algorithm (CWE-328) — JavaScript/TypeScript
+  # Detects crypto.createHash('md5'/'sha1') and CryptoJS.MD5/SHA1
+  # -------------------------------------------------------------------------
+  - id: a02-weak-hash-javascript
+    pattern-either:
+      - pattern: crypto.createHash("md5")
+      - pattern: crypto.createHash('md5')
+      - pattern: crypto.createHash("sha1")
+      - pattern: crypto.createHash('sha1')
+      - pattern: CryptoJS.MD5(...)
+      - pattern: CryptoJS.SHA1(...)
+    message: >
+      Weak hash algorithm (MD5/SHA1) detected. MD5 and SHA1 are
+      cryptographically broken and MUST NOT be used for password hashing,
+      integrity verification, or digital signatures. Use SHA-256+ or
+      bcrypt/scrypt for passwords per OWASP A02:2025.
+    languages:
+      - javascript
+      - typescript
+    severity: ERROR
+    metadata:
+      cwe:
+        - "CWE-328"
+      owasp:
+        - "A02:2021"
+        - "A02:2025"
+      nist:
+        - "SC-13"
+        - "IA-5"
+      confidence: HIGH
+      impact: HIGH
+      likelihood: HIGH
+      category: security
+      technology:
+        - javascript
+        - typescript
+      references:
+        - https://owasp.org/Top10/A02_2021-Cryptographic_Failures/
+        - https://cwe.mitre.org/data/definitions/328.html
+      fix: |
+        Use SHA-256 or stronger for integrity checks:
+          const hash = crypto.createHash('sha256').update(data).digest('hex');
+        Use bcrypt for password hashing:
+          const bcrypt = require('bcrypt');
+          const hash = await bcrypt.hash(password, 12);
+
+  # -------------------------------------------------------------------------
+  # Rule 3: Hardcoded Encryption/Secret Key (CWE-321) — Python/JS/Java
+  # Uses pattern-regex for cross-language detection
+  # -------------------------------------------------------------------------
+  - id: a02-hardcoded-key
+    pattern-regex: >-
+      (SECRET_KEY|secret_key|encryption_key|ENCRYPTION_KEY|api_key|API_KEY|private_key|PRIVATE_KEY|signing_key|SIGNING_KEY)\s*[=:]\s*["'][A-Za-z0-9+/=_\-]{8,}["']
+    message: >
+      Hardcoded encryption or secret key detected. Secrets embedded in
+      source code can be extracted by attackers through repository access
+      or binary analysis. Use environment variables, secret managers
+      (AWS Secrets Manager, HashiCorp Vault), or key management services
+      per OWASP A02:2025.
+    languages:
+      - python
+      - javascript
+      - java
+    severity: ERROR
+    metadata:
+      cwe:
+        - "CWE-321"
+      owasp:
+        - "A02:2021"
+        - "A02:2025"
+      nist:
+        - "SC-12"
+        - "SC-28"
+      confidence: MEDIUM
+      impact: HIGH
+      likelihood: HIGH
+      category: security
+      technology:
+        - python
+        - javascript
+        - java
+      references:
+        - https://owasp.org/Top10/A02_2021-Cryptographic_Failures/
+        - https://cwe.mitre.org/data/definitions/321.html
+      fix: |
+        Use environment variables or secret managers:
+          # Python
+          SECRET_KEY = os.environ["SECRET_KEY"]
+          # JavaScript
+          const SECRET_KEY = process.env.SECRET_KEY;
+          # Java
+          String secretKey = System.getenv("SECRET_KEY");
+
+  # -------------------------------------------------------------------------
+  # Rule 4: Insecure Random Number Generator (CWE-338) — Python
+  # Detects random module usage for security-sensitive operations
+  # -------------------------------------------------------------------------
+  - id: a02-insecure-random-python
+    pattern-either:
+      - pattern: random.random()
+      - pattern: random.randint(...)
+      - pattern: random.choice(...)
+      - pattern: random.randrange(...)
+      - pattern: random.uniform(...)
+    message: >
+      Insecure pseudo-random number generator (random module) detected.
+      Python's random module uses Mersenne Twister which is predictable
+      and MUST NOT be used for security-sensitive operations such as
+      token generation, password reset codes, or cryptographic keys.
+      Use secrets module per OWASP A02:2025.
+    languages:
+      - python
+    severity: WARNING
+    metadata:
+      cwe:
+        - "CWE-338"
+      owasp:
+        - "A02:2021"
+        - "A02:2025"
+      nist:
+        - "SC-13"
+        - "IA-5"
+      confidence: MEDIUM
+      impact: MEDIUM
+      likelihood: MEDIUM
+      category: security
+      technology:
+        - python
+      references:
+        - https://owasp.org/Top10/A02_2021-Cryptographic_Failures/
+        - https://cwe.mitre.org/data/definitions/338.html
+      fix: |
+        Use secrets module for security-sensitive randomness:
+          import secrets
+          token = secrets.token_urlsafe(32)
+          code = secrets.randbelow(1000000)
+          choice = secrets.choice(allowed_chars)
+
+  # -------------------------------------------------------------------------
+  # Rule 5: Insecure Random Number Generator (CWE-338) — JavaScript/TypeScript
+  # Detects Math.random() usage
+  # -------------------------------------------------------------------------
+  - id: a02-insecure-random-javascript
+    pattern: Math.random()
+    message: >
+      Insecure pseudo-random number generator (Math.random) detected.
+      Math.random() is not cryptographically secure and MUST NOT be used
+      for security-sensitive operations such as token generation, session
+      IDs, or nonce values. Use crypto.randomBytes or crypto.randomUUID
+      per OWASP A02:2025.
+    languages:
+      - javascript
+      - typescript
+    severity: WARNING
+    metadata:
+      cwe:
+        - "CWE-338"
+      owasp:
+        - "A02:2021"
+        - "A02:2025"
+      nist:
+        - "SC-13"
+        - "IA-5"
+      confidence: MEDIUM
+      impact: MEDIUM
+      likelihood: MEDIUM
+      category: security
+      technology:
+        - javascript
+        - typescript
+      references:
+        - https://owasp.org/Top10/A02_2021-Cryptographic_Failures/
+        - https://cwe.mitre.org/data/definitions/338.html
+      fix: |
+        Use crypto module for security-sensitive randomness:
+          const crypto = require('crypto');
+          const token = crypto.randomBytes(32).toString('hex');
+          const uuid = crypto.randomUUID();
+
+  # -------------------------------------------------------------------------
+  # Rule 6: Weak TLS Configuration (CWE-327) — Python/JS
+  # Detects TLS versions below 1.2 via pattern-regex
+  # -------------------------------------------------------------------------
+  - id: a02-weak-tls
+    pattern-regex: >-
+      (SSLv2|SSLv3|TLSv1(?![\._][2-9])|TLS_1_0|TLS_1_1|TLSv1_0|TLSv1_1|PROTOCOL_TLSv1(?!_[2-9])|PROTOCOL_TLSv1_1|ssl\.PROTOCOL_SSLv23|tls\.DEFAULT_MIN_VERSION.*TLSv1[^2-9_]|minVersion.*TLSv1[^2-9_])
+    message: >
+      Weak TLS protocol version detected (below TLS 1.2). SSLv2, SSLv3,
+      TLS 1.0, and TLS 1.1 are deprecated due to known vulnerabilities
+      (POODLE, BEAST, etc.). Enforce TLS 1.2 as minimum version per
+      OWASP A02:2025 and NIST SP 800-52r2.
+    languages:
+      - python
+      - javascript
+    severity: ERROR
+    metadata:
+      cwe:
+        - "CWE-327"
+      owasp:
+        - "A02:2021"
+        - "A02:2025"
+      nist:
+        - "SC-8"
+        - "SC-13"
+      confidence: HIGH
+      impact: HIGH
+      likelihood: MEDIUM
+      category: security
+      technology:
+        - python
+        - javascript
+      references:
+        - https://owasp.org/Top10/A02_2021-Cryptographic_Failures/
+        - https://cwe.mitre.org/data/definitions/327.html
+      fix: |
+        Enforce TLS 1.2 minimum:
+          # Python
+          context = ssl.SSLContext(ssl.PROTOCOL_TLS_CLIENT)
+          context.minimum_version = ssl.TLSVersion.TLSv1_2
+          # Node.js
+          const server = https.createServer({
+            minVersion: 'TLSv1.2',
+            ...options
+          });

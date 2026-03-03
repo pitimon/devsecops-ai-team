@@ -18082,7 +18082,7 @@ var TOOLS = [
   },
   {
     name: "devsecops_compliance_status",
-    description: "Aggregate compliance status across all 4 frameworks (OWASP, NIST, MITRE, NCSA) for a findings file. Returns per-framework coverage and gaps.",
+    description: "Aggregate compliance status across all 5 frameworks (OWASP, NIST, MITRE, NCSA, PDPA) for a findings file. Returns per-framework coverage and gaps.",
     inputSchema: {
       type: "object",
       properties: {
@@ -18351,7 +18351,7 @@ async function handleComplianceStatus({ findings_file }) {
   const results = readJsonFile(findings_file);
   if (!results) return mcpError(`Findings file not found: ${findings_file}`);
   const findings = results.findings || [];
-  const frameworks = ["owasp", "nist", "mitre", "ncsa"];
+  const frameworks = ["owasp", "nist", "mitre", "ncsa", "pdpa"];
   const mappings = loadMappings(frameworks);
   const status = {};
   for (const fw of frameworks) {
@@ -18532,7 +18532,7 @@ ${issues.join("\n")}`
   return { valid: true, data: result.data };
 }
 var server = new Server(
-  { name: "devsecops-mcp-server", version: "2.6.1" },
+  { name: "devsecops-mcp-server", version: "2.7.0" },
   { capabilities: { tools: {} } }
 );
 server.setRequestHandler(ListToolsRequestSchema, async () => ({

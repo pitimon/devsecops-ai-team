@@ -1,7 +1,7 @@
 rules:
   # ==========================================================================
   # A03:2021 Injection — Custom Semgrep Rules
-  # DevSecOps AI Team v2.5.0
+  # DevSecOps AI Team v2.7.0
   #
   # 11 rules (9 categories) targeting A03 injection anti-patterns
   # Languages: Python (5 rules), JavaScript/TypeScript (4 rules), Java (2 rules)
@@ -31,6 +31,7 @@ rules:
         - "CWE-89"
       owasp:
         - "A03:2021"
+        - "A05:2025"
       nist:
         - "SI-10"
         - "SC-18"
@@ -69,6 +70,7 @@ rules:
         - "CWE-89"
       owasp:
         - "A03:2021"
+        - "A05:2025"
       nist:
         - "SI-10"
         - "SC-18"
@@ -109,6 +111,7 @@ rules:
         - "CWE-89"
       owasp:
         - "A03:2021"
+        - "A05:2025"
       nist:
         - "SI-10"
         - "SC-18"
@@ -148,6 +151,7 @@ rules:
         - "CWE-78"
       owasp:
         - "A03:2021"
+        - "A05:2025"
       nist:
         - "SI-10"
         - "SC-18"
@@ -186,6 +190,7 @@ rules:
         - "CWE-78"
       owasp:
         - "A03:2021"
+        - "A05:2025"
       nist:
         - "SI-10"
         - "SC-18"
@@ -224,6 +229,7 @@ rules:
         - "CWE-79"
       owasp:
         - "A03:2021"
+        - "A05:2025"
       nist:
         - "SI-10"
         - "SC-18"
@@ -263,6 +269,7 @@ rules:
         - "CWE-79"
       owasp:
         - "A03:2021"
+        - "A05:2025"
       nist:
         - "SI-10"
         - "SC-18"
@@ -300,6 +307,7 @@ rules:
         - "CWE-79"
       owasp:
         - "A03:2021"
+        - "A05:2025"
       nist:
         - "SI-10"
         - "SC-18"
@@ -340,6 +348,7 @@ rules:
         - "CWE-90"
       owasp:
         - "A03:2021"
+        - "A05:2025"
       nist:
         - "SI-10"
         - "SC-18"
@@ -381,6 +390,7 @@ rules:
         - "CWE-1336"
       owasp:
         - "A03:2021"
+        - "A05:2025"
       nist:
         - "SI-10"
         - "SC-18"
@@ -419,6 +429,7 @@ rules:
         - "CWE-1336"
       owasp:
         - "A03:2021"
+        - "A05:2025"
       nist:
         - "SI-10"
         - "SC-18"

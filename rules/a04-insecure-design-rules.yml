@@ -1,0 +1,165 @@
+rules:
+  # ==========================================================================
+  # A04:2025 Insecure Design — Custom Semgrep Rules
+  # DevSecOps AI Team v2.7.0
+  #
+  # 4 rules targeting A04 anti-patterns
+  # Languages: Python (2 rules), Generic/regex (2 rules)
+  # Reference: skills/references/sast-patterns.md
+  # ==========================================================================
+
+  # -------------------------------------------------------------------------
+  # Category 1: Missing Rate Limiting on Auth Endpoints (CWE-770) — Generic
+  # -------------------------------------------------------------------------
+  - id: a04-missing-rate-limit
+    pattern-regex: '@(app\.route|router\.(post|put))\s*\(\s*["\x27]/(login|auth|signin|register|signup|reset[-_]?password)'
+    message: >
+      Authentication endpoint detected without rate limiting. Login, registration,
+      and password reset endpoints MUST implement rate limiting to prevent
+      brute-force and credential stuffing attacks per OWASP A04:2025.
+    languages:
+      - generic
+    severity: WARNING
+    metadata:
+      cwe:
+        - "CWE-770"
+      owasp:
+        - "A04:2021"
+        - "A04:2025"
+      nist:
+        - "AC-7"
+        - "SI-10"
+      confidence: MEDIUM
+      impact: HIGH
+      likelihood: HIGH
+      category: security
+      technology:
+        - python
+      references:
+        - https://owasp.org/Top10/A04_2021-Insecure_Design/
+        - https://cwe.mitre.org/data/definitions/770.html
+      fix: |
+        Add rate limiting to authentication endpoints:
+          from flask_limiter import Limiter
+          limiter = Limiter(app)
+          @app.route('/login', methods=['POST'])
+          @limiter.limit("5 per minute")
+          def login(): ...
+
+  # -------------------------------------------------------------------------
+  # Category 2: Unrestricted File Upload (CWE-434) — Python
+  # -------------------------------------------------------------------------
+  - id: a04-unrestricted-upload-python
+    patterns:
+      - pattern: request.files[$KEY]
+      - pattern-not-inside: |
+          ...
+          if $FILE.content_type in $ALLOWED:
+              ...
+      - pattern-not-inside: |
+          ...
+          $EXT = ...
+          if $EXT in $ALLOWED:
+              ...
+    message: >
+      File upload without type validation. File uploads MUST validate file type,
+      size, and content before processing per OWASP A04:2025.
+    languages:
+      - python
+    severity: WARNING
+    metadata:
+      cwe:
+        - "CWE-434"
+      owasp:
+        - "A04:2021"
+        - "A04:2025"
+      nist:
+        - "SI-10"
+        - "SC-18"
+      confidence: MEDIUM
+      impact: HIGH
+      likelihood: MEDIUM
+      category: security
+      technology:
+        - python
+      references:
+        - https://owasp.org/Top10/A04_2021-Insecure_Design/
+        - https://cwe.mitre.org/data/definitions/434.html
+      fix: |
+        Validate file uploads before processing:
+          ALLOWED_TYPES = {'image/png', 'image/jpeg', 'application/pdf'}
+          file = request.files['upload']
+          if file.content_type not in ALLOWED_TYPES:
+              return "Invalid file type", 400
+
+  # -------------------------------------------------------------------------
+  # Category 3: Trust Boundary Violation (CWE-501) — Python
+  # -------------------------------------------------------------------------
+  - id: a04-trust-boundary-python
+    patterns:
+      - pattern: session[$KEY] = request.$METHOD.get(...)
+    message: >
+      User input stored directly in session without validation. Data crossing
+      trust boundaries MUST be validated before storage per OWASP A04:2025.
+    languages:
+      - python
+    severity: WARNING
+    metadata:
+      cwe:
+        - "CWE-501"
+      owasp:
+        - "A04:2021"
+        - "A04:2025"
+      nist:
+        - "SI-10"
+        - "SC-3"
+      confidence: MEDIUM
+      impact: MEDIUM
+      likelihood: MEDIUM
+      category: security
+      technology:
+        - python
+      references:
+        - https://owasp.org/Top10/A04_2021-Insecure_Design/
+        - https://cwe.mitre.org/data/definitions/501.html
+      fix: |
+        Validate user input before storing in session:
+          role = request.form.get('role')
+          if role in VALID_ROLES:
+              session['role'] = role
+
+  # -------------------------------------------------------------------------
+  # Category 4: Missing Account Lockout (CWE-307) — Generic
+  # -------------------------------------------------------------------------
+  - id: a04-no-account-lockout
+    pattern-regex: 'def\s+(login|authenticate|verify_password|check_credentials)\s*\('
+    message: >
+      Authentication function detected. Ensure account lockout or progressive
+      delays are implemented after failed attempts per OWASP A04:2025.
+    languages:
+      - generic
+    severity: INFO
+    metadata:
+      cwe:
+        - "CWE-307"
+      owasp:
+        - "A04:2021"
+        - "A04:2025"
+      nist:
+        - "AC-7"
+      confidence: LOW
+      impact: HIGH
+      likelihood: MEDIUM
+      category: security
+      technology:
+        - python
+      references:
+        - https://owasp.org/Top10/A04_2021-Insecure_Design/
+        - https://cwe.mitre.org/data/definitions/307.html
+      fix: |
+        Implement account lockout after failed attempts:
+          MAX_ATTEMPTS = 5
+          LOCKOUT_MINUTES = 15
+          failed = get_failed_attempts(username)
+          if failed >= MAX_ATTEMPTS:
+              raise AccountLockedException()

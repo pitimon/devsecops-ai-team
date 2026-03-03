@@ -1,6 +1,6 @@
 # DevSecOps AI Team — Full Stack Docker Compose
 # Usage: docker compose --profile <tool> up -d
-# Profiles: sast, dast, sca, container, iac, secret, sbom
+# Profiles: sast, dast, nuclei, sca, container, iac, secret, sbom
 
 x-common: &common
   restart: unless-stopped
@@ -48,6 +48,22 @@ services:
     profiles: ["dast", "all"]
     mem_limit: 2g
     memswap_limit: 2g
+    volumes:
+      - results:/results
+      - config:/config:ro
+    networks:
+      - devsecops
+      - devsecops-dast
+    restart: unless-stopped
+
+  # ─── DAST: Nuclei ───
+  nuclei:
+    image: projectdiscovery/nuclei:latest
+    container_name: devsecops-nuclei
+    entrypoint: ["sleep", "infinity"]
+    profiles: ["nuclei", "dast", "all"]
+    mem_limit: 1g
+    memswap_limit: 1g
     volumes:
       - results:/results
       - config:/config:ro

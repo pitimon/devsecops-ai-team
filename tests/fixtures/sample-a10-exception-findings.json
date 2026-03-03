@@ -1,0 +1,31 @@
+{
+  "findings": [
+    {
+      "rule_id": "a10-generic-catch-python",
+      "severity": "WARNING",
+      "message": "Bare except clause catches all exceptions",
+      "file": "app/services/processor.py",
+      "line": 89,
+      "cwe": "CWE-396",
+      "owasp": ["A10:2025"]
+    },
+    {
+      "rule_id": "a10-empty-catch-javascript",
+      "severity": "WARNING",
+      "message": "Empty catch block silently swallows errors",
+      "file": "src/handlers/api.ts",
+      "line": 34,
+      "cwe": "CWE-396",
+      "owasp": ["A10:2025"]
+    },
+    {
+      "rule_id": "a10-stack-exposure-python",
+      "severity": "WARNING",
+      "message": "Stack trace exposure detected",
+      "file": "app/views/error_handler.py",
+      "line": 12,
+      "cwe": "CWE-209",
+      "owasp": ["A10:2025"]
+    }
+  ]
+}

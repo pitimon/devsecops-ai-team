@@ -320,6 +320,53 @@ json.dump({'findings': findings, 'summary': {
 " 2>/dev/null
     ;;
 
+  nuclei)
+    python3 -c "
+import json, sys
+
+findings = []
+i = 0
+with open('$INPUT') as f:
+    for line in f:
+        line = line.strip()
+        if not line:
+            continue
+        try:
+            item = json.loads(line)
+        except json.JSONDecodeError:
+            continue
+        i += 1
+        info = item.get('info', {})
+        classification = info.get('classification', {})
+        cwe_ids = classification.get('cwe-id', [])
+        cwe_id = cwe_ids[0] if cwe_ids else None
+
+        sev_map = {'critical': 'CRITICAL', 'high': 'HIGH', 'medium': 'MEDIUM', 'low': 'LOW', 'info': 'INFO'}
+        severity = sev_map.get(info.get('severity', 'info').lower(), 'INFO')
+
+        findings.append({
+            'id': f'FINDING-${DATE_PREFIX}-{i:03d}',
+            'source_tool': 'nuclei',
+            'scan_type': 'dast',
+            'severity': severity,
+            'confidence': 'HIGH' if classification.get('cvss-score', 0) >= 7.0 else 'MEDIUM',
+            'title': info.get('name', item.get('template-id', 'Unknown')),
+            'cwe_id': cwe_id,
+            'rule_id': item.get('template-id', ''),
+            'location': {'url': item.get('matched-at', ''), 'file': '', 'line': 0},
+            'status': 'open'
+        })
+
+summary = {'total': len(findings), 'critical': 0, 'high': 0, 'medium': 0, 'low': 0, 'info': 0}
+for f in findings:
+    key = f['severity'].lower()
+    if key in summary:
+        summary[key] += 1
+
+json.dump({'findings': findings, 'summary': summary}, open('$OUTPUT', 'w'), indent=2)
+" 2>/dev/null
+    ;;
+
   *)
     echo "[normalizer] WARNING: Unknown tool '$TOOL', copying raw output"
     cp "$INPUT" "$OUTPUT"

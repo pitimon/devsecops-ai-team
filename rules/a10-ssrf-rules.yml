@@ -1,7 +1,7 @@
 rules:
   # ==========================================================================
   # A10:2021 Server-Side Request Forgery — Custom Semgrep Rules
-  # DevSecOps AI Team v2.5.0
+  # DevSecOps AI Team v2.7.0
   #
   # 7 rules targeting SSRF anti-patterns
   # Languages: Python (4 rules), JavaScript/TypeScript (2 rules), Java (1 rule)
@@ -36,6 +36,7 @@ rules:
         - "CWE-918"
       owasp:
         - "A10:2021"
+        - "A01:2025"
       nist:
         - "SI-10"
         - "SC-7"
@@ -83,6 +84,7 @@ rules:
         - "CWE-918"
       owasp:
         - "A10:2021"
+        - "A01:2025"
       nist:
         - "SI-10"
         - "SC-7"
@@ -123,6 +125,7 @@ rules:
         - "CWE-918"
       owasp:
         - "A10:2021"
+        - "A01:2025"
       nist:
         - "SI-10"
         - "SC-7"
@@ -162,6 +165,7 @@ rules:
         - "CWE-918"
       owasp:
         - "A10:2021"
+        - "A01:2025"
       nist:
         - "SI-10"
         - "SC-7"
@@ -201,6 +205,7 @@ rules:
         - "CWE-918"
       owasp:
         - "A10:2021"
+        - "A01:2025"
       nist:
         - "SI-10"
       confidence: LOW
@@ -240,6 +245,7 @@ rules:
         - "CWE-918"
       owasp:
         - "A10:2021"
+        - "A01:2025"
       nist:
         - "SI-10"
         - "SC-7"
@@ -280,6 +286,7 @@ rules:
         - "CWE-918"
       owasp:
         - "A10:2021"
+        - "A01:2025"
       nist:
         - "SI-10"
         - "SC-7"

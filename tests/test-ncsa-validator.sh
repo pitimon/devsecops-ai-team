@@ -64,6 +64,9 @@ grep -q 'X-Frame-Options' "$VALIDATOR" && pass "Checks X-Frame-Options header" |
 grep -q 'X-Content-Type-Options' "$VALIDATOR" && pass "Checks X-Content-Type-Options header" || fail "Missing X-Content-Type-Options check"
 grep -q 'Content-Security-Policy' "$VALIDATOR" && pass "Checks CSP header" || fail "Missing CSP check"
 grep -q 'Referrer-Policy' "$VALIDATOR" && pass "Checks Referrer-Policy header" || fail "Missing Referrer-Policy check"
+grep -q 'Permissions-Policy' "$VALIDATOR" && pass "Checks Permissions-Policy header" || fail "Missing Permissions-Policy check"
+grep -q 'Cross-Origin-Opener-Policy' "$VALIDATOR" && pass "Checks Cross-Origin-Opener-Policy (COOP) header" || fail "Missing COOP check"
+grep -q 'Cross-Origin-Embedder-Policy' "$VALIDATOR" && pass "Checks Cross-Origin-Embedder-Policy (COEP) header" || fail "Missing COEP check"
 
 echo ""
 
@@ -85,6 +88,7 @@ echo "--- Section 5: TLS Security Checks ---"
 
 grep -q 'TLS' "$VALIDATOR" && pass "TLS version check present" || fail "Missing TLS check"
 grep -q 'https' "$VALIDATOR" && pass "HTTPS detection present" || fail "Missing HTTPS detection"
+grep -q 'TLS 1.3' "$VALIDATOR" && pass "TLS 1.3 preference check present" || fail "Missing TLS 1.3 preference check"
 
 echo ""
 

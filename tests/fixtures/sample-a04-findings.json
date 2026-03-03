@@ -1,0 +1,72 @@
+{
+  "findings": [
+    {
+      "id": "FINDING-A04-001",
+      "source_tool": "semgrep",
+      "scan_type": "sast",
+      "rule_id": "a04-missing-rate-limit",
+      "severity": "WARNING",
+      "title": "Authentication endpoint without rate limiting",
+      "cwe_id": "CWE-770",
+      "owasp": "A04:2021",
+      "location": {
+        "file": "app/auth/routes.py",
+        "line_start": 45,
+        "line_end": 45
+      },
+      "message": "Authentication endpoint detected without rate limiting. Login, registration, and password reset endpoints MUST implement rate limiting to prevent brute-force and credential stuffing attacks per OWASP A04:2025.",
+      "status": "open"
+    },
+    {
+      "id": "FINDING-A04-002",
+      "source_tool": "semgrep",
+      "scan_type": "sast",
+      "rule_id": "a04-unrestricted-upload-python",
+      "severity": "WARNING",
+      "title": "File upload without type validation",
+      "cwe_id": "CWE-434",
+      "owasp": "A04:2021",
+      "location": {
+        "file": "app/upload/handler.py",
+        "line_start": 23,
+        "line_end": 23
+      },
+      "message": "File upload without type validation. File uploads MUST validate file type, size, and content before processing per OWASP A04:2025.",
+      "status": "open"
+    },
+    {
+      "id": "FINDING-A04-003",
+      "source_tool": "semgrep",
+      "scan_type": "sast",
+      "rule_id": "a04-trust-boundary-python",
+      "severity": "WARNING",
+      "title": "User input stored directly in session without validation",
+      "cwe_id": "CWE-501",
+      "owasp": "A04:2021",
+      "location": {
+        "file": "app/views/profile.py",
+        "line_start": 67,
+        "line_end": 67
+      },
+      "message": "User input stored directly in session without validation. Data crossing trust boundaries MUST be validated before storage per OWASP A04:2025.",
+      "status": "open"
+    }
+  ],
+  "summary": {
+    "total": 3,
+    "critical": 0,
+    "high": 0,
+    "medium": 0,
+    "low": 0,
+    "info": 0,
+    "warning": 3,
+    "error": 0
+  },
+  "metadata": {
+    "rules_file": "rules/a04-insecure-design-rules.yml",
+    "rule_count": 4,
+    "scan_type": "sast",
+    "owasp_category": "A04:2021",
+    "cwe_coverage": ["CWE-307", "CWE-434", "CWE-501", "CWE-770"]
+  }
+}

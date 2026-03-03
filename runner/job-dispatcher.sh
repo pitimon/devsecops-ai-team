@@ -6,8 +6,9 @@ set -euo pipefail
 #
 # Usage: job-dispatcher.sh --tool <tool> --target <path> [--rules <rules>] [--format <format>] [--image <image>]
 #        ZAP options: [--mode baseline|full|api] [--auth-token <token>] [--api-spec <path>]
+#        Nuclei options: env NUCLEI_MODE=cve|full|custom [CUSTOM_TEMPLATES=<path>]
 #
-# Tools: semgrep, gitleaks, grype, trivy, checkov, zap, syft
+# Tools: semgrep, gitleaks, grype, trivy, checkov, zap, syft, nuclei
 
 TOOL=""
 TARGET=""
@@ -15,6 +16,8 @@ RULES=""
 FORMAT="json"
 IMAGE=""
 ZAP_MODE="baseline"
+NUCLEI_MODE="${NUCLEI_MODE:-cve}"
+CUSTOM_TEMPLATES="${CUSTOM_TEMPLATES:-}"
 AUTH_TOKEN=""
 API_SPEC=""
 JOB_ID="job-$(date +%Y%m%d-%H%M%S)-$$"
@@ -26,9 +29,10 @@ usage() {
   echo "Usage: $0 --tool <tool> --target <path> [--rules <rules>] [--format <format>] [--image <image>]"
   echo "       ZAP: [--mode baseline|full|api] [--auth-token <token>] [--api-spec <path>]"
   echo ""
-  echo "Tools: semgrep, gitleaks, grype, trivy, checkov, zap, syft"
+  echo "Tools: semgrep, gitleaks, grype, trivy, checkov, zap, syft, nuclei"
   echo "Formats: json (default), sarif, text"
   echo "ZAP modes: baseline (default, 120s), full (1800s), api (600s)"
+  echo "Nuclei modes: cve (default, 120s), full (600s), custom (300s)"
   exit 1
 }
 
@@ -234,6 +238,56 @@ run_syft() {
   fi
 }
 
+# ─── Nuclei DAST ───
+run_nuclei() {
+  local NUCLEI_TEMPLATES="cves"
+  local NUCLEI_TIMEOUT=120
+  local NUCLEI_EXTRA_ARGS=""
+
+  case "$NUCLEI_MODE" in
+    cve)
+      NUCLEI_TEMPLATES="cves"
+      NUCLEI_TIMEOUT=120
+      ;;
+    full)
+      NUCLEI_TEMPLATES=""
+      NUCLEI_TIMEOUT=600
+      ;;
+    custom)
+      NUCLEI_TEMPLATES=""
+      NUCLEI_TIMEOUT=300
+      if [ -n "$CUSTOM_TEMPLATES" ]; then
+        NUCLEI_EXTRA_ARGS="-t $CUSTOM_TEMPLATES"
+      fi
+      ;;
+    *)
+      echo "[dispatcher] ERROR: Unknown Nuclei mode: $NUCLEI_MODE (use cve|full|custom)"
+      exit 1
+      ;;
+  esac
+
+  # Add auth header if provided
+  if [ -n "$AUTH_TOKEN" ]; then
+    NUCLEI_EXTRA_ARGS="$NUCLEI_EXTRA_ARGS -H \"Authorization: Bearer ${AUTH_TOKEN}\""
+  fi
+
+  echo "[dispatcher] Nuclei mode: $NUCLEI_MODE, templates: ${NUCLEI_TEMPLATES:-all}..." >>"$LOG"
+
+  local NUCLEI_ARGS="-u $TARGET -jsonl -o /results/${JOB_ID}/nuclei-results.jsonl -silent"
+  [ -n "$NUCLEI_TEMPLATES" ] && NUCLEI_ARGS="$NUCLEI_ARGS -tags $NUCLEI_TEMPLATES"
+  [ -n "$NUCLEI_EXTRA_ARGS" ] && NUCLEI_ARGS="$NUCLEI_ARGS $NUCLEI_EXTRA_ARGS"
+
+  if [ "$RUNNER_MODE" = "full" ]; then
+    timeout "$NUCLEI_TIMEOUT" docker exec devsecops-nuclei \
+      nuclei $NUCLEI_ARGS 2>>"$LOG"
+  else
+    timeout "$NUCLEI_TIMEOUT" docker run --rm \
+      -v "${RESULTS_DIR}:/results" --network host \
+      projectdiscovery/nuclei:latest \
+      nuclei $NUCLEI_ARGS 2>>"$LOG"
+  fi
+}
+
 run_tool() {
   case "$TOOL" in
     semgrep)  run_semgrep ;;
@@ -243,6 +297,7 @@ run_tool() {
     checkov)  run_checkov ;;
     zap)      run_zap ;;
     syft)     run_syft ;;
+    nuclei)   run_nuclei ;;
     *)
       echo "[dispatcher] ERROR: Unknown tool: $TOOL"
       exit 1
