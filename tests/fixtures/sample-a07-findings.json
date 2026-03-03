@@ -1,0 +1,72 @@
+{
+  "findings": [
+    {
+      "id": "FINDING-A07-001",
+      "source_tool": "semgrep",
+      "scan_type": "sast",
+      "rule_id": "a07-weak-password-python",
+      "severity": "WARNING",
+      "title": "Weak password length requirement allows passwords under 8 characters",
+      "cwe_id": "CWE-521",
+      "owasp": "A07:2021",
+      "location": {
+        "file": "src/auth/validators.py",
+        "line_start": 12,
+        "line_end": 12
+      },
+      "message": "Weak password length requirement detected (CWE-521). Password validation accepts passwords shorter than 8 characters. Enforce at least 8 characters per NIST SP 800-63B.",
+      "status": "open"
+    },
+    {
+      "id": "FINDING-A07-002",
+      "source_tool": "semgrep",
+      "scan_type": "sast",
+      "rule_id": "a07-hardcoded-jwt-secret",
+      "severity": "ERROR",
+      "title": "Hardcoded secret key in JWT encode call",
+      "cwe_id": "CWE-798",
+      "owasp": "A07:2021",
+      "location": {
+        "file": "src/auth/tokens.py",
+        "line_start": 25,
+        "line_end": 25
+      },
+      "message": "Hardcoded secret in JWT encode/decode call (CWE-798). JWT signing keys MUST NOT be hardcoded in source code. Use environment variables or a secrets manager.",
+      "status": "open"
+    },
+    {
+      "id": "FINDING-A07-003",
+      "source_tool": "semgrep",
+      "scan_type": "sast",
+      "rule_id": "a07-session-no-expire",
+      "severity": "WARNING",
+      "title": "Session configured without expiry in Django settings",
+      "cwe_id": "CWE-613",
+      "owasp": "A07:2021",
+      "location": {
+        "file": "config/settings.py",
+        "line_start": 88,
+        "line_end": 88
+      },
+      "message": "Session configured without expiry (CWE-613). Setting SESSION_COOKIE_AGE to None disables session expiration. Configure a reasonable session timeout.",
+      "status": "open"
+    }
+  ],
+  "summary": {
+    "total": 3,
+    "critical": 0,
+    "high": 0,
+    "medium": 0,
+    "low": 0,
+    "info": 0,
+    "warning": 2,
+    "error": 1
+  },
+  "metadata": {
+    "rules_file": "rules/a07-auth-rules.yml",
+    "rule_count": 5,
+    "scan_type": "sast",
+    "owasp_category": "A07:2021",
+    "cwe_coverage": ["CWE-308", "CWE-521", "CWE-613", "CWE-640", "CWE-798"]
+  }
+}

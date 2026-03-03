@@ -3,6 +3,7 @@ set -euo pipefail
 
 # DevSecOps AI Team — JSON Normalizer
 # Converts tool-specific JSON output to Unified Finding Schema
+# Supports 9 tools: semgrep, gitleaks, grype, trivy, checkov, zap, syft, nuclei, trufflehog
 #
 # Usage: json-normalizer.sh --tool <tool> --input <file> --output <file>
 
@@ -354,6 +355,64 @@ with open('$INPUT') as f:
             'cwe_id': cwe_id,
             'rule_id': item.get('template-id', ''),
             'location': {'url': item.get('matched-at', ''), 'file': '', 'line': 0},
+            'status': 'open'
+        })
+
+summary = {'total': len(findings), 'critical': 0, 'high': 0, 'medium': 0, 'low': 0, 'info': 0}
+for f in findings:
+    key = f['severity'].lower()
+    if key in summary:
+        summary[key] += 1
+
+json.dump({'findings': findings, 'summary': summary}, open('$OUTPUT', 'w'), indent=2)
+" 2>/dev/null
+    ;;
+
+  trufflehog)
+    python3 -c "
+import json, sys
+
+findings = []
+with open('$INPUT') as f:
+    for line_num, line in enumerate(f, 1):
+        line = line.strip()
+        if not line:
+            continue
+        try:
+            obj = json.loads(line)
+        except json.JSONDecodeError:
+            continue
+
+        raw = obj.get('Raw', '')
+        redacted = raw[:4] + '***' if len(raw) > 4 else '***'
+        detector = obj.get('DetectorName', 'unknown')
+        verified = obj.get('Verified', False)
+
+        source = obj.get('SourceMetadata', {}).get('Data', {})
+        file_path = ''
+        line_start = 0
+        if 'Filesystem' in source:
+            file_path = source['Filesystem'].get('file', '')
+            line_start = source['Filesystem'].get('line', 0)
+        elif 'Git' in source:
+            file_path = source['Git'].get('file', '')
+            line_start = source['Git'].get('line', 0)
+
+        findings.append({
+            'id': f'TRUFFLEHOG-{line_num:03d}',
+            'source_tool': 'trufflehog',
+            'scan_type': 'secret',
+            'rule_id': f'trufflehog-{detector.lower()}',
+            'severity': 'CRITICAL' if verified else 'HIGH',
+            'confidence': 'HIGH' if verified else 'MEDIUM',
+            'title': f'{detector} secret detected',
+            'location': {
+                'file': file_path,
+                'line_start': line_start,
+                'line_end': line_start
+            },
+            'message': f'{\"Verified\" if verified else \"Unverified\"} {detector} secret found (redacted: {redacted})',
+            'verified': verified,
             'status': 'open'
         })
 

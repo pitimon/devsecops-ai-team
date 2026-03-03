@@ -1,0 +1,227 @@
+rules:
+  # ==========================================================================
+  # A08:2025 Software and Data Integrity Failures — Custom Semgrep Rules
+  # DevSecOps AI Team v2.8.0
+  #
+  # 5 rules targeting A08 anti-patterns
+  # Languages: Python (2 rules), Generic/regex (3 rules)
+  # Reference: skills/references/sast-patterns.md
+  # ==========================================================================
+
+  # -------------------------------------------------------------------------
+  # Rule 1: Unsafe Pickle Deserialization (CWE-502) — Python
+  # Detects pickle.loads() and pickle.load() which execute arbitrary code
+  # -------------------------------------------------------------------------
+  - id: a08-unsafe-pickle
+    pattern-either:
+      - pattern: pickle.loads(...)
+      - pattern: pickle.load(...)
+    message: >
+      Unsafe pickle deserialization detected (CWE-502). The pickle module
+      executes arbitrary Python code during deserialization, allowing remote
+      code execution if an attacker controls the input data. Use safe
+      alternatives like json, msgpack, or protobuf for untrusted data.
+      If pickle is required, use hmac signing to verify data integrity
+      before deserialization per OWASP A08:2025.
+    languages:
+      - python
+    severity: ERROR
+    metadata:
+      cwe:
+        - "CWE-502"
+      owasp:
+        - "A08:2021"
+        - "A08:2025"
+      nist:
+        - "SI-10"
+        - "SC-18"
+      confidence: HIGH
+      impact: CRITICAL
+      likelihood: HIGH
+      category: security
+      technology:
+        - python
+      references:
+        - https://owasp.org/Top10/A08_2021-Software_and_Data_Integrity_Failures/
+        - https://cwe.mitre.org/data/definitions/502.html
+        - https://docs.python.org/3/library/pickle.html#restricting-globals
+      fix: |
+        Replace pickle with safe serialization for untrusted data:
+          import json
+          data = json.loads(untrusted_input)
+        If pickle is required, verify integrity with HMAC:
+          import hmac, hashlib
+          if hmac.compare_digest(hmac.new(key, payload, hashlib.sha256).hexdigest(), sig):
+              obj = pickle.loads(payload)
+
+  # -------------------------------------------------------------------------
+  # Rule 2: YAML Unsafe Load (CWE-502) — Python
+  # Detects yaml.load() without SafeLoader/FullLoader/BaseLoader
+  # -------------------------------------------------------------------------
+  - id: a08-yaml-unsafe-load
+    patterns:
+      - pattern: yaml.load(...)
+      - pattern-not: yaml.load(..., Loader=yaml.SafeLoader)
+      - pattern-not: yaml.load(..., Loader=yaml.FullLoader)
+      - pattern-not: yaml.load(..., Loader=yaml.BaseLoader)
+    message: >
+      Unsafe YAML deserialization detected (CWE-502). yaml.load() without
+      a safe Loader can execute arbitrary Python code via YAML tags like
+      !!python/object. Use yaml.safe_load() or explicitly specify
+      Loader=yaml.SafeLoader to prevent code execution from untrusted
+      YAML input per OWASP A08:2025.
+    languages:
+      - python
+    severity: ERROR
+    metadata:
+      cwe:
+        - "CWE-502"
+      owasp:
+        - "A08:2021"
+        - "A08:2025"
+      nist:
+        - "SI-10"
+        - "SC-18"
+      confidence: HIGH
+      impact: HIGH
+      likelihood: HIGH
+      category: security
+      technology:
+        - python
+      references:
+        - https://owasp.org/Top10/A08_2021-Software_and_Data_Integrity_Failures/
+        - https://cwe.mitre.org/data/definitions/502.html
+        - https://pyyaml.org/wiki/PyYAMLDocumentation
+      fix: |
+        Use yaml.safe_load() or specify a safe Loader:
+          data = yaml.safe_load(untrusted_input)
+          # Or explicitly:
+          data = yaml.load(untrusted_input, Loader=yaml.SafeLoader)
+
+  # -------------------------------------------------------------------------
+  # Rule 3: CDN Script Without Subresource Integrity (CWE-829) — Generic
+  # Detects <script src="http..."> without integrity= SRI attribute
+  # -------------------------------------------------------------------------
+  - id: a08-cdn-no-integrity
+    pattern-regex: <script\s+[^>]*src\s*=\s*["']https?://[^>]*>(?![^<]*integrity)
+    message: >
+      External script loaded without Subresource Integrity (SRI) attribute
+      (CWE-829). If the CDN is compromised, attackers can inject malicious
+      code into all pages loading the script. Add integrity= and
+      crossorigin= attributes to verify script integrity per OWASP A08:2025.
+    languages:
+      - generic
+    severity: WARNING
+    metadata:
+      cwe:
+        - "CWE-829"
+      owasp:
+        - "A08:2021"
+        - "A08:2025"
+      nist:
+        - "SC-16"
+        - "SI-7"
+      confidence: MEDIUM
+      impact: MEDIUM
+      likelihood: HIGH
+      category: security
+      technology:
+        - html
+      references:
+        - https://owasp.org/Top10/A08_2021-Software_and_Data_Integrity_Failures/
+        - https://cwe.mitre.org/data/definitions/829.html
+        - https://developer.mozilla.org/en-US/docs/Web/Security/Subresource_Integrity
+      fix: |
+        Add SRI integrity and crossorigin attributes:
+          <script src="https://cdn.example.com/lib.js"
+            integrity="sha384-abc123..."
+            crossorigin="anonymous"></script>
+        Generate hashes with: shasum -b -a 384 lib.js | awk '{print $1}' | xxd -r -p | base64
+
+  # -------------------------------------------------------------------------
+  # Rule 4: Unpinned GitHub Action (CWE-829) — Generic
+  # Detects uses: org/action@ref without full SHA-1 pin (40 hex chars)
+  # -------------------------------------------------------------------------
+  - id: a08-unpinned-action
+    pattern-regex: "uses:\\s*[a-zA-Z0-9_-]+/[a-zA-Z0-9_-]+@(?!([a-f0-9]{40}))"
+    message: >
+      GitHub Actions dependency not pinned to a full commit SHA (CWE-829).
+      Using tags or branches (e.g., @v3) allows supply chain attacks if the
+      tag is moved or the upstream repository is compromised. Pin actions to
+      a full 40-character commit SHA and use Dependabot or Renovate to manage
+      updates per OWASP A08:2025.
+    languages:
+      - generic
+    severity: WARNING
+    metadata:
+      cwe:
+        - "CWE-829"
+      owasp:
+        - "A08:2021"
+        - "A08:2025"
+      nist:
+        - "SA-12"
+        - "SI-7"
+      confidence: HIGH
+      impact: MEDIUM
+      likelihood: HIGH
+      category: security
+      technology:
+        - github-actions
+      references:
+        - https://owasp.org/Top10/A08_2021-Software_and_Data_Integrity_Failures/
+        - https://cwe.mitre.org/data/definitions/829.html
+        - https://docs.github.com/en/actions/security-guides/security-hardening-for-github-actions
+      fix: |
+        Pin actions to full commit SHA:
+          # Before (vulnerable):
+          uses: actions/checkout@v4
+          # After (pinned):
+          uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11  # v4.1.1
+        Use Dependabot to keep pinned SHAs updated.
+
+  # -------------------------------------------------------------------------
+  # Rule 5: Unsigned Piped Install (CWE-494) — Generic
+  # Detects curl|bash and wget|sh piped execution patterns
+  # -------------------------------------------------------------------------
+  - id: a08-unsigned-install
+    pattern-regex: (curl|wget)\s+[^\n|]*\|\s*(ba)?sh
+    message: >
+      Piped remote script execution detected (CWE-494). Running
+      'curl ... | bash' or 'wget ... | sh' downloads and executes code
+      without integrity verification. An attacker performing a MITM attack
+      or compromising the server can inject malicious code. Download the
+      script first, verify its checksum or GPG signature, then execute
+      per OWASP A08:2025.
+    languages:
+      - generic
+    severity: ERROR
+    metadata:
+      cwe:
+        - "CWE-494"
+      owasp:
+        - "A08:2021"
+        - "A08:2025"
+      nist:
+        - "SI-7"
+        - "SC-16"
+      confidence: HIGH
+      impact: CRITICAL
+      likelihood: MEDIUM
+      category: security
+      technology:
+        - bash
+        - shell
+      references:
+        - https://owasp.org/Top10/A08_2021-Software_and_Data_Integrity_Failures/
+        - https://cwe.mitre.org/data/definitions/494.html
+        - https://www.idontplaydarts.com/2016/04/detecting-curl-pipe-bash-server-side/
+      fix: |
+        Download, verify, then execute:
+          curl -fsSL -o install.sh https://example.com/install.sh
+          echo "expected_sha256  install.sh" | sha256sum -c -
+          bash install.sh
+        Or use GPG signature verification:
+          curl -fsSL -o install.sh https://example.com/install.sh
+          curl -fsSL -o install.sh.sig https://example.com/install.sh.sig
+          gpg --verify install.sh.sig install.sh && bash install.sh

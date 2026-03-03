@@ -223,7 +223,7 @@ const TOOLS = [
   {
     name: "devsecops_compliance_status",
     description:
-      "Aggregate compliance status across all 5 frameworks (OWASP, NIST, MITRE, NCSA, PDPA) for a findings file. Returns per-framework coverage and gaps.",
+      "Aggregate compliance status across all 7 frameworks (OWASP, NIST, MITRE, NCSA, PDPA, SOC2, ISO27001) for a findings file. Returns per-framework coverage and gaps.",
     inputSchema: {
       type: "object",
       properties: {
@@ -539,7 +539,15 @@ async function handleComplianceStatus({ findings_file }) {
   if (!results) return mcpError(`Findings file not found: ${findings_file}`);
 
   const findings = results.findings || [];
-  const frameworks = ["owasp", "nist", "mitre", "ncsa", "pdpa"];
+  const frameworks = [
+    "owasp",
+    "nist",
+    "mitre",
+    "ncsa",
+    "pdpa",
+    "soc2",
+    "iso27001",
+  ];
   const mappings = loadMappings(frameworks);
 
   const status = {};
@@ -761,7 +769,7 @@ function validateInput(schema, args) {
 // ─── Server Setup ───
 
 const server = new Server(
-  { name: "devsecops-mcp-server", version: "2.7.0" },
+  { name: "devsecops-mcp-server", version: "2.8.0" },
   { capabilities: { tools: {} } },
 );
 

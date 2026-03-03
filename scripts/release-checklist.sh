@@ -168,6 +168,17 @@ JSON_FAIL=0
 while IFS= read -r json_file; do
   if python3 -c "import json; json.load(open('$json_file'))" 2>/dev/null; then
     JSON_PASS=$((JSON_PASS + 1))
+  elif python3 -c "
+import json, sys
+with open('$json_file') as f:
+    lines = [l.strip() for l in f if l.strip()]
+if not lines:
+    sys.exit(1)
+for l in lines:
+    json.loads(l)
+" 2>/dev/null; then
+    # Valid JSONL (one JSON object per line) — e.g. TruffleHog output
+    JSON_PASS=$((JSON_PASS + 1))
   else
     fail "invalid JSON: $json_file"
     JSON_FAIL=$((JSON_FAIL + 1))

@@ -1,0 +1,72 @@
+{
+  "findings": [
+    {
+      "id": "FINDING-A08-001",
+      "source_tool": "semgrep",
+      "scan_type": "sast",
+      "rule_id": "a08-unsafe-pickle",
+      "severity": "ERROR",
+      "title": "Unsafe pickle deserialization",
+      "cwe_id": "CWE-502",
+      "owasp": "A08:2021",
+      "location": {
+        "file": "app/data/loader.py",
+        "line_start": 15,
+        "line_end": 15
+      },
+      "message": "Unsafe pickle deserialization detected (CWE-502). The pickle module executes arbitrary Python code during deserialization, allowing remote code execution if an attacker controls the input data.",
+      "status": "open"
+    },
+    {
+      "id": "FINDING-A08-002",
+      "source_tool": "semgrep",
+      "scan_type": "sast",
+      "rule_id": "a08-unsigned-install",
+      "severity": "ERROR",
+      "title": "Piped remote script execution without integrity check",
+      "cwe_id": "CWE-494",
+      "owasp": "A08:2021",
+      "location": {
+        "file": "scripts/setup.sh",
+        "line_start": 8,
+        "line_end": 8
+      },
+      "message": "Piped remote script execution detected (CWE-494). Running 'curl ... | bash' downloads and executes code without integrity verification.",
+      "status": "open"
+    },
+    {
+      "id": "FINDING-A08-003",
+      "source_tool": "semgrep",
+      "scan_type": "sast",
+      "rule_id": "a08-unpinned-action",
+      "severity": "WARNING",
+      "title": "GitHub Actions dependency not pinned to commit SHA",
+      "cwe_id": "CWE-829",
+      "owasp": "A08:2021",
+      "location": {
+        "file": ".github/workflows/ci.yml",
+        "line_start": 12,
+        "line_end": 12
+      },
+      "message": "GitHub Actions dependency not pinned to a full commit SHA (CWE-829). Using tags allows supply chain attacks if the tag is moved.",
+      "status": "open"
+    }
+  ],
+  "summary": {
+    "total": 3,
+    "critical": 0,
+    "high": 0,
+    "medium": 0,
+    "low": 0,
+    "info": 0,
+    "warning": 1,
+    "error": 2
+  },
+  "metadata": {
+    "rules_file": "rules/a08-integrity-rules.yml",
+    "rule_count": 5,
+    "scan_type": "sast",
+    "owasp_category": "A08:2021",
+    "cwe_coverage": ["CWE-494", "CWE-502", "CWE-829"]
+  }
+}

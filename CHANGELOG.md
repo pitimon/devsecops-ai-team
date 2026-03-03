@@ -7,6 +7,27 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [2.8.0] — 2026-03-03
+
+### Added
+
+- OWASP 10/10 coverage: A06 Vulnerable Components (5 rules), A07 Auth Failures (5 rules), A08 Integrity Failures (5 rules) — total 68 custom rules
+- SOC 2 Trust Service Criteria compliance mapping (~40 CWEs, mappings/cwe-to-soc2.json)
+- ISO 27001:2022 Annex A controls compliance mapping (~41 CWEs, mappings/cwe-to-iso27001.json)
+- SLSA provenance assessment skill (/slsa-assess) — 14th skill with SLSA v1.1 reference
+- VEX output format (CycloneDX VEX + OpenVEX) — 7th output format
+- TruffleHog secret scanning (9th security tool) — git/filesystem/s3 modes
+- Secret validity checker (scripts/secret-verifier.sh) — 4 providers with In-the-Loop safety
+- 7 new test suites: test-a06, test-a07, test-a08, test-soc2-mapping, test-iso27001-mapping, test-slsa-skill, test-vex-formatter, test-trufflehog-integration, test-secret-verifier
+
+### Changed
+
+- MCP compliance_status now supports 7 frameworks (+SOC2, +ISO27001)
+- Secret-scan skill extended for TruffleHog alongside GitLeaks (--tool flag)
+- Normalizer supports 9 tools (+TruffleHog)
+- frameworks.json updated with SOC2, ISO27001 entries (19 total)
+- validate-plugin.sh updated: 14 skills, 17 reference files
+
 ## [2.7.0] — 2026-03-03
 
 ### Added

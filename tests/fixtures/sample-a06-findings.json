@@ -1,0 +1,72 @@
+{
+  "findings": [
+    {
+      "id": "FINDING-A06-001",
+      "source_tool": "semgrep",
+      "scan_type": "sast",
+      "rule_id": "a06-unpinned-pip",
+      "severity": "WARNING",
+      "title": "Unpinned dependency in requirements.txt",
+      "cwe_id": "CWE-1104",
+      "owasp": "A06:2021",
+      "location": {
+        "file": "requirements.txt",
+        "line_start": 3,
+        "line_end": 3
+      },
+      "message": "Unpinned dependency detected in requirements.txt. Dependencies without exact version pinning (==) may resolve to different versions across environments, including versions with known vulnerabilities.",
+      "status": "open"
+    },
+    {
+      "id": "FINDING-A06-002",
+      "source_tool": "semgrep",
+      "scan_type": "sast",
+      "rule_id": "a06-known-vulnerable-pyyaml",
+      "severity": "ERROR",
+      "title": "Unsafe yaml.load() call without SafeLoader",
+      "cwe_id": "CWE-829",
+      "owasp": "A06:2021",
+      "location": {
+        "file": "app/config/loader.py",
+        "line_start": 15,
+        "line_end": 15
+      },
+      "message": "Unsafe yaml.load() call detected without SafeLoader or FullLoader. The default Loader in older PyYAML versions allows arbitrary Python object deserialization, enabling remote code execution.",
+      "status": "open"
+    },
+    {
+      "id": "FINDING-A06-003",
+      "source_tool": "semgrep",
+      "scan_type": "sast",
+      "rule_id": "a06-untrusted-source",
+      "severity": "WARNING",
+      "title": "pip install using non-PyPI package index",
+      "cwe_id": "CWE-829",
+      "owasp": "A06:2021",
+      "location": {
+        "file": "Dockerfile",
+        "line_start": 22,
+        "line_end": 22
+      },
+      "message": "pip install using a non-PyPI package index detected. Custom or third-party package indexes may serve malicious packages through dependency confusion or typosquatting attacks.",
+      "status": "open"
+    }
+  ],
+  "summary": {
+    "total": 3,
+    "critical": 0,
+    "high": 0,
+    "medium": 0,
+    "low": 0,
+    "info": 0,
+    "warning": 2,
+    "error": 1
+  },
+  "metadata": {
+    "rules_file": "rules/a06-component-rules.yml",
+    "rule_count": 5,
+    "scan_type": "sast",
+    "owasp_category": "A06:2021",
+    "cwe_coverage": ["CWE-829", "CWE-1104"]
+  }
+}

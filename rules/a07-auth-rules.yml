@@ -1,0 +1,189 @@
+rules:
+  # ==========================================================================
+  # A07:2025 Identification and Authentication Failures — Custom Semgrep Rules
+  # DevSecOps AI Team v2.8.0
+  #
+  # 5 rules targeting A07 anti-patterns
+  # Languages: Python (3 rules), Generic/regex (2 rules)
+  # Reference: skills/references/sast-patterns.md
+  # ==========================================================================
+
+  # -------------------------------------------------------------------------
+  # Rule 1: Weak Password Length Requirement (CWE-521) — Generic
+  # -------------------------------------------------------------------------
+  - id: a07-weak-password-python
+    pattern-regex: len\(.*password.*\)\s*(<|<=|==)\s*[1-7]\b
+    message: >
+      Weak password length requirement detected (CWE-521). Password validation
+      accepts passwords shorter than 8 characters. NIST SP 800-63B recommends
+      a minimum of 8 characters, with 12+ preferred. Update the minimum length
+      check to enforce at least 8 characters.
+    languages:
+      - generic
+    severity: WARNING
+    metadata:
+      cwe:
+        - "CWE-521"
+      owasp:
+        - "A07:2021"
+        - "A07:2025"
+      nist:
+        - "IA-5"
+      confidence: MEDIUM
+      impact: HIGH
+      likelihood: HIGH
+      category: security
+      technology:
+        - python
+      references:
+        - https://owasp.org/Top10/A07_2021-Identification_and_Authentication_Failures/
+        - https://cwe.mitre.org/data/definitions/521.html
+      fix: |
+        Enforce minimum password length of 8+ characters:
+          if len(password) < 12:
+              raise ValueError("Password must be at least 12 characters")
+
+  # -------------------------------------------------------------------------
+  # Rule 2: Hardcoded JWT Secret (CWE-798) — Generic
+  # -------------------------------------------------------------------------
+  - id: a07-hardcoded-jwt-secret
+    pattern-regex: jwt\.(encode|decode)\s*\([^)]*["'][^"']{4,}["']
+    message: >
+      Hardcoded secret in JWT encode/decode call (CWE-798). JWT signing keys
+      MUST NOT be hardcoded in source code. Hardcoded secrets are trivially
+      extracted and allow token forgery. Use environment variables or a secrets
+      manager to store JWT signing keys.
+    languages:
+      - generic
+    severity: ERROR
+    metadata:
+      cwe:
+        - "CWE-798"
+      owasp:
+        - "A07:2021"
+        - "A07:2025"
+      nist:
+        - "IA-5"
+      confidence: HIGH
+      impact: CRITICAL
+      likelihood: HIGH
+      category: security
+      technology:
+        - python
+      references:
+        - https://owasp.org/Top10/A07_2021-Identification_and_Authentication_Failures/
+        - https://cwe.mitre.org/data/definitions/798.html
+      fix: |
+        Load JWT secret from environment variable:
+          secret = os.environ["JWT_SECRET_KEY"]
+          token = jwt.encode(payload, secret, algorithm="HS256")
+
+  # -------------------------------------------------------------------------
+  # Rule 3: Session Without Expiry (CWE-613) — Generic
+  # -------------------------------------------------------------------------
+  - id: a07-session-no-expire
+    pattern-regex: (SESSION_COOKIE_AGE|PERMANENT_SESSION_LIFETIME)\s*=\s*(None|0|False)
+    message: >
+      Session configured without expiry (CWE-613). Setting session lifetime to
+      None, 0, or False disables session expiration, allowing indefinite session
+      reuse. Configure a reasonable session timeout (e.g., 30 minutes for
+      sensitive applications) per OWASP A07:2021.
+    languages:
+      - generic
+    severity: WARNING
+    metadata:
+      cwe:
+        - "CWE-613"
+      owasp:
+        - "A07:2021"
+        - "A07:2025"
+      nist:
+        - "IA-5"
+      confidence: MEDIUM
+      impact: MEDIUM
+      likelihood: MEDIUM
+      category: security
+      technology:
+        - python
+      references:
+        - https://owasp.org/Top10/A07_2021-Identification_and_Authentication_Failures/
+        - https://cwe.mitre.org/data/definitions/613.html
+      fix: |
+        Set appropriate session timeout:
+          SESSION_COOKIE_AGE = 1800  # 30 minutes
+          PERMANENT_SESSION_LIFETIME = timedelta(minutes=30)
+
+  # -------------------------------------------------------------------------
+  # Rule 4: Missing MFA Check in Auth Function (CWE-308) — Generic
+  # -------------------------------------------------------------------------
+  - id: a07-missing-mfa-check
+    pattern-regex: def\s+(login|authenticate|sign_in)\s*\(
+    message: >
+      Authentication function detected without apparent MFA/2FA enforcement
+      (CWE-308). Login and authentication functions SHOULD enforce multi-factor
+      authentication for sensitive operations. This is an advisory rule —
+      verify that MFA is enforced elsewhere in the authentication flow.
+    languages:
+      - generic
+    severity: INFO
+    metadata:
+      cwe:
+        - "CWE-308"
+      owasp:
+        - "A07:2021"
+        - "A07:2025"
+      nist:
+        - "IA-5"
+      confidence: LOW
+      impact: HIGH
+      likelihood: MEDIUM
+      category: security
+      technology:
+        - python
+      references:
+        - https://owasp.org/Top10/A07_2021-Identification_and_Authentication_Failures/
+        - https://cwe.mitre.org/data/definitions/308.html
+      fix: |
+        Add MFA verification to authentication flow:
+          def login(request):
+              user = authenticate(username, password)
+              if user and not verify_mfa(user, request.data["totp_code"]):
+                  raise AuthenticationError("MFA verification required")
+
+  # -------------------------------------------------------------------------
+  # Rule 5: Permissive Password Reset Without Token (CWE-640) — Generic
+  # -------------------------------------------------------------------------
+  - id: a07-permissive-password-reset
+    pattern-regex: def\s+(reset_password|password_reset|forgot_password)\s*\([^)]*\)\s*:(?![\s\S]*token)
+    message: >
+      Password reset function without token verification (CWE-640). Password
+      reset flows MUST use a cryptographically secure, time-limited token to
+      verify the identity of the requester. Without token validation, attackers
+      can reset arbitrary user passwords.
+    languages:
+      - generic
+    severity: WARNING
+    metadata:
+      cwe:
+        - "CWE-640"
+      owasp:
+        - "A07:2021"
+        - "A07:2025"
+      nist:
+        - "IA-5"
+      confidence: MEDIUM
+      impact: HIGH
+      likelihood: MEDIUM
+      category: security
+      technology:
+        - python
+      references:
+        - https://owasp.org/Top10/A07_2021-Identification_and_Authentication_Failures/
+        - https://cwe.mitre.org/data/definitions/640.html
+      fix: |
+        Require token verification in password reset:
+          def reset_password(request, token):
+              if not verify_reset_token(token):
+                  raise InvalidTokenError("Invalid or expired reset token")
+              user = get_user_from_token(token)
+              user.set_password(request.data["new_password"])
