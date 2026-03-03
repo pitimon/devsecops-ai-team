@@ -1,6 +1,6 @@
 <p align="center">
   <img src="https://img.shields.io/badge/Claude_Code-Plugin-blueviolet?style=for-the-badge&logo=anthropic" alt="Claude Code Plugin">
-  <img src="https://img.shields.io/badge/Version-2.8.0-brightgreen?style=for-the-badge" alt="v2.8.0">
+  <img src="https://img.shields.io/badge/Version-3.0.0-brightgreen?style=for-the-badge" alt="v3.0.0">
   <img src="https://img.shields.io/badge/Tests-978%2B-success?style=for-the-badge" alt="Tests">
   <img src="https://img.shields.io/badge/License-MIT-yellow?style=for-the-badge" alt="MIT License">
 </p>
@@ -37,7 +37,7 @@
 - [Executive Summary](#executive-summary)
 - [Key Highlights](#key-highlights)
 - [OWASP Top 10 Coverage](#owasp-top-10-coverage)
-- [What's New (v2.8.0)](#whats-new)
+- [What's New (v3.0.0)](#whats-new)
 - [Use Cases](#use-cases)
 - [Quick Start](#quick-start)
 - [Architecture Overview](#architecture-overview)
@@ -117,9 +117,9 @@
 
 ## What's New
 
-> ดู [CHANGELOG.md](CHANGELOG.md) สำหรับรายละเอียดทั้งหมด (v1.0.0 → v2.8.0)
+> ดู [CHANGELOG.md](CHANGELOG.md) สำหรับรายละเอียดทั้งหมด (v1.0.0 → v3.0.0)
 
-### v2.8.0 — Supply Chain Compliance + OWASP 10/10 (Latest)
+### v3.0.0 — Supply Chain Compliance + OWASP 10/10 (Latest)
 
 - **OWASP 10/10 Custom Rules** — A06 Vulnerable Components (5), A07 Auth Failures (5), A08 Integrity Failures (5) — total 68 custom Semgrep rules
 - **SLSA Provenance Assessment** — `/slsa-assess` skill with SLSA v1.1 reference for EU CRA compliance
@@ -942,7 +942,7 @@ devsecops-ai-team/
 | [FRAMEWORK-UPDATE-RUNBOOK.md](docs/FRAMEWORK-UPDATE-RUNBOOK.md) | ขั้นตอนอัพเดท framework versions                   |
 | [MANDAY-ESTIMATION.md](docs/MANDAY-ESTIMATION.md)               | ROI analysis + cost comparison (10,222% ROI)       |
 | [CLAUDE.md](CLAUDE.md)                                          | Architecture + contributing guidelines             |
-| [CHANGELOG.md](CHANGELOG.md)                                    | Version history (v1.0.0 → v2.8.0)                  |
+| [CHANGELOG.md](CHANGELOG.md)                                    | Version history (v1.0.0 → v3.0.0)                  |
 | [SECURITY.md](SECURITY.md)                                      | Vulnerability reporting policy                     |
 
 ---
@@ -1017,7 +1017,7 @@ claude-governance (base)          devsecops-ai-team (extends)
 | v2.5.0  | Released    | Rules & MCP     | 33 rules (A01/A03/A09/A10), 3 MCP tools, PDF/CSV                 |
 | v2.6.x  | Released    | CI/CD           | GitHub Actions, GitLab CI, SARIF per-tool, MCP bundle, tech debt |
 | v2.7.0  | Released    | OWASP 2025      | Dual mapping, 53 rules, Nuclei, NCSA 1.0, PDPA                   |
-| v2.8.0  | **Current** | Supply Chain    | SLSA, VEX, 10/10 OWASP rules, SOC 2, ISO 27001, TruffleHog       |
+| v3.0.0  | **Current** | Supply Chain    | SLSA, VEX, 10/10 OWASP rules, SOC 2, ISO 27001, TruffleHog       |
 | v3.0.0  | Planned     | Platform        | Historical DB, dashboard UI, K8s, GraphQL                        |
 
 > ดูรายละเอียด roadmap ทั้งหมดได้ที่ [docs/PRD.md](docs/PRD.md)
