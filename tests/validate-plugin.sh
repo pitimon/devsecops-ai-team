@@ -50,7 +50,7 @@ done
 
 # ─── Section 3: Skills ───
 echo ""
-EXPECTED_SKILLS="devsecops-setup sast-scan dast-scan sca-scan container-scan iac-scan secret-scan sbom-generate full-pipeline compliance-report incident-response security-gate auto-fix slsa-assess"
+EXPECTED_SKILLS="devsecops-setup sast-scan dast-scan sca-scan container-scan iac-scan secret-scan sbom-generate full-pipeline compliance-report incident-response security-gate auto-fix slsa-assess k8s-scan graphql-scan"
 EXPECTED_SKILL_COUNT=$(echo $EXPECTED_SKILLS | wc -w | tr -d ' ')
 echo "--- Section 3: Skills ($EXPECTED_SKILL_COUNT expected) ---"
 SKILL_COUNT=0
@@ -156,7 +156,7 @@ done
 
 # ─── Section 9: References ───
 echo ""
-EXPECTED_REFS="sast-patterns.md dast-methodology.md sca-supply-chain.md container-hardening.md iac-security-patterns.md secret-management.md compliance-frameworks.md threat-modeling.md incident-response.md remediation-patterns.md software-integrity.md logging-monitoring.md remediation-django.md remediation-react-nextjs.md remediation-express-node.md remediation-spring.md slsa-reference.md"
+EXPECTED_REFS="sast-patterns.md dast-methodology.md sca-supply-chain.md container-hardening.md iac-security-patterns.md secret-management.md compliance-frameworks.md threat-modeling.md incident-response.md remediation-patterns.md software-integrity.md logging-monitoring.md remediation-django.md remediation-react-nextjs.md remediation-express-node.md remediation-spring.md slsa-reference.md k8s-security-reference.md graphql-security-reference.md"
 EXPECTED_REF_COUNT=$(echo $EXPECTED_REFS | wc -w | tr -d ' ')
 echo "--- Section 9: Reference Files ($EXPECTED_REF_COUNT expected) ---"
 
@@ -269,7 +269,7 @@ fi
 
 if [ -f "$ROOT_DIR/mcp/server.mjs" ]; then
   TOOL_COUNT=$(python3 -c "import re; c=open('$ROOT_DIR/mcp/server.mjs').read(); print(len(set(re.findall(r'name:\s*\"(devsecops_\w+)\"', c))))" 2>/dev/null || echo 0)
-  [ "$TOOL_COUNT" -eq 8 ] && pass "MCP server defines 8 tools" || fail "MCP server has $TOOL_COUNT tools (expected 8)"
+  [ "$TOOL_COUNT" -eq 10 ] && pass "MCP server defines 10 tools" || fail "MCP server has $TOOL_COUNT tools (expected 10)"
   grep -q "StdioServerTransport" "$ROOT_DIR/mcp/server.mjs" && pass "Uses stdio transport" || fail "Missing stdio transport"
 fi
 

@@ -1,0 +1,20 @@
+name: cycle-test
+version: "1.0"
+description: Pipeline with intentional cycle for testing
+nodes:
+  a:
+    type: scanner
+    tool: semgrep
+    depends_on: [c]
+    outputs:
+      file: "output/a.json"
+  b:
+    type: normalizer
+    depends_on: [a]
+    outputs:
+      file: "output/b.json"
+  c:
+    type: formatter
+    depends_on: [b]
+    outputs:
+      file: "output/c.json"

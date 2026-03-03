@@ -1,0 +1,27 @@
+name: test-pipeline
+version: "1.0"
+description: Test pipeline for validation
+nodes:
+  scan:
+    type: scanner
+    tool: semgrep
+    depends_on: []
+    inputs:
+      target: "${TARGET}"
+    outputs:
+      file: "output/test-semgrep.json"
+    concurrency_group: medium
+  normalize:
+    type: normalizer
+    depends_on: [scan]
+    inputs:
+      file: "${DEPS_OUTPUTS}"
+    outputs:
+      file: "output/test-normalized.json"
+  format:
+    type: formatter
+    depends_on: [normalize]
+    inputs:
+      file: "${DEPS_OUTPUTS}"
+    outputs:
+      file: "output/test-report.sarif"

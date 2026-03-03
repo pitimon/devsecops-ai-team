@@ -1,0 +1,382 @@
+rules:
+  # ==========================================================================
+  # Kubernetes Manifest Security — Custom Semgrep Rules
+  # DevSecOps AI Team v3.0.0
+  #
+  # 8 rules targeting K8s manifest misconfigurations
+  # Languages: Generic/regex (all rules target YAML manifests)
+  # Reference: skills/references/k8s-security-reference.md
+  # ==========================================================================
+
+  # -------------------------------------------------------------------------
+  # Rule 1: Privileged Container (CWE-250) — Generic
+  # Detects containers running in privileged mode
+  # -------------------------------------------------------------------------
+  - id: k8s-privileged-container
+    pattern-regex: 'privileged:\s*true'
+    message: >
+      Container configured with privileged mode enabled. Privileged containers
+      have full access to the host's devices, kernel capabilities, and can
+      escape container isolation entirely. This effectively disables all
+      container security boundaries. Remove privileged: true and use specific
+      capabilities via securityContext.capabilities.add instead per CIS
+      Kubernetes Benchmark 5.2.1.
+    languages:
+      - generic
+    severity: ERROR
+    metadata:
+      cwe:
+        - "CWE-250"
+      owasp:
+        - "A05:2021"
+        - "A05:2025"
+      nist:
+        - "AC-6"
+        - "SC-39"
+      confidence: HIGH
+      impact: HIGH
+      likelihood: HIGH
+      category: security
+      technology:
+        - kubernetes
+      references:
+        - https://owasp.org/Top10/A05_2021-Security_Misconfiguration/
+        - https://cwe.mitre.org/data/definitions/250.html
+        - https://kubernetes.io/docs/concepts/security/pod-security-standards/
+      fix: |
+        Remove privileged mode and use minimal capabilities:
+          # Bad
+          securityContext:
+            privileged: true
+          # Good
+          securityContext:
+            privileged: false
+            capabilities:
+              drop: ["ALL"]
+              add: ["NET_BIND_SERVICE"]
+
+  # -------------------------------------------------------------------------
+  # Rule 2: Run As Root (CWE-250) — Generic
+  # Detects containers running as root user (UID 0) or allowing root
+  # -------------------------------------------------------------------------
+  - id: k8s-run-as-root
+    pattern-regex: '(runAsUser:\s*0|runAsNonRoot:\s*false)'
+    message: >
+      Container configured to run as root user (UID 0) or explicitly allows
+      root execution. Running containers as root increases the blast radius
+      of a container breakout, as the attacker gains root-level access to
+      the host filesystem and processes. Set runAsNonRoot: true and specify
+      a non-zero runAsUser per CIS Kubernetes Benchmark 5.2.6.
+    languages:
+      - generic
+    severity: WARNING
+    metadata:
+      cwe:
+        - "CWE-250"
+      owasp:
+        - "A05:2021"
+        - "A05:2025"
+      nist:
+        - "AC-6"
+        - "CM-7"
+      confidence: HIGH
+      impact: HIGH
+      likelihood: MEDIUM
+      category: security
+      technology:
+        - kubernetes
+      references:
+        - https://owasp.org/Top10/A05_2021-Security_Misconfiguration/
+        - https://cwe.mitre.org/data/definitions/250.html
+        - https://kubernetes.io/docs/concepts/security/pod-security-standards/
+      fix: |
+        Run containers as non-root user:
+          # Bad
+          securityContext:
+            runAsUser: 0
+          # Bad
+          securityContext:
+            runAsNonRoot: false
+          # Good
+          securityContext:
+            runAsNonRoot: true
+            runAsUser: 1000
+            runAsGroup: 1000
+
+  # -------------------------------------------------------------------------
+  # Rule 3: Host Network Access (CWE-269) — Generic
+  # Detects pods using the host network namespace
+  # -------------------------------------------------------------------------
+  - id: k8s-host-network
+    pattern-regex: 'hostNetwork:\s*true'
+    message: >
+      Pod configured to use the host network namespace. This allows the pod
+      to access all network interfaces on the host, bypass network policies,
+      and potentially intercept traffic intended for other pods or services.
+      Remove hostNetwork: true unless absolutely required for network
+      infrastructure pods per CIS Kubernetes Benchmark 5.2.4.
+    languages:
+      - generic
+    severity: WARNING
+    metadata:
+      cwe:
+        - "CWE-269"
+      owasp:
+        - "A05:2021"
+        - "A05:2025"
+      nist:
+        - "AC-4"
+        - "SC-7"
+      confidence: HIGH
+      impact: HIGH
+      likelihood: MEDIUM
+      category: security
+      technology:
+        - kubernetes
+      references:
+        - https://owasp.org/Top10/A05_2021-Security_Misconfiguration/
+        - https://cwe.mitre.org/data/definitions/269.html
+        - https://kubernetes.io/docs/concepts/security/pod-security-standards/
+      fix: |
+        Remove host network access:
+          # Bad
+          spec:
+            hostNetwork: true
+          # Good
+          spec:
+            hostNetwork: false
+        Use NetworkPolicies for controlled pod communication.
+
+  # -------------------------------------------------------------------------
+  # Rule 4: No Resource Limits (CWE-770) — Generic
+  # Detects containers without CPU/memory resource limits
+  # -------------------------------------------------------------------------
+  - id: k8s-no-resource-limits
+    pattern-regex: 'containers:\s*\n(\s+-\s+(?!.*resources:).*\n)*'
+    message: >
+      Container defined without resource limits (CPU/memory). Without
+      resource limits, a single container can consume all available node
+      resources, causing denial of service for other workloads. This enables
+      resource exhaustion attacks and noisy-neighbor problems. Always set
+      resources.limits for both cpu and memory per CIS Kubernetes Benchmark
+      5.2.7.
+    languages:
+      - generic
+    severity: WARNING
+    metadata:
+      cwe:
+        - "CWE-770"
+      owasp:
+        - "A05:2021"
+        - "A05:2025"
+      nist:
+        - "SC-6"
+        - "SI-17"
+      confidence: MEDIUM
+      impact: MEDIUM
+      likelihood: HIGH
+      category: security
+      technology:
+        - kubernetes
+      references:
+        - https://owasp.org/Top10/A05_2021-Security_Misconfiguration/
+        - https://cwe.mitre.org/data/definitions/770.html
+        - https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/
+      fix: |
+        Add resource limits to all containers:
+          containers:
+            - name: app
+              image: myapp:1.0.0
+              resources:
+                limits:
+                  cpu: "500m"
+                  memory: "256Mi"
+                requests:
+                  cpu: "100m"
+                  memory: "128Mi"
+
+  # -------------------------------------------------------------------------
+  # Rule 5: Latest Image Tag (CWE-829) — Generic
+  # Detects container images using :latest tag or missing a tag entirely
+  # -------------------------------------------------------------------------
+  - id: k8s-latest-tag
+    pattern-regex: 'image:\s*[a-zA-Z0-9._/-]+(:(latest)\s*$|[^:}\s]*\s*$)'
+    message: >
+      Container image using :latest tag or missing a specific version tag.
+      The :latest tag is mutable and can resolve to different image versions
+      across deployments, introducing untested or vulnerable code. Missing
+      tags default to :latest. Always use immutable tags (semantic versions
+      or digests) for reproducible deployments per OWASP A06:2025.
+    languages:
+      - generic
+    severity: WARNING
+    metadata:
+      cwe:
+        - "CWE-829"
+      owasp:
+        - "A06:2021"
+        - "A06:2025"
+      nist:
+        - "SA-12"
+        - "CM-7"
+      confidence: MEDIUM
+      impact: MEDIUM
+      likelihood: HIGH
+      category: security
+      technology:
+        - kubernetes
+      references:
+        - https://owasp.org/Top10/A06_2021-Vulnerable_and_Outdated_Components/
+        - https://cwe.mitre.org/data/definitions/829.html
+        - https://kubernetes.io/docs/concepts/containers/images/
+      fix: |
+        Pin container images to specific versions or digests:
+          # Bad
+          image: nginx:latest
+          image: nginx
+          # Good
+          image: nginx:1.25.3
+          image: nginx@sha256:abc123...
+
+  # -------------------------------------------------------------------------
+  # Rule 6: No Readiness Probe (CWE-693) — Generic
+  # Detects containers without a readinessProbe configured
+  # -------------------------------------------------------------------------
+  - id: k8s-no-readiness-probe
+    pattern-regex: 'containers:\s*\n(\s+-\s+(?!.*readinessProbe).*\n)*'
+    message: >
+      Container defined without a readinessProbe. Without readiness probes,
+      Kubernetes cannot determine if a pod is ready to receive traffic,
+      potentially routing requests to unhealthy or uninitialized instances.
+      This can lead to service degradation and cascading failures. Configure
+      readinessProbe with appropriate health check endpoints.
+    languages:
+      - generic
+    severity: INFO
+    metadata:
+      cwe:
+        - "CWE-693"
+      owasp:
+        - "A05:2021"
+        - "A05:2025"
+      nist:
+        - "SI-17"
+        - "SC-5"
+      confidence: MEDIUM
+      impact: LOW
+      likelihood: MEDIUM
+      category: security
+      technology:
+        - kubernetes
+      references:
+        - https://owasp.org/Top10/A05_2021-Security_Misconfiguration/
+        - https://cwe.mitre.org/data/definitions/693.html
+        - https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-startup-probes/
+      fix: |
+        Add readiness probes to all containers:
+          containers:
+            - name: app
+              image: myapp:1.0.0
+              readinessProbe:
+                httpGet:
+                  path: /healthz
+                  port: 8080
+                initialDelaySeconds: 5
+                periodSeconds: 10
+
+  # -------------------------------------------------------------------------
+  # Rule 7: Wildcard RBAC Permissions (CWE-269) — Generic
+  # Detects overly permissive RBAC rules using wildcards
+  # -------------------------------------------------------------------------
+  - id: k8s-wildcard-rbac
+    pattern-regex: '(verbs:\s*\[?"?\*"?\]?|resources:\s*\[?"?\*"?\]?)'
+    message: >
+      RBAC rule with wildcard (*) permission detected in verbs or resources.
+      Wildcard permissions grant unrestricted access to all API operations
+      or all resource types, violating the principle of least privilege.
+      An attacker who compromises a service account with wildcard RBAC can
+      escalate privileges across the entire cluster. Specify only the exact
+      verbs and resources required per CIS Kubernetes Benchmark 5.1.3.
+    languages:
+      - generic
+    severity: ERROR
+    metadata:
+      cwe:
+        - "CWE-269"
+      owasp:
+        - "A01:2021"
+        - "A01:2025"
+      nist:
+        - "AC-6"
+        - "AC-3"
+      confidence: HIGH
+      impact: HIGH
+      likelihood: MEDIUM
+      category: security
+      technology:
+        - kubernetes
+      references:
+        - https://owasp.org/Top10/A01_2021-Broken_Access_Control/
+        - https://cwe.mitre.org/data/definitions/269.html
+        - https://kubernetes.io/docs/reference/access-authn-authz/rbac/
+      fix: |
+        Replace wildcard permissions with specific verbs and resources:
+          # Bad
+          rules:
+            - apiGroups: ["*"]
+              resources: ["*"]
+              verbs: ["*"]
+          # Good
+          rules:
+            - apiGroups: [""]
+              resources: ["pods", "services"]
+              verbs: ["get", "list", "watch"]
+
+  # -------------------------------------------------------------------------
+  # Rule 8: Default Namespace Usage (CWE-269) — Generic
+  # Detects workloads deployed to the default namespace
+  # -------------------------------------------------------------------------
+  - id: k8s-default-namespace
+    pattern-regex: 'namespace:\s*default\s*$'
+    message: >
+      Resource deployed to the default namespace. The default namespace
+      lacks network policies, resource quotas, and RBAC isolation by
+      default. Workloads in the default namespace share a flat network and
+      may be accessible to any pod without explicit restrictions. Always
+      deploy workloads to dedicated namespaces with appropriate network
+      policies and RBAC bindings per CIS Kubernetes Benchmark 5.7.1.
+    languages:
+      - generic
+    severity: WARNING
+    metadata:
+      cwe:
+        - "CWE-269"
+      owasp:
+        - "A05:2021"
+        - "A05:2025"
+      nist:
+        - "AC-4"
+        - "SC-32"
+      confidence: HIGH
+      impact: MEDIUM
+      likelihood: HIGH
+      category: security
+      technology:
+        - kubernetes
+      references:
+        - https://owasp.org/Top10/A05_2021-Security_Misconfiguration/
+        - https://cwe.mitre.org/data/definitions/269.html
+        - https://kubernetes.io/docs/concepts/overview/working-with-objects/namespaces/
+      fix: |
+        Deploy workloads to dedicated namespaces:
+          # Bad
+          metadata:
+            name: my-app
+            namespace: default
+          # Good
+          metadata:
+            name: my-app
+            namespace: production
+        Create namespace-specific policies:
+          kubectl create namespace production
+          kubectl apply -f network-policy.yaml -n production

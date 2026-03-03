@@ -1,15 +1,15 @@
 <p align="center">
   <img src="https://img.shields.io/badge/Claude_Code-Plugin-blueviolet?style=for-the-badge&logo=anthropic" alt="Claude Code Plugin">
-  <img src="https://img.shields.io/badge/Version-2.8.0-brightgreen?style=for-the-badge" alt="v2.8.0">
+  <img src="https://img.shields.io/badge/Version-3.0.0-brightgreen?style=for-the-badge" alt="v3.0.0">
   <img src="https://img.shields.io/badge/Tests-978%2B-success?style=for-the-badge" alt="Tests">
   <img src="https://img.shields.io/badge/License-MIT-yellow?style=for-the-badge" alt="MIT License">
 </p>
 
 <p align="center">
   <img src="https://img.shields.io/badge/Agents-18-blue?style=flat-square" alt="18 Agents">
-  <img src="https://img.shields.io/badge/Skills-14-green?style=flat-square" alt="14 Skills">
-  <img src="https://img.shields.io/badge/Tools-9-orange?style=flat-square" alt="9 Tools">
-  <img src="https://img.shields.io/badge/MCP-8_Tools-purple?style=flat-square" alt="MCP">
+  <img src="https://img.shields.io/badge/Skills-16-green?style=flat-square" alt="16 Skills">
+  <img src="https://img.shields.io/badge/Tools-11-orange?style=flat-square" alt="11 Tools">
+  <img src="https://img.shields.io/badge/MCP-10_Tools-purple?style=flat-square" alt="MCP">
   <img src="https://img.shields.io/badge/OWASP_2021%2B2025-10%2F10-critical?style=flat-square" alt="OWASP 2021+2025 10/10">
   <img src="https://img.shields.io/badge/CWE_Mappings-405-informational?style=flat-square" alt="405 CWEs">
   <img src="https://img.shields.io/badge/Frameworks-7-blueviolet?style=flat-square" alt="7 Compliance Frameworks">
@@ -37,11 +37,11 @@
 - [Executive Summary](#executive-summary)
 - [Key Highlights](#key-highlights)
 - [OWASP Top 10 Coverage](#owasp-top-10-coverage)
-- [What's New (v2.8.0)](#whats-new)
+- [What's New (v3.0.0)](#whats-new)
 - [Use Cases](#use-cases)
 - [Quick Start](#quick-start)
 - [Architecture Overview](#architecture-overview)
-- [14 Skills](#14-skills--คำสั่งทั้งหมด)
+- [16 Skills](#16-skills--คำสั่งทั้งหมด)
 - [18 AI Agents](#18-ai-agents--ทีมผู้เชี่ยวชาญ)
 - [Vulnerability Prioritization](#vulnerability-prioritization)
 - [Role-Based Security Policy](#role-based-security-policy)
@@ -65,33 +65,33 @@
 
 ## Executive Summary
 
-| Metric                    | Value                                                                                                              |
-| ------------------------- | ------------------------------------------------------------------------------------------------------------------ |
-| **Project Type**          | Claude Code Plugin Skill Pack (pure markdown/JSON/shell)                                                           |
-| **AI Agents**             | 18 agents across 4 groups (Orchestrators, Specialists, Experts, Core Team)                                         |
-| **Skills (Commands)**     | 14 slash commands (/sast-scan, /dast-scan, /full-pipeline, /slsa-assess, ...)                                      |
-| **Security Tools**        | 9 open-source tools in Docker containers (Semgrep, ZAP, Nuclei, Grype, Trivy, Checkov, GitLeaks, Syft, TruffleHog) |
-| **MCP Tools**             | 8 composable tools for programmatic integration                                                                    |
-| **Compliance Frameworks** | 7 frameworks — OWASP Top 10 (2021+2025), NIST 800-53, MITRE ATT&CK, NCSA, PDPA, SOC 2, ISO 27001                   |
-| **CWE Mappings**          | 405 total (OWASP 120 + NIST 100 + MITRE 93 + NCSA 62 + PDPA 30)                                                    |
-| **OWASP Top 10 Coverage** | 10/10 categories — dual-version 2021+2025 mapping                                                                  |
-| **Tests**                 | 978+ checks across 28 suites — all passing                                                                         |
-| **QA Rounds**             | 8 rounds, 54/54 latest (cumulative 950+ checks)                                                                    |
-| **ROI**                   | 10,222% — 3,100 THB actual vs 320,000 THB equivalent (133x speed)                                                  |
-| **Version**               | 2.8.0 (2026-03-03)                                                                                                 |
+| Metric                    | Value                                                                                                                                           |
+| ------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Project Type**          | Claude Code Plugin Skill Pack (pure markdown/JSON/shell)                                                                                        |
+| **AI Agents**             | 18 agents across 4 groups (Orchestrators, Specialists, Experts, Core Team)                                                                      |
+| **Skills (Commands)**     | 16 slash commands (/sast-scan, /dast-scan, /full-pipeline, /k8s-scan, /graphql-scan, ...)                                                       |
+| **Security Tools**        | 11 open-source tools in Docker containers (Semgrep, ZAP, Nuclei, Grype, Trivy, Checkov, GitLeaks, Syft, TruffleHog, kube-bench, Nuclei-GraphQL) |
+| **MCP Tools**             | 10 composable tools for programmatic integration                                                                                                |
+| **Compliance Frameworks** | 7 frameworks — OWASP Top 10 (2021+2025), NIST 800-53, MITRE ATT&CK, NCSA, PDPA, SOC 2, ISO 27001                                                |
+| **CWE Mappings**          | 405 total (OWASP 120 + NIST 100 + MITRE 93 + NCSA 62 + PDPA 30)                                                                                 |
+| **OWASP Top 10 Coverage** | 10/10 categories — dual-version 2021+2025 mapping                                                                                               |
+| **Tests**                 | 978+ checks across 28 suites — all passing                                                                                                      |
+| **QA Rounds**             | 8 rounds, 54/54 latest (cumulative 950+ checks)                                                                                                 |
+| **ROI**                   | 10,222% — 3,100 THB actual vs 320,000 THB equivalent (133x speed)                                                                               |
+| **Version**               | 3.0.0 (2026-03-03)                                                                                                                              |
 
 ---
 
 ## Key Highlights
 
 - **18 AI Agents, 1 Team** — Orchestrators delegate งานให้ Specialists, Experts วิเคราะห์ผลข้ามเครื่องมือ, Core Team enforce quality gates — ทั้งหมดทำงานร่วมกันผ่าน mandatory routing table
-- **9 Security Tools, 1 Command** — `/full-pipeline` รันทุกเครื่องมือแบบ parallel, deduplicate ผลข้าม tools, สร้าง unified report ในคำสั่งเดียว
+- **11 Security Tools, 1 Command** — `/full-pipeline` รันทุกเครื่องมือแบบ parallel, deduplicate ผลข้าม tools, สร้าง unified report ในคำสั่งเดียว
 - **Real-Time Protection** — บล็อก commits ที่มี CRITICAL findings, ตรวจจับ secrets (AWS keys, GitHub tokens, JWT) ก่อนเขียนลง disk — ทำงานใน 500ms
 - **CVSS v4.0 Prioritization** — วิเคราะห์ business impact, exploitability (Weaponized → None), กำหนด SLA tiers (P1: 24 ชม. → P4: backlog)
 - **486 CWE Compliance Mappings** — Auto-map ผลสแกนไปยัง OWASP Top 10 (120), NIST 800-53 (100), MITRE ATT&CK (93), NCSA (62), PDPA (30), SOC 2 (~40), ISO 27001 (~41)
 - **NCSA Web Security Standard** — รองรับมาตรฐานความมั่นคงปลอดภัยเว็บไซต์ สพธอ. (HTTP Headers, TLS, Session Management)
-- **MCP Server** — 8 composable tools สำหรับ programmatic integration กับ MCP-compatible clients (compare, compliance_status, suggest_fix)
-- **Custom OWASP Rules** — 68 custom Semgrep rules for A01 (access control), A02 (crypto), A03 (injection), A04 (insecure design), A05 (misconfig), A06 (vulnerable components), A07 (auth failures), A08 (integrity failures), A09 (logging), A10 (SSRF + exception handling)
+- **MCP Server** — 10 composable tools สำหรับ programmatic integration กับ MCP-compatible clients (compare, compliance_status, suggest_fix, history, pipeline)
+- **Custom OWASP Rules** — 84 custom Semgrep rules for A01 (access control), A02 (crypto), A03 (injection), A04 (insecure design), A05 (misconfig), A06 (vulnerable components), A07 (auth failures), A08 (integrity failures), A09 (logging), A10 (SSRF + exception handling), K8s manifests, GraphQL endpoints
 - **7 Output Formats** — SARIF, JSON, Markdown, HTML, PDF, CSV, VEX
 
 ---
@@ -117,20 +117,28 @@
 
 ## What's New
 
-> ดู [CHANGELOG.md](CHANGELOG.md) สำหรับรายละเอียดทั้งหมด (v1.0.0 → v2.8.0)
+> ดู [CHANGELOG.md](CHANGELOG.md) สำหรับรายละเอียดทั้งหมด (v1.0.0 → v3.0.0)
 
-### v2.8.0 — Supply Chain Compliance + OWASP 10/10 (Latest)
+### v3.0.0 — Platform Release (Latest)
+
+- **SQLite Historical Database** — `scripts/scan-db.sh` with 7 subcommands for persistent scan tracking and trend analysis
+- **DAG Pipeline Engine** — `runner/pipeline-engine.sh` with topological sort and 4 built-in pipeline definitions
+- **Security Dashboard** — Alpine.js + Chart.js self-contained HTML dashboard with 6 panels
+- **K8s Security Scanning** — `/k8s-scan` skill with 8 Semgrep rules + kube-bench CIS Benchmark integration
+- **GraphQL Security Scanning** — `/graphql-scan` skill with 8 Semgrep rules + 4 Nuclei templates
+- **2 New MCP Tools** — `devsecops_history` and `devsecops_pipeline` (10 total)
+- **84 Custom Semgrep Rules** — +16 new rules (8 K8s + 8 GraphQL)
+
+<details>
+<summary>Previous versions</summary>
+
+### v2.8.0 — Supply Chain Compliance + OWASP 10/10
 
 - **OWASP 10/10 Custom Rules** — A06 Vulnerable Components (5), A07 Auth Failures (5), A08 Integrity Failures (5) — total 68 custom Semgrep rules
 - **SLSA Provenance Assessment** — `/slsa-assess` skill with SLSA v1.1 reference for EU CRA compliance
 - **VEX Output Format** — CycloneDX VEX + OpenVEX as 7th output format
 - **TruffleHog Secret Scanning** — 9th security tool with git/filesystem/s3 modes
-- **Secret Validity Checker** — `scripts/secret-verifier.sh` with 4 providers and In-the-Loop safety
 - **SOC 2 + ISO 27001 Compliance** — 2 new mapping files (~81 CWEs total), 7 frameworks
-- **978+ tests** across 28 suites
-
-<details>
-<summary>Previous versions</summary>
 
 ### v2.7.0 — OWASP 2025, Nuclei DAST, PDPA Compliance
 
@@ -408,7 +416,7 @@ MCP server จะถูก load อัตโนมัติผ่าน `.mcp.js
 
 ---
 
-## 14 Skills — คำสั่งทั้งหมด
+## 16 Skills — คำสั่งทั้งหมด
 
 ### Security Scanning
 
@@ -422,6 +430,8 @@ MCP server จะถูก load อัตโนมัติผ่าน `.mcp.js
 | `/secret-scan`    | GitLeaks, TruffleHog | ค้นหา API keys, passwords, tokens ที่หลุดเข้า code + validity check | Out-of-Loop   |
 | `/sbom-generate`  | Syft                 | สร้าง Software Bill of Materials (CycloneDX/SPDX)                   | Out-of-Loop   |
 | `/slsa-assess`    | —                    | ประเมิน SLSA provenance level ตาม SLSA v1.1 specification           | On-the-Loop   |
+| `/k8s-scan`       | kube-bench, Semgrep  | สแกน K8s manifests + CIS Benchmark compliance                       | Out-of-Loop   |
+| `/graphql-scan`   | Semgrep, Nuclei      | ตรวจสอบ GraphQL endpoints: introspection, depth, batching           | On-the-Loop   |
 
 ### Orchestration & Reporting
 
@@ -859,40 +869,40 @@ bash tests/test-release.sh                 # 12 release checklist tests
 
 ### Value Delivered
 
-| Deliverable                  | Quantity                                                                             |
-| ---------------------------- | ------------------------------------------------------------------------------------ |
-| AI Agents                    | 18 (fully configured with routing + delegation)                                      |
-| Security Skills              | 14 (8 scanning + 6 orchestration)                                                    |
-| Docker Tool Integrations     | 9 (Semgrep, ZAP, Nuclei, Grype, Trivy, Checkov, GitLeaks, Syft, TruffleHog)          |
-| MCP Tools                    | 8 (scan, results, gate, compliance, status, compare, compliance_status, suggest_fix) |
-| CWE Compliance Mappings      | 486 across 7 frameworks                                                              |
-| Custom Security Rules        | 68 (OWASP A01/A02/A03/A04/A05/A06/A07/A08/A09/A10 Semgrep rules)                     |
-| Automated Tests              | 978+ across 28 suites                                                                |
-| Reference Documents          | 17 domain knowledge files (~500-800 lines each)                                      |
-| Hooks (Real-time Protection) | 3 (session-start, scan-on-write, pre-commit-gate)                                    |
-| Output Formatters            | 7 (SARIF, JSON, Markdown, HTML, PDF, CSV, VEX)                                       |
+| Deliverable                  | Quantity                                                                                                 |
+| ---------------------------- | -------------------------------------------------------------------------------------------------------- |
+| AI Agents                    | 18 (fully configured with routing + delegation)                                                          |
+| Security Skills              | 16 (10 scanning + 6 orchestration)                                                                       |
+| Docker Tool Integrations     | 11 (Semgrep, ZAP, Nuclei, Grype, Trivy, Checkov, GitLeaks, Syft, TruffleHog, kube-bench, Nuclei-GraphQL) |
+| MCP Tools                    | 10 (scan, results, gate, compliance, status, compare, compliance_status, suggest_fix, history, pipeline) |
+| CWE Compliance Mappings      | 486 across 7 frameworks                                                                                  |
+| Custom Security Rules        | 84 (OWASP A01-A10 + K8s + GraphQL Semgrep rules)                                                         |
+| Automated Tests              | 978+ across 34+ suites                                                                                   |
+| Reference Documents          | 19 domain knowledge files (~500-800 lines each)                                                          |
+| Hooks (Real-time Protection) | 3 (session-start, scan-on-write, pre-commit-gate)                                                        |
+| Output Formatters            | 7 (SARIF, JSON, Markdown, HTML, PDF, CSV, VEX)                                                           |
 
 ---
 
 ## Comparison with Alternatives
 
-| Feature                | DevSecOps AI Team              | GitHub Advanced Security | Snyk             | SonarQube    |
-| ---------------------- | ------------------------------ | ------------------------ | ---------------- | ------------ |
-| **Pricing**            | Free (MIT)                     | $49/user/mo              | $52/user/mo+     | $150+/mo     |
-| **SAST**               | Semgrep                        | CodeQL                   | Snyk Code        | SonarQube    |
-| **DAST**               | ZAP + Nuclei                   | —                        | —                | —            |
-| **SCA**                | Grype                          | Dependabot               | Snyk Open Source | —            |
-| **Container**          | Trivy                          | —                        | Snyk Container   | —            |
-| **IaC**                | Checkov                        | —                        | Snyk IaC         | —            |
-| **Secrets**            | GitLeaks + TruffleHog          | Secret scanning          | —                | —            |
-| **SBOM**               | Syft                           | —                        | —                | —            |
-| **AI Agents**          | 18 agents                      | —                        | —                | —            |
-| **NLP Interface**      | Natural language               | —                        | —                | —            |
-| **NCSA Compliance**    | Built-in                       | —                        | —                | —            |
-| **Offline/Air-gapped** | Full support                   | Partial                  | —                | Self-hosted  |
-| **Data Privacy**       | 100% local                     | Cloud                    | Cloud            | Self-hosted  |
-| **Custom Rules**       | 68 rules (10 OWASP categories) | Custom CodeQL            | —                | Custom rules |
-| **MCP Integration**    | 8 tools                        | —                        | —                | —            |
+| Feature                | DevSecOps AI Team                   | GitHub Advanced Security | Snyk             | SonarQube    |
+| ---------------------- | ----------------------------------- | ------------------------ | ---------------- | ------------ |
+| **Pricing**            | Free (MIT)                          | $49/user/mo              | $52/user/mo+     | $150+/mo     |
+| **SAST**               | Semgrep                             | CodeQL                   | Snyk Code        | SonarQube    |
+| **DAST**               | ZAP + Nuclei                        | —                        | —                | —            |
+| **SCA**                | Grype                               | Dependabot               | Snyk Open Source | —            |
+| **Container**          | Trivy                               | —                        | Snyk Container   | —            |
+| **IaC**                | Checkov                             | —                        | Snyk IaC         | —            |
+| **Secrets**            | GitLeaks + TruffleHog               | Secret scanning          | —                | —            |
+| **SBOM**               | Syft                                | —                        | —                | —            |
+| **AI Agents**          | 18 agents                           | —                        | —                | —            |
+| **NLP Interface**      | Natural language                    | —                        | —                | —            |
+| **NCSA Compliance**    | Built-in                            | —                        | —                | —            |
+| **Offline/Air-gapped** | Full support                        | Partial                  | —                | Self-hosted  |
+| **Data Privacy**       | 100% local                          | Cloud                    | Cloud            | Self-hosted  |
+| **Custom Rules**       | 84 rules (10 OWASP + K8s + GraphQL) | Custom CodeQL            | —                | Custom rules |
+| **MCP Integration**    | 10 tools                            | —                        | —                | —            |
 
 > **Note**: DevSecOps AI Team ใช้ open-source tools ทั้งหมด — ไม่มี vendor lock-in, source code ไม่ออกจากเครื่อง
 
@@ -911,19 +921,22 @@ devsecops-ai-team/
 |   +-- specialists/         #   7 specialist agents
 |   +-- experts/             #   4 expert agents
 |   +-- core-team/           #   4 core team agents
-+-- skills/                  # 14 skill definitions (SKILL.md)
-|   +-- references/          # 17 domain knowledge files (~500-800 lines each)
++-- skills/                  # 16 skill definitions (SKILL.md)
+|   +-- references/          # 19 domain knowledge files (~500-800 lines each)
 +-- runner/                  # Sidecar Runner (Dockerfile, compose, dispatcher, collector)
-+-- formatters/              # SARIF, Markdown, HTML, PDF, CSV, VEX, JSON normalizer, dedup
-+-- mcp/                     # MCP server -- 8 tools
+|   +-- pipelines/           #   DAG pipeline definitions (YAML)
+|   +-- pipeline-engine.sh   #   DAG execution engine with topological sort
+|   +-- nuclei-templates/    #   Custom Nuclei templates (GraphQL)
++-- formatters/              # SARIF, Markdown, HTML, PDF, CSV, VEX, JSON normalizer, dedup, dashboard
++-- mcp/                     # MCP server -- 10 tools
 |   +-- server.mjs           #   ESM module, stdio transport
 |   +-- package.json         #   @modelcontextprotocol/sdk + zod
 +-- mappings/                # CWE->OWASP, CWE->NIST, CWE->MITRE, CWE->NCSA, CWE->PDPA, CWE->SOC2, CWE->ISO27001, severity policy
-+-- rules/                   # Custom Semgrep rules (A01, A02, A03, A04, A05, A06, A07, A08, A09, A10)
-+-- templates/               # Report templates (HTML, Markdown)
++-- rules/                   # Custom Semgrep rules (A01-A10, K8s, GraphQL) — 84 rules
++-- templates/               # Report templates (HTML, Markdown, dashboard.html)
 +-- hooks/                   # 3 hooks (session-start, scan-on-write, pre-commit-gate)
-+-- scripts/                 # install-runner, install-rules, check-prerequisites, NCSA validator
-+-- tests/                   # 978+ tests across 28 suites
++-- scripts/                 # install-runner, install-rules, check-prerequisites, NCSA validator, scan-db.sh
++-- tests/                   # 978+ tests across 34 suites
 +-- docs/                    # INSTALL, TROUBLESHOOTING, AGENT-CATALOG, RUNBOOK, MANDAY
 +-- examples/                # Rules, policies, DOMAIN.md, Semgrep rules
 +-- frameworks.json          # 19 tracked security frameworks with version info
@@ -942,7 +955,7 @@ devsecops-ai-team/
 | [FRAMEWORK-UPDATE-RUNBOOK.md](docs/FRAMEWORK-UPDATE-RUNBOOK.md) | ขั้นตอนอัพเดท framework versions                   |
 | [MANDAY-ESTIMATION.md](docs/MANDAY-ESTIMATION.md)               | ROI analysis + cost comparison (10,222% ROI)       |
 | [CLAUDE.md](CLAUDE.md)                                          | Architecture + contributing guidelines             |
-| [CHANGELOG.md](CHANGELOG.md)                                    | Version history (v1.0.0 → v2.8.0)                  |
+| [CHANGELOG.md](CHANGELOG.md)                                    | Version history (v1.0.0 → v3.0.0)                  |
 | [SECURITY.md](SECURITY.md)                                      | Vulnerability reporting policy                     |
 
 ---
@@ -1017,8 +1030,8 @@ claude-governance (base)          devsecops-ai-team (extends)
 | v2.5.0  | Released    | Rules & MCP     | 33 rules (A01/A03/A09/A10), 3 MCP tools, PDF/CSV                 |
 | v2.6.x  | Released    | CI/CD           | GitHub Actions, GitLab CI, SARIF per-tool, MCP bundle, tech debt |
 | v2.7.0  | Released    | OWASP 2025      | Dual mapping, 53 rules, Nuclei, NCSA 1.0, PDPA                   |
-| v2.8.0  | **Current** | Supply Chain    | SLSA, VEX, 10/10 OWASP rules, SOC 2, ISO 27001, TruffleHog       |
-| v3.0.0  | Planned     | Platform        | Historical DB, dashboard UI, K8s, GraphQL                        |
+| v2.8.0  | Released    | Supply Chain    | SLSA, VEX, 10/10 OWASP rules, SOC 2, ISO 27001, TruffleHog       |
+| v3.0.0  | **Current** | Platform        | SQLite DB, DAG pipeline, dashboard, K8s scan, GraphQL scan       |
 
 > ดูรายละเอียด roadmap ทั้งหมดได้ที่ [docs/PRD.md](docs/PRD.md)
 
@@ -1032,7 +1045,7 @@ MIT License — see [LICENSE](LICENSE)
 
 <p align="center">
   <strong>DevSecOps AI Team</strong> — Enterprise Security Plugin for Claude Code<br>
-  <sub>18 AI Agents | 14 Skills | 9 Tools | 8 MCP Tools | 7 Output Formats | 486 CWE Mappings | OWASP 10/10</sub><br>
+  <sub>18 AI Agents | 16 Skills | 11 Tools | 10 MCP Tools | 7 Output Formats | 486 CWE Mappings | OWASP 10/10</sub><br>
   <sub>Built with <a href="https://claude.ai/claude-code">Claude Code</a> | Powered by Open Source Security Tools</sub>
 </p>
 

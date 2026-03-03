@@ -1,0 +1,32 @@
+id: graphql-field-suggestion
+
+info:
+  name: GraphQL Field Suggestion Enabled
+  author: devsecops-ai-team
+  severity: low
+  description: GraphQL field suggestions are enabled, leaking schema information through autocomplete hints when invalid field names are queried
+  tags: graphql,field-suggestion,information-disclosure
+  reference:
+    - https://owasp.org/API-Security/editions/2023/en/0xa3-broken-object-property-level-authorization/
+  metadata:
+    cwe: CWE-200
+    owasp: A01:2021
+
+http:
+  - method: POST
+    path:
+      - "{{BaseURL}}/graphql"
+      - "{{BaseURL}}/api/graphql"
+    headers:
+      Content-Type: application/json
+    body: '{"query":"{__typ}"}'
+    matchers-condition: and
+    matchers:
+      - type: word
+        words:
+          - "Did you mean"
+        condition: or
+      - type: status
+        status:
+          - 200
+          - 400

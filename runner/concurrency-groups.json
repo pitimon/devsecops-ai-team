@@ -2,7 +2,7 @@
   "_comment": "Concurrency groups for parallel tool execution in CI pipelines",
   "groups": {
     "heavy": {
-      "tools": ["zap"],
+      "tools": ["zap", "kube-bench"],
       "max_parallel": 1,
       "mem_limit": "2g",
       "description": "Memory-intensive tools that should run serially"

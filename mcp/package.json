@@ -1,6 +1,6 @@
 {
   "name": "devsecops-mcp-server",
-  "version": "2.8.0",
+  "version": "3.0.0",
   "type": "module",
   "description": "MCP server for DevSecOps AI Team — exposes security scanning tools as MCP tools",
   "main": "server.mjs",

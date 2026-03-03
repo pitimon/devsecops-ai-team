@@ -1,0 +1,80 @@
+# Full security scan pipeline — runs all tools, normalizes, deduplicates, formats
+name: full-scan
+version: "1.0"
+description: "Full security scan pipeline with all tools"
+
+nodes:
+  semgrep:
+    type: scanner
+    tool: semgrep
+    depends_on: []
+    inputs:
+      target: "${SCAN_TARGET}"
+    outputs:
+      file: "output/semgrep-raw.json"
+    concurrency_group: medium
+
+  gitleaks:
+    type: scanner
+    tool: gitleaks
+    depends_on: []
+    inputs:
+      target: "${SCAN_TARGET}"
+    outputs:
+      file: "output/gitleaks-raw.json"
+    concurrency_group: light
+
+  grype:
+    type: scanner
+    tool: grype
+    depends_on: []
+    inputs:
+      target: "${SCAN_TARGET}"
+    outputs:
+      file: "output/grype-raw.json"
+    concurrency_group: medium
+
+  trivy:
+    type: scanner
+    tool: trivy
+    depends_on: []
+    inputs:
+      target: "${SCAN_TARGET}"
+    outputs:
+      file: "output/trivy-raw.json"
+    concurrency_group: medium
+
+  checkov:
+    type: scanner
+    tool: checkov
+    depends_on: []
+    inputs:
+      target: "${SCAN_TARGET}"
+    outputs:
+      file: "output/checkov-raw.json"
+    concurrency_group: medium
+
+  normalize:
+    type: normalizer
+    depends_on: [semgrep, gitleaks, grype, trivy, checkov]
+    inputs:
+      findings: "${DEPS_OUTPUTS}"
+    outputs:
+      file: "output/all-normalized.json"
+
+  dedup:
+    type: dedup
+    depends_on: [normalize]
+    inputs:
+      findings: "output/all-normalized.json"
+    outputs:
+      file: "output/deduped.json"
+
+  format:
+    type: formatter
+    depends_on: [dedup]
+    inputs:
+      findings: "output/deduped.json"
+      format: "${OUTPUT_FORMAT:-sarif}"
+    outputs:
+      file: "output/report.${OUTPUT_FORMAT:-sarif}"

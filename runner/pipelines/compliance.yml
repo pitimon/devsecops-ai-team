@@ -1,0 +1,51 @@
+# Compliance audit pipeline — SAST + IaC scanning with compliance checks
+name: compliance
+version: "1.0"
+description: "Compliance audit pipeline with Semgrep SAST, Checkov IaC, and framework compliance checks"
+
+nodes:
+  semgrep:
+    type: scanner
+    tool: semgrep
+    depends_on: []
+    inputs:
+      target: "${SCAN_TARGET}"
+    outputs:
+      file: "output/semgrep-raw.json"
+    concurrency_group: medium
+
+  checkov:
+    type: scanner
+    tool: checkov
+    depends_on: []
+    inputs:
+      target: "${SCAN_TARGET}"
+    outputs:
+      file: "output/checkov-raw.json"
+    concurrency_group: medium
+
+  normalize:
+    type: normalizer
+    depends_on: [semgrep, checkov]
+    inputs:
+      findings: "${DEPS_OUTPUTS}"
+    outputs:
+      file: "output/compliance-normalized.json"
+
+  compliance-check:
+    type: compliance
+    depends_on: [normalize]
+    inputs:
+      findings: "output/compliance-normalized.json"
+      frameworks: "${COMPLIANCE_FRAMEWORKS:-owasp,nist,ncsa}"
+    outputs:
+      file: "output/compliance-status.json"
+
+  format:
+    type: formatter
+    depends_on: [compliance-check]
+    inputs:
+      findings: "output/compliance-status.json"
+      format: "${OUTPUT_FORMAT:-sarif}"
+    outputs:
+      file: "output/compliance-report.${OUTPUT_FORMAT:-sarif}"

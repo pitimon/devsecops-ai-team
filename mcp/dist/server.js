@@ -18114,6 +18114,68 @@ var TOOLS = [
         }
       }
     }
+  },
+  {
+    name: "devsecops_history",
+    description: "Query historical scan results from the SQLite database. Supports stats, query with filters (severity, tool, cwe), and trend analysis.",
+    inputSchema: {
+      type: "object",
+      properties: {
+        action: {
+          type: "string",
+          enum: ["stats", "query", "trend", "lifecycle"],
+          description: "Action to perform"
+        },
+        severity: {
+          type: "string",
+          description: "Filter by severity (CRITICAL, HIGH, MEDIUM, LOW, INFO)"
+        },
+        tool: {
+          type: "string",
+          description: "Filter by source tool"
+        },
+        cwe: {
+          type: "string",
+          description: "Filter by CWE ID"
+        },
+        days: {
+          type: "number",
+          description: "Trend period in days (default: 30)"
+        },
+        fingerprint: {
+          type: "string",
+          description: "Finding fingerprint for lifecycle"
+        },
+        db: {
+          type: "string",
+          description: "Database path (default: output/devsecops.db)"
+        }
+      },
+      required: ["action"]
+    }
+  },
+  {
+    name: "devsecops_pipeline",
+    description: "Manage DAG security scan pipelines. Supports validate, list, status, and to-json actions.",
+    inputSchema: {
+      type: "object",
+      properties: {
+        action: {
+          type: "string",
+          enum: ["validate", "list", "status", "to-json"],
+          description: "Pipeline action"
+        },
+        pipeline: {
+          type: "string",
+          description: "Pipeline YAML file path (for validate/to-json)"
+        },
+        run_id: {
+          type: "string",
+          description: "Run ID for status check"
+        }
+      },
+      required: ["action"]
+    }
   }
 ];
 function readNormalizedFindings(jobId) {
@@ -18475,6 +18537,86 @@ async function handleSuggestFix({ cwe_id, rule_id, finding_file }) {
   }
   return mcpJson(suggestions);
 }
+async function handleHistory({
+  action,
+  severity,
+  tool,
+  cwe,
+  days,
+  fingerprint,
+  db
+}) {
+  const scriptPath = resolve(ROOT_DIR, "scripts", "scan-db.sh");
+  if (!existsSync(scriptPath)) {
+    return mcpError(
+      "scan-db.sh not found. Ensure the scripts/ directory is intact."
+    );
+  }
+  const args = [scriptPath, action];
+  const env = {};
+  if (db) env.SCAN_DB = db;
+  switch (action) {
+    case "stats":
+      break;
+    case "query":
+      if (severity) args.push("--severity", severity);
+      if (tool) args.push("--tool", tool);
+      if (cwe) args.push("--cwe", cwe);
+      break;
+    case "trend":
+      if (days) args.push("--days", String(days));
+      break;
+    case "lifecycle":
+      if (fingerprint) args.push("--fingerprint", fingerprint);
+      break;
+  }
+  const result = runCommand("bash", args, { timeout: 3e4, env });
+  if (!result.success) {
+    return mcpError(
+      `scan-db.sh ${action} failed (exit ${result.exitCode}): ${result.error || result.output}`
+    );
+  }
+  try {
+    const data = JSON.parse(result.output);
+    return mcpJson(data);
+  } catch {
+    return { content: [{ type: "text", text: result.output }] };
+  }
+}
+async function handlePipeline({ action, pipeline, run_id }) {
+  const enginePath = resolve(RUNNER_DIR, "pipeline-engine.sh");
+  if (!existsSync(enginePath)) {
+    return mcpError(
+      "pipeline-engine.sh not found. Ensure the runner/ directory is intact."
+    );
+  }
+  const args = [enginePath, action];
+  switch (action) {
+    case "validate":
+      if (pipeline) args.push(pipeline);
+      break;
+    case "list":
+      break;
+    case "status":
+      if (run_id) args.push("--run-id", run_id);
+      break;
+    case "to-json":
+      if (pipeline) args.push(pipeline);
+      break;
+  }
+  const result = runCommand("bash", args, { timeout: 3e4 });
+  if (!result.success) {
+    return mcpError(
+      `pipeline-engine.sh ${action} failed (exit ${result.exitCode}): ${result.error || result.output}`
+    );
+  }
+  try {
+    const data = JSON.parse(result.output);
+    return mcpJson(data);
+  } catch {
+    return { content: [{ type: "text", text: result.output }] };
+  }
+}
 var ScanSchema = external_exports.object({
   tool: external_exports.enum([
     "semgrep",
@@ -18517,6 +18659,20 @@ var SuggestFixSchema = external_exports.object({
 }).refine((data) => data.cwe_id || data.rule_id || data.finding_file, {
   message: "At least one of cwe_id, rule_id, or finding_file is required"
 });
+var HistorySchema = external_exports.object({
+  action: external_exports.enum(["stats", "query", "trend", "lifecycle"]).describe("Action to perform"),
+  severity: external_exports.string().optional().describe("Filter by severity (CRITICAL, HIGH, MEDIUM, LOW, INFO)"),
+  tool: external_exports.string().optional().describe("Filter by source tool"),
+  cwe: external_exports.string().optional().describe("Filter by CWE ID"),
+  days: external_exports.number().optional().default(30).describe("Trend period in days"),
+  fingerprint: external_exports.string().optional().describe("Finding fingerprint for lifecycle"),
+  db: external_exports.string().optional().describe("Database path (default: output/devsecops.db)")
+});
+var PipelineSchema = external_exports.object({
+  action: external_exports.enum(["validate", "list", "status", "to-json"]).describe("Pipeline action"),
+  pipeline: external_exports.string().optional().describe("Pipeline YAML file path (for validate/to-json)"),
+  run_id: external_exports.string().optional().describe("Run ID for status check")
+});
 function validateInput(schema, args) {
   const result = schema.safeParse(args || {});
   if (!result.success) {
@@ -18540,7 +18696,7 @@ ${issues.join("\n")}`
   return { valid: true, data: result.data };
 }
 var server = new Server(
-  { name: "devsecops-mcp-server", version: "2.8.0" },
+  { name: "devsecops-mcp-server", version: "3.0.0" },
   { capabilities: { tools: {} } }
 );
 server.setRequestHandler(ListToolsRequestSchema, async () => ({
@@ -18587,6 +18743,16 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
       const v = validateInput(SuggestFixSchema, args);
       if (!v.valid) return v.error;
       return handleSuggestFix(v.data);
+    }
+    case "devsecops_history": {
+      const v = validateInput(HistorySchema, args);
+      if (!v.valid) return v.error;
+      return handleHistory(v.data);
+    }
+    case "devsecops_pipeline": {
+      const v = validateInput(PipelineSchema, args);
+      if (!v.valid) return v.error;
+      return handlePipeline(v.data);
     }
     default:
       return {

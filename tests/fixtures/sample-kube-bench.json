@@ -1,0 +1,50 @@
+[
+  {
+    "test_number": "1.1.1",
+    "test_desc": "Ensure that the API server pod specification file permissions are set to 644 or more restrictive",
+    "audit": "stat -c %a /etc/kubernetes/manifests/kube-apiserver.yaml",
+    "AuditConfig": "",
+    "type": "",
+    "remediation": "Run the below command on the control plane node.\nchmod 644 /etc/kubernetes/manifests/kube-apiserver.yaml",
+    "test_info": [
+      "Ensure that the API server pod specification file permissions are set to 644 or more restrictive"
+    ],
+    "status": "FAIL",
+    "actual_value": "permissions: 755",
+    "scored": true,
+    "IsMultiple": false,
+    "expected_result": "permissions of the file are equal to or more restrictive than 644"
+  },
+  {
+    "test_number": "1.2.6",
+    "test_desc": "Ensure that the --kubelet-certificate-authority argument is set as appropriate",
+    "audit": "cat /etc/kubernetes/manifests/kube-apiserver.yaml | grep kubelet-certificate-authority",
+    "AuditConfig": "",
+    "type": "",
+    "remediation": "Follow the Kubernetes documentation and setup the TLS connection between the apiserver and kubelets.\nEdit the API server pod specification file /etc/kubernetes/manifests/kube-apiserver.yaml on the control plane node and set the --kubelet-certificate-authority parameter to the path to the cert file for the certificate authority.",
+    "test_info": [
+      "Ensure that the --kubelet-certificate-authority argument is set as appropriate"
+    ],
+    "status": "WARN",
+    "actual_value": "",
+    "scored": false,
+    "IsMultiple": false,
+    "expected_result": "--kubelet-certificate-authority is present"
+  },
+  {
+    "test_number": "1.1.2",
+    "test_desc": "Ensure that the API server pod specification file ownership is set to root:root",
+    "audit": "stat -c %U:%G /etc/kubernetes/manifests/kube-apiserver.yaml",
+    "AuditConfig": "",
+    "type": "",
+    "remediation": "Run the below command on the control plane node.\nchown root:root /etc/kubernetes/manifests/kube-apiserver.yaml",
+    "test_info": [
+      "Ensure that the API server pod specification file ownership is set to root:root"
+    ],
+    "status": "PASS",
+    "actual_value": "root:root",
+    "scored": true,
+    "IsMultiple": false,
+    "expected_result": "ownership is set to root:root"
+  }
+]

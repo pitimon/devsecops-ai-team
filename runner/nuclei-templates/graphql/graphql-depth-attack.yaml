@@ -1,0 +1,40 @@
+id: graphql-depth-attack
+
+info:
+  name: GraphQL Query Depth Limit Missing
+  author: devsecops-ai-team
+  severity: high
+  description: GraphQL endpoint does not enforce query depth limiting, allowing attackers to craft deeply nested queries that exhaust server resources
+  tags: graphql,depth-attack,dos,complexity
+  reference:
+    - https://owasp.org/API-Security/editions/2023/en/0xa4-unrestricted-resource-consumption/
+  metadata:
+    cwe: CWE-400
+    owasp: A04:2021
+
+http:
+  - method: POST
+    path:
+      - "{{BaseURL}}/graphql"
+      - "{{BaseURL}}/api/graphql"
+    headers:
+      Content-Type: application/json
+    body: '{"query":"{__schema{types{fields{type{fields{type{fields{type{fields{type{fields{type{name}}}}}}}}}}}}"}'
+    matchers-condition: and
+    matchers:
+      - type: word
+        words:
+          - "depth"
+          - "complexity"
+          - "too many"
+          - "limit"
+        condition: or
+        negative: true
+      - type: word
+        words:
+          - "__schema"
+          - "types"
+        condition: or
+      - type: status
+        status:
+          - 200

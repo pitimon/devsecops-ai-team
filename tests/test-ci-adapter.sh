@@ -158,7 +158,7 @@ for g in d['groups'].values():
     tools.extend(g['tools'])
 print(len(tools))
 " 2>/dev/null)
-[ "$TOTAL_TOOLS" = "7" ] && pass "all 7 tools in concurrency groups" || fail "expected 7 tools, got $TOTAL_TOOLS"
+[ "$TOTAL_TOOLS" = "8" ] && pass "all 8 tools in concurrency groups" || fail "expected 8 tools, got $TOTAL_TOOLS"
 
 # ─── Pipeline Runner Tests ───
 echo ""
