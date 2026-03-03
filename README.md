@@ -1,7 +1,7 @@
 <p align="center">
   <img src="https://img.shields.io/badge/Claude_Code-Plugin-blueviolet?style=for-the-badge&logo=anthropic" alt="Claude Code Plugin">
   <img src="https://img.shields.io/badge/Version-2.6.1-brightgreen?style=for-the-badge" alt="v2.6.1">
-  <img src="https://img.shields.io/badge/Tests-770%2B-success?style=for-the-badge" alt="Tests">
+  <img src="https://img.shields.io/badge/Tests-793%2B-success?style=for-the-badge" alt="Tests">
   <img src="https://img.shields.io/badge/License-MIT-yellow?style=for-the-badge" alt="MIT License">
 </p>
 
