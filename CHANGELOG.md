@@ -7,6 +7,27 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [3.1.0] — 2026-03-03
+
+### Added
+
+- **Professional README redesign** — Commercial-grade product presentation (1,071 → 615 lines), condensed for 2-minute scanability
+- **Quick Start guide** (`docs/QUICK-START.md`) — Install to first scan in 5 minutes with bilingual walkthrough
+- **First Scan Walkthrough** (`docs/FIRST-SCAN-WALKTHROUGH.md`) — Behind-the-scenes agent orchestration explained
+- **Demo scenarios** (`demo/`) — 3 presenter-ready demos (5/10/15 min) with bilingual talk track and FAQ
+- **Demo vulnerable project** (`tests/fixtures/demo-project/`) — Sample app with intentional vulnerabilities for onboarding
+- **Architecture reference** (`docs/ARCHITECTURE.md`) — Pipeline delegation and decision loop details
+- **Features reference** (`docs/FEATURES.md`) — Consolidated skills, agents, MCP, compliance, output formats
+- **Project structure reference** (`docs/PROJECT-STRUCTURE.md`) — Directory tree and file descriptions
+- **Service tiers** in README — Starter / Pro / Enterprise consulting + training offerings
+
+### Fixed
+
+- README version reference 3.0.3 → 3.0.4 in executive summary
+- CLAUDE.md formatters list missing Dashboard (7 → 8 formats)
+- INSTALL.md MCP tools incomplete (5 → 10 tools listed)
+- SECURITY.md missing v3.0.x support, deprecated v1.0.x
+
 ## [3.0.4] — 2026-03-03
 
 ### Fixed

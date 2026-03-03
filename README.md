@@ -1,6 +1,6 @@
 <p align="center">
   <img src="https://img.shields.io/badge/Claude_Code-Plugin-blueviolet?style=for-the-badge&logo=anthropic" alt="Claude Code Plugin">
-  <img src="https://img.shields.io/badge/Version-3.0.4-brightgreen?style=for-the-badge" alt="v3.0.4">
+  <img src="https://img.shields.io/badge/Version-3.1.0-brightgreen?style=for-the-badge" alt="v3.1.0">
   <img src="https://img.shields.io/badge/Tests-1302%2B-success?style=for-the-badge" alt="Tests">
   <img src="https://img.shields.io/badge/License-MIT-yellow?style=for-the-badge" alt="MIT License">
 </p>
@@ -37,7 +37,7 @@
 - [Executive Summary](#executive-summary)
 - [Key Highlights](#key-highlights)
 - [OWASP Top 10 Coverage](#owasp-top-10-coverage)
-- [What's New (v3.0.4)](#whats-new)
+- [What's New (v3.1.0)](#whats-new)
 - [Use Cases](#use-cases)
 - [Why DevSecOps AI Team?](#why-devsecops-ai-team)
 - [Quick Start](#quick-start)
@@ -110,9 +110,22 @@
 
 ## What's New
 
-> ดู [CHANGELOG.md](CHANGELOG.md) สำหรับรายละเอียดทั้งหมด (v1.0.0 → v3.0.4)
+> ดู [CHANGELOG.md](CHANGELOG.md) สำหรับรายละเอียดทั้งหมด (v1.0.0 → v3.1.0)
 
-### v3.0.4 — Platform Release (Latest)
+### v3.1.0 — Commercial Ready (Latest)
+
+- **Professional README Redesign** — Commercial-grade product presentation (1,071 → 615 lines)
+- **Quick Start Guide** — Install to first scan in 5 minutes ([docs/QUICK-START.md](docs/QUICK-START.md))
+- **First Scan Walkthrough** — Behind-the-scenes agent orchestration explained ([docs/FIRST-SCAN-WALKTHROUGH.md](docs/FIRST-SCAN-WALKTHROUGH.md))
+- **Demo Scenarios** — 3 presenter-ready demos (5/10/15 min) with bilingual talk track ([demo/](demo/))
+- **Demo Vulnerable Project** — Onboarding sample with intentional vulnerabilities ([tests/fixtures/demo-project/](tests/fixtures/demo-project/))
+- **Service Tiers** — Starter / Pro / Enterprise consulting + training offerings
+- **Consolidated Documentation** — Architecture, Features, Project Structure extracted to dedicated docs
+
+<details>
+<summary>Previous versions</summary>
+
+### v3.0.4 — Platform Release
 
 - **SQLite Historical Database** — `scripts/scan-db.sh` with 7 subcommands for persistent scan tracking and trend analysis
 - **DAG Pipeline Engine** — `runner/pipeline-engine.sh` with topological sort and 4 built-in pipeline definitions
@@ -121,9 +134,6 @@
 - **GraphQL Security Scanning** — `/graphql-scan` skill with 8 Semgrep rules + 4 Nuclei templates
 - **2 New MCP Tools** — `devsecops_history` and `devsecops_pipeline` (10 total)
 - **84 Custom Semgrep Rules** — +16 new rules (8 K8s + 8 GraphQL)
-
-<details>
-<summary>Previous versions</summary>
 
 ### v2.8.0 — Supply Chain Compliance + OWASP 10/10
 
@@ -559,7 +569,7 @@ DevSecOps AI Team พร้อมให้บริการ consulting, impleme
 | [FRAMEWORK-UPDATE-RUNBOOK.md](docs/FRAMEWORK-UPDATE-RUNBOOK.md) | ขั้นตอนอัพเดท framework versions                   |
 | [MANDAY-ESTIMATION.md](docs/MANDAY-ESTIMATION.md)               | ROI analysis + cost comparison (10,222% ROI)       |
 | [CLAUDE.md](CLAUDE.md)                                          | Architecture + contributing guidelines             |
-| [CHANGELOG.md](CHANGELOG.md)                                    | Version history (v1.0.0 → v3.0.4)                  |
+| [CHANGELOG.md](CHANGELOG.md)                                    | Version history (v1.0.0 → v3.1.0)                  |
 | [SECURITY.md](SECURITY.md)                                      | Vulnerability reporting policy                     |
 
 ---
@@ -591,7 +601,8 @@ DevSecOps AI Team พร้อมให้บริการ consulting, impleme
 | v2.6.x  | Released    | CI/CD           | GitHub Actions, GitLab CI, SARIF per-tool, MCP bundle, tech debt |
 | v2.7.0  | Released    | OWASP 2025      | Dual mapping, 53 rules, Nuclei, NCSA 1.0, PDPA                   |
 | v2.8.0  | Released    | Supply Chain    | SLSA, VEX, 10/10 OWASP rules, SOC 2, ISO 27001, TruffleHog       |
-| v3.0.4  | **Current** | Platform        | SQLite DB, DAG pipeline, dashboard, K8s scan, GraphQL scan       |
+| v3.0.x  | Released    | Platform        | SQLite DB, DAG pipeline, dashboard, K8s scan, GraphQL scan       |
+| v3.1.0  | **Current** | Commercial      | README redesign, onboarding, demos, service tiers                |
 
 > ดูรายละเอียด roadmap ทั้งหมดได้ที่ [docs/PRD.md](docs/PRD.md)
 
