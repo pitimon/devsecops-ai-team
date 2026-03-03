@@ -20,7 +20,7 @@ echo ""
 COMPOSE="$ROOT_DIR/runner/docker-compose.yml"
 DISPATCHER="$ROOT_DIR/runner/job-dispatcher.sh"
 NORMALIZER="$ROOT_DIR/formatters/json-normalizer.sh"
-FIXTURE="$ROOT_DIR/tests/fixtures/sample-trufflehog.json"
+FIXTURE="$ROOT_DIR/tests/fixtures/sample-trufflehog.jsonl"
 SKILL="$ROOT_DIR/skills/secret-scan/SKILL.md"
 
 # ═══════════════════════════════════════════
@@ -175,8 +175,8 @@ echo ""
 echo "--- Section 5: Fixture Validation ---"
 
 [ -f "$FIXTURE" ] \
-  && pass "sample-trufflehog.json fixture exists" \
-  || fail "sample-trufflehog.json fixture missing"
+  && pass "sample-trufflehog.jsonl fixture exists" \
+  || fail "sample-trufflehog.jsonl fixture missing"
 
 # Validate each line is valid JSON
 python3 -c "
