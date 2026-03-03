@@ -4,7 +4,7 @@ This file provides guidance to Claude Code when working with this repository.
 
 ## What This Is
 
-A Claude Code **plugin skill pack** (`devsecops-ai-team`) distributed via the `pitimon-devsecops` marketplace. It provides 18 AI agents and 13 skills for enterprise DevSecOps security scanning across the full pipeline (SAST, DAST, SCA, Container, IaC, Secrets, SBOM, Compliance, IR) using open-source tools in Docker containers.
+A Claude Code **plugin skill pack** (`devsecops-ai-team`) distributed via the `pitimon-devsecops` marketplace. It provides 18 AI agents and 14 skills for enterprise DevSecOps security scanning across the full pipeline (SAST, DAST, SCA, Container, IaC, Secrets, SBOM, Compliance, IR, SLSA) using open-source tools in Docker containers.
 
 There are no build/lint/test commands for source code — this is a pure markdown/JSON/shell skill definition repository.
 
@@ -18,30 +18,30 @@ User prompt → keyword match in SKILL.md frontmatter
   → Agent loads reference file from skills/references/
   → job-dispatcher.sh routes to Docker container tool
   → result-collector.sh normalizes output
-  → Formatter produces SARIF/JSON/MD/HTML/PDF/CSV
+  → Formatter produces SARIF/JSON/MD/HTML/PDF/CSV/VEX
 ```
 
 ### Three Layers
 
 1. **Plugin metadata** (`.claude-plugin/`) — Marketplace and plugin identity
-2. **Skills + Agents** (`skills/`, `agents/`) — 13 skills and 18 agents
+2. **Skills + Agents** (`skills/`, `agents/`) — 14 skills and 18 agents
 3. **Sidecar Runner** (`runner/`) — Docker container orchestration for security tools
 
 ### Key Files
 
-| File                              | Role                                                |
-| --------------------------------- | --------------------------------------------------- |
-| `.claude-plugin/plugin.json`      | Plugin manifest (name, version, skills path)        |
-| `.claude-plugin/marketplace.json` | Marketplace registry entry                          |
-| `skills/*/SKILL.md`               | Skill definitions (13 skills)                       |
-| `skills/references/*.md`          | On-demand domain knowledge (16 files)               |
-| `agents/*/`                       | Agent definitions (18 agents in 4 groups)           |
-| `hooks/hooks.json`                | Hook registrations (3 hooks)                        |
-| `runner/`                         | Sidecar Runner (Dockerfile, compose, scripts)       |
-| `formatters/`                     | Output formatters (SARIF, JSON, MD, HTML, PDF, CSV) |
-| `mappings/`                       | Compliance mappings (CWE to OWASP/NIST/MITRE/NCSA)  |
-| `frameworks.json`                 | Framework version tracking (16 frameworks)          |
-| `ci-templates/`                   | CI templates for GitHub Actions and GitLab CI       |
+| File                              | Role                                                             |
+| --------------------------------- | ---------------------------------------------------------------- |
+| `.claude-plugin/plugin.json`      | Plugin manifest (name, version, skills path)                     |
+| `.claude-plugin/marketplace.json` | Marketplace registry entry                                       |
+| `skills/*/SKILL.md`               | Skill definitions (14 skills)                                    |
+| `skills/references/*.md`          | On-demand domain knowledge (17 files)                            |
+| `agents/*/`                       | Agent definitions (18 agents in 4 groups)                        |
+| `hooks/hooks.json`                | Hook registrations (3 hooks)                                     |
+| `runner/`                         | Sidecar Runner (Dockerfile, compose, scripts)                    |
+| `formatters/`                     | Output formatters (SARIF, JSON, MD, HTML, PDF, CSV, VEX)         |
+| `mappings/`                       | Compliance mappings (CWE to OWASP/NIST/MITRE/NCSA/SOC2/ISO27001) |
+| `frameworks.json`                 | Framework version tracking (19 frameworks)                       |
+| `ci-templates/`                   | CI templates for GitHub Actions and GitLab CI                    |
 
 ### Agent Groups
 
@@ -54,15 +54,17 @@ User prompt → keyword match in SKILL.md frontmatter
 
 ### Tools (Docker containers)
 
-| Tool     | Purpose   | Image                            |
-| -------- | --------- | -------------------------------- |
-| Semgrep  | SAST      | `returntocorp/semgrep:latest`    |
-| ZAP      | DAST      | `ghcr.io/zaproxy/zaproxy:stable` |
-| Grype    | SCA       | `anchore/grype:latest`           |
-| Trivy    | Container | `aquasec/trivy:latest`           |
-| Checkov  | IaC       | `bridgecrew/checkov:latest`      |
-| GitLeaks | Secrets   | `zricethezav/gitleaks:latest`    |
-| Syft     | SBOM      | `anchore/syft:latest`            |
+| Tool       | Purpose   | Image                               |
+| ---------- | --------- | ----------------------------------- |
+| Semgrep    | SAST      | `returntocorp/semgrep:latest`       |
+| ZAP        | DAST      | `ghcr.io/zaproxy/zaproxy:stable`    |
+| Nuclei     | DAST      | `projectdiscovery/nuclei:latest`    |
+| Grype      | SCA       | `anchore/grype:latest`              |
+| Trivy      | Container | `aquasec/trivy:latest`              |
+| Checkov    | IaC       | `bridgecrew/checkov:latest`         |
+| GitLeaks   | Secrets   | `zricethezav/gitleaks:latest`       |
+| TruffleHog | Secrets   | `trufflesecurity/trufflehog:latest` |
+| Syft       | SBOM      | `anchore/syft:latest`               |
 
 ## Critical Naming Conventions
 
