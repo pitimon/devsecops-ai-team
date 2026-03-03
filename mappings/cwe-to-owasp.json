@@ -606,6 +606,16 @@
       "owasp": ["A05:2021", "A05:2025"],
       "category": "Security Misconfiguration",
       "name": "Improper Restriction of Rendered UI Layers or Frames"
+    },
+    "CWE-521": {
+      "owasp": ["A07:2021", "A07:2025"],
+      "category": "Identification and Authentication Failures",
+      "name": "Weak Password Requirements"
+    },
+    "CWE-640": {
+      "owasp": ["A07:2021", "A07:2025"],
+      "category": "Identification and Authentication Failures",
+      "name": "Weak Password Recovery Mechanism for Forgotten Password"
     }
   }
 }
