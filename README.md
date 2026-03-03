@@ -1,6 +1,6 @@
 <p align="center">
   <img src="https://img.shields.io/badge/Claude_Code-Plugin-blueviolet?style=for-the-badge&logo=anthropic" alt="Claude Code Plugin">
-  <img src="https://img.shields.io/badge/Version-2.7.0-brightgreen?style=for-the-badge" alt="v2.7.0">
+  <img src="https://img.shields.io/badge/Version-2.8.0-brightgreen?style=for-the-badge" alt="v2.8.0">
   <img src="https://img.shields.io/badge/Tests-978%2B-success?style=for-the-badge" alt="Tests">
   <img src="https://img.shields.io/badge/License-MIT-yellow?style=for-the-badge" alt="MIT License">
 </p>
@@ -37,7 +37,7 @@
 - [Executive Summary](#executive-summary)
 - [Key Highlights](#key-highlights)
 - [OWASP Top 10 Coverage](#owasp-top-10-coverage)
-- [What's New (v2.7.0)](#whats-new)
+- [What's New (v2.8.0)](#whats-new)
 - [Use Cases](#use-cases)
 - [Quick Start](#quick-start)
 - [Architecture Overview](#architecture-overview)
@@ -117,9 +117,9 @@
 
 ## What's New
 
-> ดู [CHANGELOG.md](CHANGELOG.md) สำหรับรายละเอียดทั้งหมด (v1.0.0 → v2.7.0)
+> ดู [CHANGELOG.md](CHANGELOG.md) สำหรับรายละเอียดทั้งหมด (v1.0.0 → v2.8.0)
 
-### v2.7.0 — OWASP 2025, Nuclei DAST, PDPA Compliance (Latest)
+### v2.8.0 — OWASP 2025, Nuclei DAST, PDPA Compliance (Latest)
 
 - **OWASP Top 10 2025** — dual-version mapping (2021+2025) across all 120 CWEs, 4 new rule sets (A02/A04/A05/A10-exception)
 - **53 Custom Semgrep Rules** — was 33, added A02 Cryptographic Failures (6), A04 Insecure Design (4), A05 Misconfiguration (6), A10 Exception Handling (4)
@@ -929,7 +929,7 @@ devsecops-ai-team/
 | [FRAMEWORK-UPDATE-RUNBOOK.md](docs/FRAMEWORK-UPDATE-RUNBOOK.md) | ขั้นตอนอัพเดท framework versions                   |
 | [MANDAY-ESTIMATION.md](docs/MANDAY-ESTIMATION.md)               | ROI analysis + cost comparison (10,222% ROI)       |
 | [CLAUDE.md](CLAUDE.md)                                          | Architecture + contributing guidelines             |
-| [CHANGELOG.md](CHANGELOG.md)                                    | Version history (v1.0.0 → v2.7.0)                  |
+| [CHANGELOG.md](CHANGELOG.md)                                    | Version history (v1.0.0 → v2.8.0)                  |
 | [SECURITY.md](SECURITY.md)                                      | Vulnerability reporting policy                     |
 
 ---
@@ -1003,7 +1003,7 @@ claude-governance (base)          devsecops-ai-team (extends)
 | v2.4.0  | Released    | Detection       | A09 custom rules, ZAP multi-mode, NCSA validator                 |
 | v2.5.0  | Released    | Rules & MCP     | 33 rules (A01/A03/A09/A10), 3 MCP tools, PDF/CSV                 |
 | v2.6.x  | Released    | CI/CD           | GitHub Actions, GitLab CI, SARIF per-tool, MCP bundle, tech debt |
-| v2.7.0  | **Current** | OWASP 2025      | Dual mapping, 53 rules, Nuclei, NCSA 1.0, PDPA                   |
+| v2.8.0  | **Current** | OWASP 2025      | Dual mapping, 53 rules, Nuclei, NCSA 1.0, PDPA                   |
 | v2.8.0  | Planned     | Supply Chain    | SLSA, VEX, 10/10 OWASP rules, SOC 2                              |
 | v3.0.0  | Planned     | Platform        | Historical DB, dashboard UI, K8s, GraphQL                        |
 
