@@ -15,7 +15,7 @@ fi
 INPUT=$(cat)
 
 # Extract content to scan based on tool type
-TOOL_NAME=$(echo "$INPUT" | grep -o '"tool_name":"[^"]*"' | head -1 | cut -d'"' -f4)
+TOOL_NAME=$(echo "$INPUT" | python3 -c "import sys,json; print(json.load(sys.stdin).get('tool_name',''))" 2>/dev/null || echo "")
 
 CONTENT=""
 case "$TOOL_NAME" in

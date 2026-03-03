@@ -50,9 +50,9 @@ done
 
 # ─── Section 3: Skills ───
 echo ""
-echo "--- Section 3: Skills (13 expected) ---"
-
 EXPECTED_SKILLS="devsecops-setup sast-scan dast-scan sca-scan container-scan iac-scan secret-scan sbom-generate full-pipeline compliance-report incident-response security-gate auto-fix"
+EXPECTED_SKILL_COUNT=$(echo $EXPECTED_SKILLS | wc -w | tr -d ' ')
+echo "--- Section 3: Skills ($EXPECTED_SKILL_COUNT expected) ---"
 SKILL_COUNT=0
 for skill in $EXPECTED_SKILLS; do
   if [ -f "$ROOT_DIR/skills/$skill/SKILL.md" ]; then
@@ -67,11 +67,12 @@ for skill in $EXPECTED_SKILLS; do
     fail "skill $skill missing"
   fi
 done
-[ "$SKILL_COUNT" -eq 13 ] && pass "all 13 skills present" || fail "expected 13 skills, found $SKILL_COUNT"
+[ "$SKILL_COUNT" -eq "$EXPECTED_SKILL_COUNT" ] && pass "all $EXPECTED_SKILL_COUNT skills present" || fail "expected $EXPECTED_SKILL_COUNT skills, found $SKILL_COUNT"
 
 # ─── Section 4: Agents ───
 echo ""
-echo "--- Section 4: Agents (18 expected) ---"
+EXPECTED_AGENT_COUNT=$(find "$ROOT_DIR/agents" -name '*.md' -type f | wc -l | tr -d ' ')
+echo "--- Section 4: Agents ($EXPECTED_AGENT_COUNT expected) ---"
 
 AGENT_COUNT=0
 for group in orchestrators specialists experts core-team; do
@@ -90,7 +91,7 @@ for group in orchestrators specialists experts core-team; do
     fail "agent group $group missing"
   fi
 done
-[ "$AGENT_COUNT" -eq 18 ] && pass "all 18 agents present" || fail "expected 18 agents, found $AGENT_COUNT"
+[ "$AGENT_COUNT" -eq "$EXPECTED_AGENT_COUNT" ] && pass "all $EXPECTED_AGENT_COUNT agents present" || fail "expected $EXPECTED_AGENT_COUNT agents, found $AGENT_COUNT"
 
 # ─── Section 5: Hooks ───
 echo ""
@@ -155,9 +156,10 @@ done
 
 # ─── Section 9: References ───
 echo ""
-echo "--- Section 9: Reference Files ---"
-
 EXPECTED_REFS="sast-patterns.md dast-methodology.md sca-supply-chain.md container-hardening.md iac-security-patterns.md secret-management.md compliance-frameworks.md threat-modeling.md incident-response.md remediation-patterns.md software-integrity.md logging-monitoring.md remediation-django.md remediation-react-nextjs.md remediation-express-node.md remediation-spring.md"
+EXPECTED_REF_COUNT=$(echo $EXPECTED_REFS | wc -w | tr -d ' ')
+echo "--- Section 9: Reference Files ($EXPECTED_REF_COUNT expected) ---"
+
 REF_COUNT=0
 for ref in $EXPECTED_REFS; do
   if [ -f "$ROOT_DIR/skills/references/$ref" ]; then
@@ -167,7 +169,7 @@ for ref in $EXPECTED_REFS; do
     fail "reference $ref missing"
   fi
 done
-[ "$REF_COUNT" -eq 16 ] && pass "all 16 reference files present" || fail "expected 16 references, found $REF_COUNT"
+[ "$REF_COUNT" -eq "$EXPECTED_REF_COUNT" ] && pass "all $EXPECTED_REF_COUNT reference files present" || fail "expected $EXPECTED_REF_COUNT references, found $REF_COUNT"
 
 # ─── Section 10: Templates & Examples ───
 echo ""
