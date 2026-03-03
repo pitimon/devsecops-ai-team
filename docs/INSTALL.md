@@ -145,7 +145,7 @@ bash tests/test-normalizer.sh
 # ตรวจสอบ MCP server (v2.0)
 bash tests/test-mcp-server.sh
 
-# ตรวจสอบ plugin structure (223 checks)
+# ตรวจสอบ plugin structure (276 checks)
 bash tests/validate-plugin.sh
 ```
 

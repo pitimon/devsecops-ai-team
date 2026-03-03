@@ -161,8 +161,10 @@ Claude Code / MCP Client ---- stdio ----> mcp/server.mjs
 | `devsecops_compliance`        | findings_file, frameworks     | cross-walk matrix            | Map findings ไปยัง OWASP/NIST/MITRE/NCSA    |
 | `devsecops_status`            | (none)                        | runner + images status       | ตรวจสอบ Docker + tool images ที่พร้อมใช้งาน |
 | `devsecops_compare`           | baseline_file, current_file   | new/fixed/unchanged + trend  | เปรียบเทียบ 2 ผลสแกน (trend analysis)       |
-| `devsecops_compliance_status` | findings_file                 | per-framework coverage       | สรุป compliance ข้าม 5 frameworks           |
+| `devsecops_compliance_status` | findings_file                 | per-framework coverage       | สรุป compliance ข้าม 7 frameworks           |
 | `devsecops_suggest_fix`       | cwe_id, rule_id, finding_file | remediation suggestions      | แนะนำวิธีแก้ไขจาก CWE/rule knowledge        |
+| `devsecops_history`           | query, limit                  | scan history records         | ค้นหาประวัติ scan จาก SQLite DB             |
+| `devsecops_pipeline`          | pipeline, target              | pipeline execution results   | รัน DAG pipeline กับหลาย tools พร้อมกัน     |
 
 ### ติดตั้ง MCP
 
@@ -222,7 +224,7 @@ Plugin นี้ map ผลลัพธ์จาก CWE ไปยัง complian
 
 ## Output Formats
 
-ผลลัพธ์จากทุก scan สามารถ export ได้ 7 รูปแบบ:
+ผลลัพธ์จากทุก scan สามารถ export ได้ 8 รูปแบบ:
 
 | Format           | ใช้ทำอะไร                                                       | ตัวอย่าง           |
 | ---------------- | --------------------------------------------------------------- | ------------------ |
@@ -233,6 +235,7 @@ Plugin นี้ map ผลลัพธ์จาก CWE ไปยัง complian
 | **PDF**          | Enterprise report สำหรับ audit / mgmt                           | `results.pdf`      |
 | **CSV**          | Import ลง spreadsheet / SIEM                                    | `results.csv`      |
 | **VEX**          | Vulnerability Exploitability eXchange (CycloneDX VEX + OpenVEX) | `results.vex.json` |
+| **Dashboard**    | Alpine.js + Chart.js self-contained HTML security dashboard     | `dashboard.html`   |
 
 ### Unified Finding Schema
 

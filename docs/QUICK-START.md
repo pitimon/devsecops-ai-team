@@ -46,7 +46,7 @@ claude plugin install devsecops-ai-team@pitimon-devsecops
 ถ้าเห็น DevSecOps AI Team context prompt แสดงว่าติดตั้งสำเร็จ ระบบจะแสดง:
 
 ```
-DevSecOps AI Team v3.0.4 — 18 agents, 16 skills, 11 tools
+DevSecOps AI Team v3.1.0 — 18 agents, 16 skills, 11 tools
 Type /sast-scan, /secret-scan, /full-pipeline, etc. to begin
 ```
 

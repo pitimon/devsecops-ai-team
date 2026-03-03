@@ -10,12 +10,12 @@
 
 **Responsibility**: เรียกใช้ security tools ผ่าน Docker containers, จัดการ custom rules, route jobs
 
-| Component                        | Role                                                      |
-| -------------------------------- | --------------------------------------------------------- |
-| `runner/job-dispatcher.sh`       | Routes scan requests to Docker containers                 |
-| `runner/docker-compose.yml`      | Tool container definitions with profiles                  |
-| `rules/*.yml`                    | Custom Semgrep rules (84 rules, 10 OWASP + K8s + GraphQL) |
-| `scripts/check-prerequisites.sh` | Validates tool availability                               |
+| Component                        | Role                                                                      |
+| -------------------------------- | ------------------------------------------------------------------------- |
+| `runner/job-dispatcher.sh`       | Routes scan requests to Docker containers                                 |
+| `runner/docker-compose.yml`      | Tool container definitions with profiles                                  |
+| `rules/*.yml`                    | Custom Semgrep rules (84 rules across 13 files: 10 OWASP + K8s + GraphQL) |
+| `scripts/check-prerequisites.sh` | Validates tool availability                                               |
 
 **Invariants**: Scan targets MUST be validated before execution. DAST targets MUST require explicit user approval (In-the-Loop).
 
@@ -54,14 +54,16 @@
 
 **Responsibility**: format findings เป็น output formats ที่หลากหลาย
 
-| Component                          | Role                      |
-| ---------------------------------- | ------------------------- |
-| `formatters/sarif-formatter.sh`    | SARIF v2.1.0 output       |
-| `formatters/json-formatter.sh`     | Structured JSON output    |
-| `formatters/markdown-formatter.sh` | Human-readable Markdown   |
-| `formatters/html-formatter.sh`     | Standalone HTML report    |
-| `formatters/pdf-formatter.sh`      | Enterprise PDF via pandoc |
-| `formatters/csv-formatter.sh`      | Spreadsheet CSV export    |
+| Component                           | Role                                         |
+| ----------------------------------- | -------------------------------------------- |
+| `formatters/sarif-formatter.sh`     | SARIF v2.1.0 output                          |
+| `formatters/json-formatter.sh`      | Structured JSON output                       |
+| `formatters/markdown-formatter.sh`  | Human-readable Markdown                      |
+| `formatters/html-formatter.sh`      | Standalone HTML report                       |
+| `formatters/pdf-formatter.sh`       | Enterprise PDF via pandoc                    |
+| `formatters/csv-formatter.sh`       | Spreadsheet CSV export                       |
+| `formatters/vex-formatter.sh`       | VEX output (CycloneDX VEX + OpenVEX)         |
+| `formatters/dashboard-generator.sh` | Alpine.js + Chart.js HTML security dashboard |
 
 **Invariants**: SARIF output MUST include `tool.driver.name` for GitHub Security tab categorization. Each tool MUST produce separate SARIF analysis (GitHub Jul 2025 change).
 
@@ -69,14 +71,14 @@
 
 **Responsibility**: coordinate AI agents, skills, MCP tools
 
-| Component               | Role                                                                       |
-| ----------------------- | -------------------------------------------------------------------------- |
-| `agents/orchestrators/` | 3 orchestrator agents (DevSecOps Lead, Job Dispatcher, Report Coordinator) |
-| `agents/specialists/`   | 7 specialist agents (tool-specific)                                        |
-| `agents/experts/`       | 4 expert agents (cross-cutting)                                            |
-| `agents/core-team/`     | 4 core team agents (QA, ops)                                               |
-| `skills/*/SKILL.md`     | 16 skill definitions                                                       |
-| `mcp/server.mjs`        | 10 MCP tools                                                               |
+| Component               | Role                                                                              |
+| ----------------------- | --------------------------------------------------------------------------------- |
+| `agents/orchestrators/` | 3 orchestrator agents (DevSecOps Lead, Security Stack Analyst, Team Configurator) |
+| `agents/specialists/`   | 7 specialist agents (tool-specific)                                               |
+| `agents/experts/`       | 4 expert agents (cross-cutting)                                                   |
+| `agents/core-team/`     | 4 core team agents (QA, ops)                                                      |
+| `skills/*/SKILL.md`     | 16 skill definitions                                                              |
+| `mcp/server.mjs`        | 10 MCP tools                                                                      |
 
 **Invariants**: Agent.decision_loop MUST be one of: out-of-loop, on-the-loop, in-the-loop. MCP tools MUST validate input via Zod schemas before execution.
 
@@ -98,24 +100,24 @@
 
 ### Finding
 
-| Field       | Type     | Constraints                                                   |
-| ----------- | -------- | ------------------------------------------------------------- |
-| id          | string   | Format: `FINDING-YYYYMMDD-NNN`, unique across all scans       |
-| source_tool | enum     | One of: semgrep, zap, grype, trivy, checkov, gitleaks, syft   |
-| scan_type   | enum     | One of: sast, dast, sca, container, iac, secret, sbom         |
-| severity    | enum     | One of: CRITICAL, HIGH, MEDIUM, LOW, INFO                     |
-| confidence  | enum     | One of: HIGH, MEDIUM, LOW                                     |
-| title       | string   | Human-readable summary, max 200 chars                         |
-| description | string   | Detailed explanation with context                             |
-| cwe_id      | string   | Format: `CWE-NNN`, nullable                                   |
-| cvss_score  | float    | 0.0-10.0, nullable (for SCA/container findings)               |
-| location    | Location | Where the finding was detected                                |
-| compliance  | object   | Framework mappings (OWASP, NIST, MITRE, NCSA)                 |
-| owasp_2025  | string   | OWASP Top 10 2025 category (dual-tagging with 2021), nullable |
-| remediation | object   | Fix guidance with code examples                               |
-| status      | enum     | One of: open, suppressed, fixed, false_positive               |
-| first_seen  | datetime | ISO 8601, when first detected                                 |
-| scan_id     | string   | Links to parent ScanRun                                       |
+| Field       | Type     | Constraints                                                                                 |
+| ----------- | -------- | ------------------------------------------------------------------------------------------- |
+| id          | string   | Format: `FINDING-YYYYMMDD-NNN`, unique across all scans                                     |
+| source_tool | enum     | One of: semgrep, zap, grype, trivy, checkov, gitleaks, syft, nuclei, trufflehog, kube-bench |
+| scan_type   | enum     | One of: sast, dast, sca, container, iac, secret, sbom                                       |
+| severity    | enum     | One of: CRITICAL, HIGH, MEDIUM, LOW, INFO                                                   |
+| confidence  | enum     | One of: HIGH, MEDIUM, LOW                                                                   |
+| title       | string   | Human-readable summary, max 200 chars                                                       |
+| description | string   | Detailed explanation with context                                                           |
+| cwe_id      | string   | Format: `CWE-NNN`, nullable                                                                 |
+| cvss_score  | float    | 0.0-10.0, nullable (for SCA/container findings)                                             |
+| location    | Location | Where the finding was detected                                                              |
+| compliance  | object   | Framework mappings (OWASP, NIST, MITRE, NCSA, PDPA, SOC 2, ISO 27001)                       |
+| owasp_2025  | string   | OWASP Top 10 2025 category (dual-tagging with 2021), nullable                               |
+| remediation | object   | Fix guidance with code examples                                                             |
+| status      | enum     | One of: open, suppressed, fixed, false_positive                                             |
+| first_seen  | datetime | ISO 8601, when first detected                                                               |
+| scan_id     | string   | Links to parent ScanRun                                                                     |
 
 ### Location
 
@@ -214,13 +216,13 @@
 
 ### ComplianceStatus
 
-| Field          | Type     | Constraints                               |
-| -------------- | -------- | ----------------------------------------- |
-| framework      | string   | Framework name (OWASP, NIST, MITRE, NCSA) |
-| total_findings | int      | Total findings with CWE mapping           |
-| mapped_count   | int      | Findings mapped to this framework         |
-| coverage_pct   | float    | 0.0-100.0, mapped_count/total_findings    |
-| unmapped_cwes  | string[] | CWEs without framework mapping            |
+| Field          | Type     | Constraints                                                       |
+| -------------- | -------- | ----------------------------------------------------------------- |
+| framework      | string   | Framework name (OWASP, NIST, MITRE, NCSA, PDPA, SOC 2, ISO 27001) |
+| total_findings | int      | Total findings with CWE mapping                                   |
+| mapped_count   | int      | Findings mapped to this framework                                 |
+| coverage_pct   | float    | 0.0-100.0, mapped_count/total_findings                            |
+| unmapped_cwes  | string[] | CWEs without framework mapping                                    |
 
 ### RemediationSuggestion
 

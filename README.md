@@ -71,7 +71,7 @@
 | **Tests**                 | 1,302+ checks across 42 suites — all passing                                                                                                    |
 | **QA Rounds**             | 13 rounds, 75/75 latest (cumulative 1,300+ checks)                                                                                              |
 | **ROI**                   | 10,222% — 3,100 THB actual vs 320,000 THB equivalent (133x speed)                                                                               |
-| **Version**               | 3.0.4 (2026-03-03)                                                                                                                              |
+| **Version**               | 3.1.0 (2026-03-03)                                                                                                                              |
 
 ---
 
