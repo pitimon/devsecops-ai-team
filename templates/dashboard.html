@@ -1,0 +1,1063 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>DevSecOps Security Dashboard</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4"></script>
+    <script
+      defer
+      src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"
+    ></script>
+    <style>
+      :root {
+        --bg-primary: #ffffff;
+        --bg-secondary: #f8f9fa;
+        --bg-card: #ffffff;
+        --text-primary: #1a1a2e;
+        --text-secondary: #6c757d;
+        --border: #dee2e6;
+        --accent: #4361ee;
+        --accent-hover: #3a56d4;
+        --critical: #dc3545;
+        --high: #fd7e14;
+        --medium: #ffc107;
+        --low: #20c997;
+        --info: #6c757d;
+        --shadow: rgba(0, 0, 0, 0.08);
+        --modal-overlay: rgba(0, 0, 0, 0.5);
+      }
+      .dark {
+        --bg-primary: #1a1a2e;
+        --bg-secondary: #16213e;
+        --bg-card: #1e2a4a;
+        --text-primary: #e0e0e0;
+        --text-secondary: #a0a0a0;
+        --border: #2d2d44;
+        --shadow: rgba(0, 0, 0, 0.3);
+        --modal-overlay: rgba(0, 0, 0, 0.7);
+      }
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+      body {
+        font-family:
+          -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+        background: var(--bg-primary);
+        color: var(--text-primary);
+        line-height: 1.6;
+        transition:
+          background 0.3s,
+          color 0.3s;
+      }
+      /* Header */
+      .header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 1rem 2rem;
+        background: var(--bg-secondary);
+        border-bottom: 1px solid var(--border);
+      }
+      .header h1 {
+        font-size: 1.4rem;
+        font-weight: 700;
+      }
+      .header-meta {
+        font-size: 0.85rem;
+        color: var(--text-secondary);
+      }
+      .dark-toggle {
+        background: var(--accent);
+        color: #fff;
+        border: none;
+        padding: 0.4rem 1rem;
+        border-radius: 6px;
+        cursor: pointer;
+        font-size: 0.85rem;
+      }
+      .dark-toggle:hover {
+        background: var(--accent-hover);
+      }
+      /* Filter bar */
+      .filter-bar {
+        display: flex;
+        gap: 1rem;
+        padding: 0.75rem 2rem;
+        background: var(--bg-secondary);
+        border-bottom: 1px solid var(--border);
+        flex-wrap: wrap;
+        align-items: center;
+      }
+      .filter-bar label {
+        font-size: 0.8rem;
+        color: var(--text-secondary);
+        font-weight: 600;
+      }
+      .filter-bar select {
+        padding: 0.35rem 0.75rem;
+        border: 1px solid var(--border);
+        border-radius: 4px;
+        background: var(--bg-card);
+        color: var(--text-primary);
+        font-size: 0.85rem;
+      }
+      .filter-group {
+        display: flex;
+        align-items: center;
+        gap: 0.4rem;
+      }
+      /* Grid */
+      .dashboard-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 1.25rem;
+        padding: 1.5rem 2rem;
+      }
+      @media (max-width: 1024px) {
+        .dashboard-grid {
+          grid-template-columns: repeat(2, 1fr);
+        }
+      }
+      @media (max-width: 640px) {
+        .dashboard-grid {
+          grid-template-columns: 1fr;
+        }
+      }
+      .panel {
+        background: var(--bg-card);
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        padding: 1.25rem;
+        box-shadow: 0 2px 8px var(--shadow);
+      }
+      .panel-title {
+        font-size: 0.9rem;
+        font-weight: 700;
+        margin-bottom: 1rem;
+        color: var(--text-primary);
+        border-bottom: 2px solid var(--accent);
+        padding-bottom: 0.5rem;
+      }
+      /* Pipeline flow */
+      .pipeline-nodes {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+        align-items: center;
+      }
+      .pipeline-node {
+        display: flex;
+        align-items: center;
+        gap: 0.4rem;
+        padding: 0.4rem 0.75rem;
+        border-radius: 6px;
+        font-size: 0.8rem;
+        font-weight: 600;
+        border: 1px solid var(--border);
+        background: var(--bg-secondary);
+      }
+      .pipeline-arrow {
+        color: var(--text-secondary);
+        font-size: 1rem;
+      }
+      .status-badge {
+        display: inline-block;
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+      }
+      .status-pass {
+        background: var(--low);
+      }
+      .status-fail {
+        background: var(--critical);
+      }
+      .status-skip {
+        background: var(--info);
+      }
+      .status-running {
+        background: var(--medium);
+        animation: pulse 1.5s infinite;
+      }
+      @keyframes pulse {
+        0%,
+        100% {
+          opacity: 1;
+        }
+        50% {
+          opacity: 0.4;
+        }
+      }
+      /* Charts */
+      .chart-container {
+        position: relative;
+        width: 100%;
+        max-height: 260px;
+      }
+      .chart-container canvas {
+        max-height: 260px;
+      }
+      /* Table */
+      .results-table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 0.82rem;
+      }
+      .results-table th,
+      .results-table td {
+        padding: 0.5rem 0.6rem;
+        text-align: left;
+        border-bottom: 1px solid var(--border);
+      }
+      .results-table th {
+        font-weight: 700;
+        color: var(--text-secondary);
+        font-size: 0.75rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+      }
+      .results-table tr {
+        cursor: pointer;
+        transition: background 0.15s;
+      }
+      .results-table tr:hover {
+        background: var(--bg-secondary);
+      }
+      .sev-critical {
+        color: var(--critical);
+        font-weight: 700;
+      }
+      .sev-high {
+        color: var(--high);
+        font-weight: 700;
+      }
+      .sev-medium {
+        color: var(--medium);
+        font-weight: 700;
+      }
+      .sev-low {
+        color: var(--low);
+        font-weight: 700;
+      }
+      /* Compliance heatmap */
+      .heatmap-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+        gap: 0.6rem;
+      }
+      .heatmap-cell {
+        padding: 0.75rem;
+        border-radius: 6px;
+        text-align: center;
+        font-size: 0.8rem;
+        font-weight: 600;
+        transition: transform 0.15s;
+      }
+      .heatmap-cell:hover {
+        transform: scale(1.05);
+      }
+      .heatmap-label {
+        font-size: 0.7rem;
+        color: var(--text-secondary);
+        margin-top: 0.2rem;
+      }
+      .heatmap-value {
+        font-size: 1.3rem;
+      }
+      /* Modal */
+      .modal-overlay {
+        position: fixed;
+        inset: 0;
+        background: var(--modal-overlay);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 1000;
+        padding: 2rem;
+      }
+      .modal-content {
+        background: var(--bg-card);
+        border: 1px solid var(--border);
+        border-radius: 10px;
+        padding: 1.5rem;
+        max-width: 640px;
+        width: 100%;
+        max-height: 80vh;
+        overflow-y: auto;
+        box-shadow: 0 8px 32px var(--shadow);
+      }
+      .modal-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 1rem;
+        border-bottom: 1px solid var(--border);
+        padding-bottom: 0.75rem;
+      }
+      .modal-header h3 {
+        font-size: 1rem;
+      }
+      .modal-close {
+        background: none;
+        border: none;
+        font-size: 1.5rem;
+        cursor: pointer;
+        color: var(--text-secondary);
+        line-height: 1;
+      }
+      .modal-close:hover {
+        color: var(--text-primary);
+      }
+      .detail-row {
+        display: flex;
+        gap: 0.5rem;
+        margin-bottom: 0.5rem;
+        font-size: 0.85rem;
+      }
+      .detail-label {
+        font-weight: 700;
+        min-width: 90px;
+        color: var(--text-secondary);
+      }
+      .detail-value {
+        color: var(--text-primary);
+        word-break: break-all;
+      }
+      pre.raw-json {
+        background: var(--bg-secondary);
+        border: 1px solid var(--border);
+        border-radius: 4px;
+        padding: 0.75rem;
+        font-size: 0.75rem;
+        overflow-x: auto;
+        margin-top: 0.75rem;
+        max-height: 200px;
+        overflow-y: auto;
+      }
+      /* Utility */
+      .severity-tag {
+        display: inline-block;
+        padding: 0.15rem 0.5rem;
+        border-radius: 4px;
+        font-size: 0.75rem;
+        font-weight: 700;
+        color: #fff;
+      }
+      .severity-tag.critical {
+        background: var(--critical);
+      }
+      .severity-tag.high {
+        background: var(--high);
+      }
+      .severity-tag.medium {
+        background: var(--medium);
+        color: #333;
+      }
+      .severity-tag.low {
+        background: var(--low);
+      }
+      .severity-tag.info {
+        background: var(--info);
+      }
+      .text-muted {
+        color: var(--text-secondary);
+        font-size: 0.8rem;
+      }
+      .empty-state {
+        text-align: center;
+        color: var(--text-secondary);
+        padding: 2rem;
+        font-size: 0.85rem;
+      }
+    </style>
+  </head>
+  <body>
+    <div x-data="dashboard()" x-init="init()">
+      <!-- Header -->
+      <div class="header">
+        <div>
+          <h1>DevSecOps Security Dashboard</h1>
+          <span
+            class="header-meta"
+            x-text="'Scan: ' + (scanData.scan_id || 'N/A') + ' | Target: ' + (scanData.target || 'N/A') + ' | ' + (scanData.finished_at || '')"
+          ></span>
+        </div>
+        <button
+          class="dark-toggle"
+          @click="toggleDark()"
+          x-text="darkMode ? 'Light Mode' : 'Dark Mode'"
+        ></button>
+      </div>
+
+      <!-- Filter Bar -->
+      <div class="filter-bar">
+        <div class="filter-group">
+          <label>Severity:</label>
+          <select x-model="filters.severity" @change="applyFilters()">
+            <option value="all">All</option>
+            <option value="critical">Critical</option>
+            <option value="high">High</option>
+            <option value="medium">Medium</option>
+            <option value="low">Low</option>
+            <option value="info">Info</option>
+          </select>
+        </div>
+        <div class="filter-group">
+          <label>Tool:</label>
+          <select x-model="filters.tool" @change="applyFilters()">
+            <option value="all">All</option>
+            <template x-for="t in availableTools" :key="t">
+              <option :value="t" x-text="t"></option>
+            </template>
+          </select>
+        </div>
+        <div class="filter-group">
+          <label>Category:</label>
+          <select x-model="filters.category" @change="applyFilters()">
+            <option value="all">All</option>
+            <template x-for="cat in availableCategories" :key="cat">
+              <option :value="cat" x-text="cat"></option>
+            </template>
+          </select>
+        </div>
+        <div
+          class="text-muted"
+          x-text="filteredFindings.length + ' findings shown'"
+        ></div>
+      </div>
+
+      <!-- Dashboard Grid -->
+      <div class="dashboard-grid">
+        <!-- Panel 1: Pipeline Flow -->
+        <div class="panel">
+          <div class="panel-title">Pipeline Flow</div>
+          <div
+            class="pipeline-nodes"
+            x-show="pipelineData.nodes && pipelineData.nodes.length > 0"
+          >
+            <template
+              x-for="(node, idx) in pipelineData.nodes"
+              :key="node.name"
+            >
+              <span style="display: contents">
+                <span class="pipeline-node">
+                  <span
+                    class="status-badge"
+                    :class="{
+                  'status-pass': node.status === 'pass',
+                  'status-fail': node.status === 'fail',
+                  'status-skip': node.status === 'skip',
+                  'status-running': node.status === 'running'
+                }"
+                  ></span>
+                  <span x-text="node.name"></span>
+                  <span
+                    class="text-muted"
+                    x-show="node.duration"
+                    x-text="node.duration + 's'"
+                  ></span>
+                </span>
+                <span
+                  class="pipeline-arrow"
+                  x-show="idx < pipelineData.nodes.length - 1"
+                  >&#8594;</span
+                >
+              </span>
+            </template>
+          </div>
+          <div
+            class="empty-state"
+            x-show="!pipelineData.nodes || pipelineData.nodes.length === 0"
+          >
+            No pipeline data available
+          </div>
+        </div>
+
+        <!-- Panel 2: Severity Distribution -->
+        <div class="panel">
+          <div class="panel-title">Severity Distribution</div>
+          <div class="chart-container">
+            <canvas id="severityChart"></canvas>
+          </div>
+        </div>
+
+        <!-- Panel 3: OWASP Top 10 Coverage -->
+        <div class="panel">
+          <div class="panel-title">OWASP Top 10 Coverage</div>
+          <div class="chart-container">
+            <canvas id="owaspChart"></canvas>
+          </div>
+        </div>
+
+        <!-- Panel 4: Tool Results -->
+        <div class="panel">
+          <div class="panel-title">Tool Results</div>
+          <table class="results-table" x-show="toolSummary.length > 0">
+            <thead>
+              <tr>
+                <th>Tool</th>
+                <th>Total</th>
+                <th>Critical</th>
+                <th>High</th>
+                <th>Medium</th>
+                <th>Low</th>
+              </tr>
+            </thead>
+            <tbody>
+              <template x-for="row in toolSummary" :key="row.tool">
+                <tr>
+                  <td x-text="row.tool"></td>
+                  <td x-text="row.total"></td>
+                  <td class="sev-critical" x-text="row.critical"></td>
+                  <td class="sev-high" x-text="row.high"></td>
+                  <td class="sev-medium" x-text="row.medium"></td>
+                  <td class="sev-low" x-text="row.low"></td>
+                </tr>
+              </template>
+            </tbody>
+          </table>
+          <div class="empty-state" x-show="toolSummary.length === 0">
+            No tool results
+          </div>
+        </div>
+
+        <!-- Panel 5: Compliance Heatmap -->
+        <div class="panel">
+          <div class="panel-title">Compliance Heatmap</div>
+          <div
+            class="heatmap-grid"
+            x-show="scanData.compliance && scanData.compliance.length > 0"
+          >
+            <template x-for="fw in scanData.compliance" :key="fw.framework">
+              <div
+                class="heatmap-cell"
+                :style="'background:' + heatmapColor(fw.coverage)"
+              >
+                <div
+                  class="heatmap-value"
+                  x-text="Math.round(fw.coverage * 100) + '%'"
+                ></div>
+                <div
+                  class="heatmap-label"
+                  x-text="fw.framework.toUpperCase()"
+                ></div>
+              </div>
+            </template>
+          </div>
+          <div
+            class="empty-state"
+            x-show="!scanData.compliance || scanData.compliance.length === 0"
+          >
+            No compliance data available
+          </div>
+        </div>
+
+        <!-- Panel 6: Trend -->
+        <div class="panel">
+          <div class="panel-title">Trend (Findings over Time)</div>
+          <div class="chart-container">
+            <canvas id="trendChart"></canvas>
+          </div>
+          <div
+            class="empty-state"
+            x-show="!trendData.dates || trendData.dates.length === 0"
+            id="trendEmpty"
+          >
+            No trend data available
+          </div>
+        </div>
+      </div>
+
+      <!-- Findings Table -->
+      <div style="padding: 0 2rem 2rem">
+        <div class="panel">
+          <div class="panel-title">Findings Detail</div>
+          <table class="results-table" x-show="filteredFindings.length > 0">
+            <thead>
+              <tr>
+                <th>Severity</th>
+                <th>Rule ID</th>
+                <th>File</th>
+                <th>Tool</th>
+                <th>OWASP</th>
+              </tr>
+            </thead>
+            <tbody>
+              <template
+                x-for="finding in filteredFindings"
+                :key="finding.fingerprint || (finding.rule_id + finding.file + finding.line_start)"
+              >
+                <tr @click="showDetail(finding)">
+                  <td>
+                    <span
+                      class="severity-tag"
+                      :class="finding.severity"
+                      x-text="finding.severity"
+                    ></span>
+                  </td>
+                  <td x-text="finding.rule_id"></td>
+                  <td
+                    x-text="(finding.file || '') + (finding.line_start ? ':' + finding.line_start : '')"
+                  ></td>
+                  <td x-text="finding.source_tool"></td>
+                  <td
+                    x-text="Array.isArray(finding.owasp) ? finding.owasp.join(', ') : (finding.owasp || '-')"
+                  ></td>
+                </tr>
+              </template>
+            </tbody>
+          </table>
+          <div class="empty-state" x-show="filteredFindings.length === 0">
+            No findings match current filters
+          </div>
+        </div>
+      </div>
+
+      <!-- Finding Detail Modal -->
+      <div
+        class="modal-overlay"
+        x-show="showModal"
+        x-cloak
+        @click.self="showModal = false"
+        @keydown.escape.window="showModal = false"
+      >
+        <div class="modal-content">
+          <div class="modal-header">
+            <h3 x-text="selectedFinding ? selectedFinding.rule_id : ''"></h3>
+            <button class="modal-close" @click="showModal = false">
+              &times;
+            </button>
+          </div>
+          <template x-if="selectedFinding">
+            <div>
+              <div class="detail-row">
+                <span class="detail-label">Severity</span>
+                <span class="detail-value"
+                  ><span
+                    class="severity-tag"
+                    :class="selectedFinding.severity"
+                    x-text="selectedFinding.severity"
+                  ></span
+                ></span>
+              </div>
+              <div class="detail-row">
+                <span class="detail-label">Tool</span>
+                <span
+                  class="detail-value"
+                  x-text="selectedFinding.source_tool"
+                ></span>
+              </div>
+              <div class="detail-row">
+                <span class="detail-label">File</span>
+                <span
+                  class="detail-value"
+                  x-text="(selectedFinding.file || 'N/A') + (selectedFinding.line_start ? ':' + selectedFinding.line_start : '')"
+                ></span>
+              </div>
+              <div class="detail-row">
+                <span class="detail-label">CWE</span>
+                <span
+                  class="detail-value"
+                  x-text="selectedFinding.cwe || 'N/A'"
+                ></span>
+              </div>
+              <div class="detail-row">
+                <span class="detail-label">OWASP</span>
+                <span
+                  class="detail-value"
+                  x-text="Array.isArray(selectedFinding.owasp) ? selectedFinding.owasp.join(', ') : (selectedFinding.owasp || 'N/A')"
+                ></span>
+              </div>
+              <div class="detail-row">
+                <span class="detail-label">First Seen</span>
+                <span
+                  class="detail-value"
+                  x-text="selectedFinding.first_seen || 'N/A'"
+                ></span>
+              </div>
+              <div class="detail-row">
+                <span class="detail-label">Triage</span>
+                <span
+                  class="detail-value"
+                  x-text="selectedFinding.triage || 'open'"
+                ></span>
+              </div>
+              <div class="detail-row" x-show="selectedFinding.suggestion">
+                <span class="detail-label">Suggestion</span>
+                <span
+                  class="detail-value"
+                  x-text="selectedFinding.suggestion"
+                ></span>
+              </div>
+              <pre
+                class="raw-json"
+                x-show="selectedFinding.raw_finding"
+                x-text="typeof selectedFinding.raw_finding === 'string' ? selectedFinding.raw_finding : JSON.stringify(selectedFinding.raw_finding, null, 2)"
+              ></pre>
+            </div>
+          </template>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      /**
+       * Data placeholders — replaced by dashboard-generator.sh with actual JSON.
+       * Generator uses sed/python to replace the comment markers with real data.
+       */
+      const SCAN_DATA = /*__SCAN_DATA__*/ {
+        scan_id: "demo",
+        target: "example-project",
+        started_at: "2026-01-01T00:00:00Z",
+        finished_at: "2026-01-01T00:05:00Z",
+        status: "completed",
+        findings: [],
+        compliance: [],
+      };
+
+      const PIPELINE_DATA = /*__PIPELINE__*/ {
+        name: "full-scan",
+        nodes: [],
+      };
+
+      const TREND_DATA = /*__TREND__*/ {
+        dates: [],
+        critical: [],
+        high: [],
+        medium: [],
+        low: [],
+      };
+
+      function dashboard() {
+        return {
+          scanData: SCAN_DATA,
+          pipelineData: PIPELINE_DATA,
+          trendData: TREND_DATA,
+          filters: { severity: "all", tool: "all", category: "all" },
+          showModal: false,
+          selectedFinding: null,
+          darkMode: false,
+          severityChartInstance: null,
+          owaspChartInstance: null,
+          trendChartInstance: null,
+
+          get filteredFindings() {
+            let findings = this.scanData.findings || [];
+            if (this.filters.severity !== "all") {
+              findings = findings.filter(
+                (f) => f.severity === this.filters.severity,
+              );
+            }
+            if (this.filters.tool !== "all") {
+              findings = findings.filter(
+                (f) => f.source_tool === this.filters.tool,
+              );
+            }
+            if (this.filters.category !== "all") {
+              findings = findings.filter((f) => {
+                const owasp = Array.isArray(f.owasp)
+                  ? f.owasp
+                  : f.owasp
+                    ? [f.owasp]
+                    : [];
+                return owasp.includes(this.filters.category);
+              });
+            }
+            return findings;
+          },
+
+          get severityCounts() {
+            const counts = { critical: 0, high: 0, medium: 0, low: 0, info: 0 };
+            (this.scanData.findings || []).forEach((f) => {
+              if (counts.hasOwnProperty(f.severity)) counts[f.severity]++;
+            });
+            return counts;
+          },
+
+          get toolSummary() {
+            const map = {};
+            (this.filteredFindings || []).forEach((f) => {
+              if (!map[f.source_tool]) {
+                map[f.source_tool] = {
+                  tool: f.source_tool,
+                  total: 0,
+                  critical: 0,
+                  high: 0,
+                  medium: 0,
+                  low: 0,
+                };
+              }
+              map[f.source_tool].total++;
+              if (map[f.source_tool].hasOwnProperty(f.severity)) {
+                map[f.source_tool][f.severity]++;
+              }
+            });
+            return Object.values(map).sort((a, b) => b.total - a.total);
+          },
+
+          get availableTools() {
+            const tools = new Set();
+            (this.scanData.findings || []).forEach((f) =>
+              tools.add(f.source_tool),
+            );
+            return [...tools].sort();
+          },
+
+          get availableCategories() {
+            const cats = new Set();
+            (this.scanData.findings || []).forEach((f) => {
+              const owasp = Array.isArray(f.owasp)
+                ? f.owasp
+                : f.owasp
+                  ? [f.owasp]
+                  : [];
+              owasp.forEach((c) => cats.add(c));
+            });
+            return [...cats].sort();
+          },
+
+          get owaspCounts() {
+            const categories = [
+              "A01",
+              "A02",
+              "A03",
+              "A04",
+              "A05",
+              "A06",
+              "A07",
+              "A08",
+              "A09",
+              "A10",
+            ];
+            const counts = {};
+            categories.forEach((c) => (counts[c] = 0));
+            (this.scanData.findings || []).forEach((f) => {
+              const owasp = Array.isArray(f.owasp)
+                ? f.owasp
+                : f.owasp
+                  ? [f.owasp]
+                  : [];
+              owasp.forEach((cat) => {
+                const key = categories.find((c) => cat.startsWith(c));
+                if (key) counts[key]++;
+              });
+            });
+            return counts;
+          },
+
+          init() {
+            this.renderSeverityChart();
+            this.renderOwaspChart();
+            this.renderTrendChart();
+          },
+
+          applyFilters() {
+            this.renderSeverityChart();
+            this.renderOwaspChart();
+          },
+
+          toggleDark() {
+            this.darkMode = !this.darkMode;
+            document.body.classList.toggle("dark");
+            // Re-render charts with updated colors
+            this.renderSeverityChart();
+            this.renderOwaspChart();
+            this.renderTrendChart();
+          },
+
+          showDetail(finding) {
+            this.selectedFinding = finding;
+            this.showModal = true;
+          },
+
+          heatmapColor(coverage) {
+            const pct = Math.round(coverage * 100);
+            if (pct >= 90) return "rgba(32, 201, 151, 0.25)";
+            if (pct >= 70) return "rgba(32, 201, 151, 0.15)";
+            if (pct >= 50) return "rgba(255, 193, 7, 0.2)";
+            if (pct >= 30) return "rgba(253, 126, 20, 0.2)";
+            return "rgba(220, 53, 69, 0.2)";
+          },
+
+          chartTextColor() {
+            return this.darkMode ? "#a0a0a0" : "#6c757d";
+          },
+
+          renderSeverityChart() {
+            const ctx = document.getElementById("severityChart");
+            if (!ctx) return;
+            if (this.severityChartInstance)
+              this.severityChartInstance.destroy();
+
+            const counts = this.severityCounts;
+            this.severityChartInstance = new Chart(ctx, {
+              type: "doughnut",
+              data: {
+                labels: ["Critical", "High", "Medium", "Low", "Info"],
+                datasets: [
+                  {
+                    data: [
+                      counts.critical,
+                      counts.high,
+                      counts.medium,
+                      counts.low,
+                      counts.info,
+                    ],
+                    backgroundColor: [
+                      "#dc3545",
+                      "#fd7e14",
+                      "#ffc107",
+                      "#20c997",
+                      "#6c757d",
+                    ],
+                    borderWidth: 2,
+                    borderColor: this.darkMode ? "#1a1a2e" : "#ffffff",
+                  },
+                ],
+              },
+              options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                  legend: {
+                    position: "right",
+                    labels: {
+                      color: this.chartTextColor(),
+                      padding: 12,
+                      font: { size: 11 },
+                    },
+                  },
+                },
+              },
+            });
+          },
+
+          renderOwaspChart() {
+            const ctx = document.getElementById("owaspChart");
+            if (!ctx) return;
+            if (this.owaspChartInstance) this.owaspChartInstance.destroy();
+
+            const counts = this.owaspCounts;
+            const labels = Object.keys(counts);
+            const data = Object.values(counts);
+
+            this.owaspChartInstance = new Chart(ctx, {
+              type: "bar",
+              data: {
+                labels: labels,
+                datasets: [
+                  {
+                    label: "Findings",
+                    data: data,
+                    backgroundColor: "#4361ee",
+                    borderRadius: 4,
+                  },
+                ],
+              },
+              options: {
+                indexAxis: "y",
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                  x: {
+                    beginAtZero: true,
+                    ticks: { color: this.chartTextColor(), stepSize: 1 },
+                    grid: { color: this.darkMode ? "#2d2d44" : "#dee2e6" },
+                  },
+                  y: {
+                    ticks: { color: this.chartTextColor() },
+                    grid: { display: false },
+                  },
+                },
+                plugins: {
+                  legend: { display: false },
+                },
+              },
+            });
+          },
+
+          renderTrendChart() {
+            const ctx = document.getElementById("trendChart");
+            if (!ctx) return;
+            if (this.trendChartInstance) this.trendChartInstance.destroy();
+
+            const trend = this.trendData;
+            if (!trend.dates || trend.dates.length === 0) return;
+
+            // Hide empty state if we have data
+            const emptyEl = document.getElementById("trendEmpty");
+            if (emptyEl) emptyEl.style.display = "none";
+
+            this.trendChartInstance = new Chart(ctx, {
+              type: "line",
+              data: {
+                labels: trend.dates,
+                datasets: [
+                  {
+                    label: "Critical",
+                    data: trend.critical || [],
+                    borderColor: "#dc3545",
+                    backgroundColor: "rgba(220,53,69,0.1)",
+                    fill: true,
+                    tension: 0.3,
+                  },
+                  {
+                    label: "High",
+                    data: trend.high || [],
+                    borderColor: "#fd7e14",
+                    backgroundColor: "rgba(253,126,20,0.1)",
+                    fill: true,
+                    tension: 0.3,
+                  },
+                  {
+                    label: "Medium",
+                    data: trend.medium || [],
+                    borderColor: "#ffc107",
+                    backgroundColor: "rgba(255,193,7,0.1)",
+                    fill: true,
+                    tension: 0.3,
+                  },
+                  {
+                    label: "Low",
+                    data: trend.low || [],
+                    borderColor: "#20c997",
+                    backgroundColor: "rgba(32,201,151,0.1)",
+                    fill: true,
+                    tension: 0.3,
+                  },
+                ],
+              },
+              options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                interaction: { intersect: false, mode: "index" },
+                scales: {
+                  x: {
+                    ticks: { color: this.chartTextColor() },
+                    grid: { color: this.darkMode ? "#2d2d44" : "#dee2e6" },
+                  },
+                  y: {
+                    beginAtZero: true,
+                    ticks: { color: this.chartTextColor(), stepSize: 1 },
+                    grid: { color: this.darkMode ? "#2d2d44" : "#dee2e6" },
+                  },
+                },
+                plugins: {
+                  legend: {
+                    labels: {
+                      color: this.chartTextColor(),
+                      font: { size: 11 },
+                    },
+                  },
+                },
+              },
+            });
+          },
+        };
+      }
+    </script>
+  </body>
+</html>
