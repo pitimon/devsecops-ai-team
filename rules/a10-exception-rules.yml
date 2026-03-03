@@ -1,0 +1,152 @@
+rules:
+  # ==========================================================================
+  # A10:2025 Exception Handling — Custom Semgrep Rules
+  # DevSecOps AI Team v2.7.0
+  #
+  # 4 rules targeting A10:2025 anti-patterns (NEW 2025 category)
+  # NOTE: This is separate from a10-ssrf-rules.yml which covers A10:2021/A01:2025
+  # Languages: Python (2 rules), JavaScript/TypeScript (1 rule), Generic (1 rule)
+  # Reference: skills/references/sast-patterns.md
+  # ==========================================================================
+
+  # -------------------------------------------------------------------------
+  # Rule 1: Bare except clause in Python (CWE-396)
+  # -------------------------------------------------------------------------
+  - id: a10-generic-catch-python
+    patterns:
+      - pattern: |
+          except:
+              ...
+    message: >
+      Bare except clause catches all exceptions including SystemExit and
+      KeyboardInterrupt. Use specific exception types per OWASP A10:2025.
+    languages:
+      - python
+    severity: WARNING
+    metadata:
+      cwe: ["CWE-396"]
+      owasp: ["A10:2025"]
+      nist: ["SI-11"]
+      confidence: HIGH
+      impact: MEDIUM
+      likelihood: HIGH
+      category: security
+      technology: [python]
+      references:
+        - https://owasp.org/Top10/A10_2025-Improper_Logging_and_Exception_Handling/
+        - https://cwe.mitre.org/data/definitions/396.html
+      fix: |
+        Use specific exception types:
+          try:
+              risky_operation()
+          except (ValueError, KeyError) as e:
+              logger.error(f"Operation failed: {e}")
+              raise
+
+  # -------------------------------------------------------------------------
+  # Rule 2: Empty catch block in JavaScript/TypeScript (CWE-396)
+  # -------------------------------------------------------------------------
+  - id: a10-empty-catch-javascript
+    patterns:
+      - pattern: |
+          try { ... } catch ($ERR) { }
+    message: >
+      Empty catch block silently swallows errors. Exceptions MUST be logged
+      or re-thrown per OWASP A10:2025.
+    languages:
+      - javascript
+      - typescript
+    severity: WARNING
+    metadata:
+      cwe: ["CWE-396"]
+      owasp: ["A10:2025"]
+      nist: ["SI-11"]
+      confidence: HIGH
+      impact: MEDIUM
+      likelihood: HIGH
+      category: security
+      technology: [javascript, typescript]
+      references:
+        - https://owasp.org/Top10/A10_2025-Improper_Logging_and_Exception_Handling/
+        - https://cwe.mitre.org/data/definitions/396.html
+      fix: |
+        Log or re-throw caught exceptions:
+          try {
+            riskyOperation();
+          } catch (err) {
+            logger.error('Operation failed', { error: err.message });
+            throw err;
+          }
+
+  # -------------------------------------------------------------------------
+  # Rule 3: Stack trace exposure in Python (CWE-209)
+  # -------------------------------------------------------------------------
+  - id: a10-stack-exposure-python
+    pattern-either:
+      - pattern: traceback.format_exc()
+      - pattern: traceback.print_exc()
+    message: >
+      Stack trace exposure detected. Stack traces MUST NOT be returned in
+      HTTP responses as they reveal internal implementation details per
+      OWASP A10:2025. Log internally instead.
+    languages:
+      - python
+    severity: WARNING
+    metadata:
+      cwe: ["CWE-209"]
+      owasp: ["A10:2025"]
+      nist: ["SI-11", "SI-15"]
+      confidence: MEDIUM
+      impact: MEDIUM
+      likelihood: MEDIUM
+      category: security
+      technology: [python]
+      references:
+        - https://owasp.org/Top10/A10_2025-Improper_Logging_and_Exception_Handling/
+        - https://cwe.mitre.org/data/definitions/209.html
+      fix: |
+        Log stack traces internally, return generic error:
+          import logging
+          logger = logging.getLogger(__name__)
+          try:
+              process()
+          except Exception as e:
+              logger.exception("Processing failed")
+              return {"error": "Internal server error"}, 500
+
+  # -------------------------------------------------------------------------
+  # Rule 4: Unhandled promise rejection (CWE-755)
+  # -------------------------------------------------------------------------
+  - id: a10-unhandled-promise
+    pattern-regex: '\.\s*then\s*\([^)]*\)\s*[;}\n]'
+    message: >
+      Promise chain without .catch() handler. Unhandled promise rejections
+      can crash the process and leak information per OWASP A10:2025.
+    languages:
+      - generic
+    severity: INFO
+    metadata:
+      cwe: ["CWE-755"]
+      owasp: ["A10:2025"]
+      nist: ["SI-11"]
+      confidence: LOW
+      impact: MEDIUM
+      likelihood: MEDIUM
+      category: security
+      technology: [javascript, typescript]
+      references:
+        - https://owasp.org/Top10/A10_2025-Improper_Logging_and_Exception_Handling/
+        - https://cwe.mitre.org/data/definitions/755.html
+      fix: |
+        Always handle promise rejections:
+          fetchData()
+            .then(data => process(data))
+            .catch(err => {
+              logger.error('Fetch failed', { error: err.message });
+            });
+        Or use async/await with try-catch:
+          try {
+            const data = await fetchData();
+          } catch (err) {
+            logger.error('Fetch failed', { error: err.message });
+          }
