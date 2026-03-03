@@ -50,7 +50,7 @@ done
 
 # ─── Section 3: Skills ───
 echo ""
-EXPECTED_SKILLS="devsecops-setup sast-scan dast-scan sca-scan container-scan iac-scan secret-scan sbom-generate full-pipeline compliance-report incident-response security-gate auto-fix"
+EXPECTED_SKILLS="devsecops-setup sast-scan dast-scan sca-scan container-scan iac-scan secret-scan sbom-generate full-pipeline compliance-report incident-response security-gate auto-fix slsa-assess"
 EXPECTED_SKILL_COUNT=$(echo $EXPECTED_SKILLS | wc -w | tr -d ' ')
 echo "--- Section 3: Skills ($EXPECTED_SKILL_COUNT expected) ---"
 SKILL_COUNT=0
@@ -156,7 +156,7 @@ done
 
 # ─── Section 9: References ───
 echo ""
-EXPECTED_REFS="sast-patterns.md dast-methodology.md sca-supply-chain.md container-hardening.md iac-security-patterns.md secret-management.md compliance-frameworks.md threat-modeling.md incident-response.md remediation-patterns.md software-integrity.md logging-monitoring.md remediation-django.md remediation-react-nextjs.md remediation-express-node.md remediation-spring.md"
+EXPECTED_REFS="sast-patterns.md dast-methodology.md sca-supply-chain.md container-hardening.md iac-security-patterns.md secret-management.md compliance-frameworks.md threat-modeling.md incident-response.md remediation-patterns.md software-integrity.md logging-monitoring.md remediation-django.md remediation-react-nextjs.md remediation-express-node.md remediation-spring.md slsa-reference.md"
 EXPECTED_REF_COUNT=$(echo $EXPECTED_REFS | wc -w | tr -d ' ')
 echo "--- Section 9: Reference Files ($EXPECTED_REF_COUNT expected) ---"
 
