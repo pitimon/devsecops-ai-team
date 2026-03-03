@@ -1,0 +1,256 @@
+{
+  "_meta": {
+    "description": "CWE to ISO 27001:2022 Annex A controls mapping",
+    "source": "https://www.iso.org/standard/27001",
+    "iso27001_version": "2022",
+    "last_updated": "2026-03-03"
+  },
+  "mappings": {
+    "CWE-16": {
+      "iso27001": ["A.8.9"],
+      "category": "Technological Controls",
+      "name": "Configuration",
+      "requirement": "Configuration management shall be established and implemented"
+    },
+    "CWE-20": {
+      "iso27001": ["A.8.25"],
+      "category": "Technological Controls",
+      "name": "Improper Input Validation",
+      "requirement": "Secure development lifecycle shall include input validation"
+    },
+    "CWE-22": {
+      "iso27001": ["A.8.28"],
+      "category": "Technological Controls",
+      "name": "Path Traversal",
+      "requirement": "Secure coding practices shall prevent path traversal"
+    },
+    "CWE-78": {
+      "iso27001": ["A.8.26"],
+      "category": "Technological Controls",
+      "name": "OS Command Injection",
+      "requirement": "Application security requirements shall prevent injection"
+    },
+    "CWE-79": {
+      "iso27001": ["A.8.26"],
+      "category": "Technological Controls",
+      "name": "Cross-site Scripting (XSS)",
+      "requirement": "Application security requirements shall prevent injection"
+    },
+    "CWE-89": {
+      "iso27001": ["A.8.26", "A.8.28"],
+      "category": "Technological Controls",
+      "name": "SQL Injection",
+      "requirement": "Secure coding practices shall be applied"
+    },
+    "CWE-90": {
+      "iso27001": ["A.8.26"],
+      "category": "Technological Controls",
+      "name": "LDAP Injection",
+      "requirement": "Application security requirements shall prevent injection"
+    },
+    "CWE-117": {
+      "iso27001": ["A.5.28"],
+      "category": "Organizational Controls",
+      "name": "Improper Log Output Neutralization",
+      "requirement": "Evidence collection procedures shall ensure log integrity"
+    },
+    "CWE-200": {
+      "iso27001": ["A.8.12"],
+      "category": "Technological Controls",
+      "name": "Information Exposure",
+      "requirement": "Data leakage prevention measures shall be applied"
+    },
+    "CWE-209": {
+      "iso27001": ["A.8.11"],
+      "category": "Technological Controls",
+      "name": "Error Message Information Exposure",
+      "requirement": "Data masking shall be applied to prevent information disclosure"
+    },
+    "CWE-256": {
+      "iso27001": ["A.8.12"],
+      "category": "Technological Controls",
+      "name": "Plaintext Storage of Password",
+      "requirement": "Data leakage prevention measures shall protect credentials"
+    },
+    "CWE-269": {
+      "iso27001": ["A.8.3"],
+      "category": "Technological Controls",
+      "name": "Improper Privilege Management",
+      "requirement": "Information access restriction shall enforce least privilege"
+    },
+    "CWE-287": {
+      "iso27001": ["A.8.5"],
+      "category": "Technological Controls",
+      "name": "Improper Authentication",
+      "requirement": "Secure authentication shall be implemented"
+    },
+    "CWE-308": {
+      "iso27001": ["A.8.5"],
+      "category": "Technological Controls",
+      "name": "Single-factor Authentication",
+      "requirement": "Secure authentication technologies shall be used"
+    },
+    "CWE-311": {
+      "iso27001": ["A.8.12", "A.8.24"],
+      "category": "Technological Controls",
+      "name": "Missing Encryption of Sensitive Data",
+      "requirement": "Cryptography and data leakage prevention shall be applied"
+    },
+    "CWE-312": {
+      "iso27001": ["A.8.12"],
+      "category": "Technological Controls",
+      "name": "Cleartext Storage of Sensitive Information",
+      "requirement": "Data leakage prevention shall protect data at rest"
+    },
+    "CWE-319": {
+      "iso27001": ["A.8.12", "A.8.24"],
+      "category": "Technological Controls",
+      "name": "Cleartext Transmission of Sensitive Information",
+      "requirement": "Cryptography shall protect data in transit"
+    },
+    "CWE-327": {
+      "iso27001": ["A.8.24"],
+      "category": "Technological Controls",
+      "name": "Use of Broken Cryptographic Algorithm",
+      "requirement": "Cryptography policy shall mandate approved algorithms"
+    },
+    "CWE-328": {
+      "iso27001": ["A.8.24"],
+      "category": "Technological Controls",
+      "name": "Use of Weak Hash",
+      "requirement": "Cryptography policy shall mandate strong hash functions"
+    },
+    "CWE-338": {
+      "iso27001": ["A.8.24"],
+      "category": "Technological Controls",
+      "name": "Use of Weak PRNG",
+      "requirement": "Cryptography shall use cryptographically secure random generators"
+    },
+    "CWE-359": {
+      "iso27001": ["A.8.12"],
+      "category": "Technological Controls",
+      "name": "Exposure of Private Personal Information",
+      "requirement": "Data leakage prevention shall protect personal information"
+    },
+    "CWE-390": {
+      "iso27001": ["A.8.15"],
+      "category": "Technological Controls",
+      "name": "Detection of Error Condition Without Action",
+      "requirement": "Logging shall capture and alert on error conditions"
+    },
+    "CWE-400": {
+      "iso27001": ["A.8.28"],
+      "category": "Technological Controls",
+      "name": "Uncontrolled Resource Consumption",
+      "requirement": "Secure coding shall prevent resource exhaustion"
+    },
+    "CWE-434": {
+      "iso27001": ["A.8.25"],
+      "category": "Technological Controls",
+      "name": "Unrestricted Upload of File with Dangerous Type",
+      "requirement": "Secure development lifecycle shall validate uploads"
+    },
+    "CWE-494": {
+      "iso27001": ["A.8.29"],
+      "category": "Technological Controls",
+      "name": "Download of Code Without Integrity Check",
+      "requirement": "Security testing shall verify code integrity"
+    },
+    "CWE-502": {
+      "iso27001": ["A.8.28"],
+      "category": "Technological Controls",
+      "name": "Deserialization of Untrusted Data",
+      "requirement": "Secure coding shall prevent unsafe deserialization"
+    },
+    "CWE-521": {
+      "iso27001": ["A.8.5"],
+      "category": "Technological Controls",
+      "name": "Weak Password Requirements",
+      "requirement": "Secure authentication shall enforce password strength"
+    },
+    "CWE-532": {
+      "iso27001": ["A.8.12"],
+      "category": "Technological Controls",
+      "name": "Insertion of Sensitive Information into Log File",
+      "requirement": "Data leakage prevention shall protect log content"
+    },
+    "CWE-613": {
+      "iso27001": ["A.8.5"],
+      "category": "Technological Controls",
+      "name": "Insufficient Session Expiration",
+      "requirement": "Secure authentication shall manage session lifecycle"
+    },
+    "CWE-639": {
+      "iso27001": ["A.8.3"],
+      "category": "Technological Controls",
+      "name": "Authorization Bypass Through User-Controlled Key (IDOR)",
+      "requirement": "Information access restriction shall prevent IDOR"
+    },
+    "CWE-640": {
+      "iso27001": ["A.8.5"],
+      "category": "Technological Controls",
+      "name": "Weak Password Recovery Mechanism",
+      "requirement": "Secure authentication shall protect recovery mechanisms"
+    },
+    "CWE-770": {
+      "iso27001": ["A.8.28"],
+      "category": "Technological Controls",
+      "name": "Allocation of Resources Without Limits",
+      "requirement": "Secure coding shall enforce resource limits"
+    },
+    "CWE-778": {
+      "iso27001": ["A.5.25"],
+      "category": "Organizational Controls",
+      "name": "Insufficient Logging",
+      "requirement": "Assessment and decision on information security events"
+    },
+    "CWE-798": {
+      "iso27001": ["A.8.5"],
+      "category": "Technological Controls",
+      "name": "Use of Hardcoded Credentials",
+      "requirement": "Secure authentication shall not embed credentials"
+    },
+    "CWE-829": {
+      "iso27001": ["A.8.29"],
+      "category": "Technological Controls",
+      "name": "Inclusion of Functionality from Untrusted Control Sphere",
+      "requirement": "Security testing shall verify third-party components"
+    },
+    "CWE-862": {
+      "iso27001": ["A.8.3"],
+      "category": "Technological Controls",
+      "name": "Missing Authorization",
+      "requirement": "Information access restriction shall enforce authorization"
+    },
+    "CWE-863": {
+      "iso27001": ["A.8.3"],
+      "category": "Technological Controls",
+      "name": "Incorrect Authorization",
+      "requirement": "Information access restriction shall validate authorization"
+    },
+    "CWE-918": {
+      "iso27001": ["A.8.26"],
+      "category": "Technological Controls",
+      "name": "Server-Side Request Forgery (SSRF)",
+      "requirement": "Application security requirements shall prevent SSRF"
+    },
+    "CWE-942": {
+      "iso27001": ["A.8.9"],
+      "category": "Technological Controls",
+      "name": "Overly Permissive Cross-domain Whitelist (CORS)",
+      "requirement": "Configuration management shall enforce CORS policy"
+    },
+    "CWE-1104": {
+      "iso27001": ["A.8.29"],
+      "category": "Technological Controls",
+      "name": "Use of Unmaintained Third-party Components",
+      "requirement": "Security testing shall assess component maintenance status"
+    },
+    "CWE-1336": {
+      "iso27001": ["A.8.26"],
+      "category": "Technological Controls",
+      "name": "Improper Neutralization of Special Elements in Template Engine (Template Injection)",
+      "requirement": "Application security requirements shall prevent template injection"
+    }
+  }
+}
