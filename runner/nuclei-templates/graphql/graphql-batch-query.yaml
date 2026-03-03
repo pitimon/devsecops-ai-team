@@ -1,0 +1,31 @@
+id: graphql-batch-query
+
+info:
+  name: GraphQL Batch Query Abuse
+  author: devsecops-ai-team
+  severity: medium
+  description: GraphQL endpoint accepts batch queries without limit, enabling denial-of-service and brute-force attacks by sending multiple operations in a single request
+  tags: graphql,batch-query,dos,rate-limiting
+  reference:
+    - https://owasp.org/API-Security/editions/2023/en/0xa4-unrestricted-resource-consumption/
+  metadata:
+    cwe: CWE-770
+    owasp: A04:2021
+
+http:
+  - method: POST
+    path:
+      - "{{BaseURL}}/graphql"
+      - "{{BaseURL}}/api/graphql"
+    headers:
+      Content-Type: application/json
+    body: '[{"query":"{__typename}"},{"query":"{__typename}"},{"query":"{__typename}"},{"query":"{__typename}"},{"query":"{__typename}"},{"query":"{__typename}"},{"query":"{__typename}"},{"query":"{__typename}"},{"query":"{__typename}"},{"query":"{__typename}"}]'
+    matchers-condition: and
+    matchers:
+      - type: word
+        words:
+          - "__typename"
+        condition: or
+      - type: status
+        status:
+          - 200
