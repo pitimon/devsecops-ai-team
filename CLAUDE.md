@@ -41,7 +41,7 @@ User prompt → keyword match in SKILL.md frontmatter
 | `runner/pipeline-engine.sh`         | DAG pipeline engine with topological sort                           |
 | `runner/pipelines/`                 | Pipeline definitions (default, sast-only, secrets-only, compliance) |
 | `runner/nuclei-templates/`          | Custom Nuclei templates (GraphQL scanning)                          |
-| `formatters/`                       | Output formatters (SARIF, JSON, MD, HTML, PDF, CSV, VEX)            |
+| `formatters/`                       | Output formatters (SARIF, JSON, MD, HTML, PDF, CSV, VEX, Dashboard) |
 | `formatters/dashboard-generator.sh` | SQLite to HTML dashboard conversion                                 |
 | `scripts/scan-db.sh`                | SQLite historical database (7 subcommands)                          |
 | `templates/dashboard.html`          | Alpine.js + Chart.js security dashboard template                    |

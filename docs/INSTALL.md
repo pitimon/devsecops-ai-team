@@ -160,7 +160,20 @@ cd mcp && npm install
 # MCP server จะถูก load อัตโนมัติผ่าน .mcp.json เมื่อเปิด Claude Code
 ```
 
-MCP tools ที่พร้อมใช้: `devsecops_scan`, `devsecops_results`, `devsecops_gate`, `devsecops_compliance`, `devsecops_status`
+MCP tools ที่พร้อมใช้ (10 tools):
+
+| Tool                          | Description                                        |
+| ----------------------------- | -------------------------------------------------- |
+| `devsecops_scan`              | Run security scans (SAST, DAST, SCA, etc.)         |
+| `devsecops_normalize`         | Normalize scan results to unified schema           |
+| `devsecops_results`           | Query scan results                                 |
+| `devsecops_triage`            | Prioritize findings by severity/exploitability     |
+| `devsecops_enrich`            | Add OWASP/CWE/compliance context to findings       |
+| `devsecops_compare`           | Compare scan results between runs                  |
+| `devsecops_compliance_status` | Check compliance framework coverage (7 frameworks) |
+| `devsecops_suggest_fix`       | AI-powered fix suggestions                         |
+| `devsecops_history`           | Query scan history from SQLite DB                  |
+| `devsecops_pipeline`          | Run DAG pipeline with multiple tools               |
 
 ### ตรวจสอบ MCP
 
