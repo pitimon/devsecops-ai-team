@@ -1,0 +1,4 @@
+# SQLite database (runtime data, not committed)
+*.db
+*.db-journal
+*.db-wal
