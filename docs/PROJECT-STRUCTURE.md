@@ -32,7 +32,8 @@ devsecops-ai-team/
 +-- hooks/                   # 3 hooks (session-start, scan-on-write, pre-commit-gate)
 +-- scripts/                 # install-runner, install-rules, check-prerequisites, NCSA validator, scan-db.sh
 +-- tests/                   # 1,302+ tests across 42 suites
-+-- docs/                    # INSTALL, TROUBLESHOOTING, AGENT-CATALOG, RUNBOOK, MANDAY
++-- demo/                    # Demo scenarios (3 presenter-ready demos: 5/10/15 min)
++-- docs/                    # 12 documentation files (see table below)
 +-- examples/                # Rules, policies, DOMAIN.md, Semgrep rules
 +-- frameworks.json          # 19 tracked security frameworks with version info
 ```
@@ -44,11 +45,18 @@ devsecops-ai-team/
 | Document                                                      | Description                                            |
 | ------------------------------------------------------------- | ------------------------------------------------------ |
 | [**Wiki**](https://github.com/pitimon/devsecops-ai-team/wiki) | Comprehensive documentation with ASCII diagrams        |
+| [QUICK-START.md](QUICK-START.md)                              | Install to first scan in 5 minutes                     |
+| [FIRST-SCAN-WALKTHROUGH.md](FIRST-SCAN-WALKTHROUGH.md)        | Behind the scenes — agent orchestration explained      |
 | [INSTALL.md](INSTALL.md)                                      | Installation guide (standard, manual, air-gapped, MCP) |
+| [FEATURES.md](FEATURES.md)                                    | Skills, agents, MCP, compliance, output formats        |
+| [ARCHITECTURE.md](ARCHITECTURE.md)                            | Pipeline delegation, decision loop, system design      |
 | [AGENT-CATALOG.md](AGENT-CATALOG.md)                          | 18 agents with routing cues + triggers                 |
+| [CI-INTEGRATION.md](CI-INTEGRATION.md)                        | CI/CD templates for GitHub Actions and GitLab CI       |
 | [TROUBLESHOOTING.md](TROUBLESHOOTING.md)                      | Common issues (8 scenarios)                            |
 | [FRAMEWORK-UPDATE-RUNBOOK.md](FRAMEWORK-UPDATE-RUNBOOK.md)    | Framework version update procedure                     |
 | [MANDAY-ESTIMATION.md](MANDAY-ESTIMATION.md)                  | ROI analysis + cost comparison (10,222% ROI)           |
+| [PRD.md](PRD.md)                                              | Product Requirements Document (vision through v3.1.0)  |
+| [PROJECT-STRUCTURE.md](PROJECT-STRUCTURE.md)                  | Directory tree + file descriptions (this file)         |
 | [CLAUDE.md](../CLAUDE.md)                                     | Architecture + contributing guidelines                 |
-| [CHANGELOG.md](../CHANGELOG.md)                               | Version history (v1.0.0 - v3.0.4)                      |
+| [CHANGELOG.md](../CHANGELOG.md)                               | Version history (v1.0.0 → v3.1.0)                      |
 | [SECURITY.md](../SECURITY.md)                                 | Vulnerability reporting policy                         |
