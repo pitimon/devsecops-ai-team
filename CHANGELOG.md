@@ -7,6 +7,27 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [3.0.3] — 2026-03-03
+
+### Fixed
+
+- **Dashboard injection bugs** (#69): Fixed 2 bugs in `dashboard-generator.sh` `inject_data()` that caused blank dashboards with real scan data
+  - **Bug 1**: Triple-quote string injection (`'''$json'''`) broke on findings containing single quotes (e.g., `sk_live_...`). Replaced with file-based data passing via temp files
+  - **Bug 2**: Multi-line placeholder regex (`[^;]*`) didn't match template's multi-line default objects, leaving leftover JavaScript that caused `SyntaxError`. Fixed with `re.DOTALL` flag + `lambda` substitution (also avoids Python 3.12+ `\u` escape deprecation)
+- **Documentation accuracy sync**: Updated 25+ stale metrics across README.md, DOMAIN.md, PRD.md, INSTALL.md — CWE 405→488, OWASP 120→122, QA 8→13, output formats 7→8
+
+### Added
+
+- **Dashboard regression tests**: 5 new tests in `test-dashboard-generator.sh` (21 → 26) for special character injection (single quotes, backslashes, `\u` sequences)
+- **Smoke test prompts**: v3.0.0 section with K8s, GraphQL, pipeline, dashboard, scan history, and SLSA assessment prompts
+- **GitHub Wiki**: Updated 4 pages (Home, Installation, Architecture, Skills) + created 2 new pages (Skills-Reference, Test-Results) for v3.0.2 accuracy
+
+### Changed
+
+- **DOMAIN.md**: Fixed stale counts — Semgrep rules 33→84, skills 13→16, MCP tools 8→10, OWASP CWE 105→122, added PDPA/SOC2/ISO27001 mapping entries
+- **docs/PRD.md**: Updated to v3.0.2 state — CWE 486→488, tests 978→1284, QA 10→13, output formats 7→8
+- **docs/INSTALL.md**: Added 3 missing Docker tools (nuclei, trufflehog, kube-bench) to pull + uninstall lists
+
 ## [3.0.2] — 2026-03-03
 
 ### Fixed

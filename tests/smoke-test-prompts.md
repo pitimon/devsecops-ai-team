@@ -99,6 +99,42 @@ Manual functional test scenarios for each skill and agent.
 2. "Scan for SSRF vulnerabilities using A10 rules"
 3. "Check for injection vulnerabilities with A03 rules"
 
+### /k8s-scan (v3.0.0)
+
+1. "Scan my Kubernetes cluster for CIS benchmark violations"
+2. "Check my K8s manifests for security misconfigurations"
+3. "Run kube-bench against the cluster"
+
+### /graphql-scan (v3.0.0)
+
+1. "Scan my GraphQL endpoint for security issues"
+2. "Check for GraphQL introspection enabled in production"
+3. "Test GraphQL API for query depth and batching attacks"
+
+### Pipeline Engine (v3.0.0)
+
+1. "Run the default security pipeline"
+2. "Show pipeline status for the last scan"
+3. "Run SAST-only pipeline"
+
+### Dashboard Generation (v3.0.0)
+
+1. "Generate a security dashboard from scan history"
+2. "Show me a visual overview of security trends"
+3. "Create an HTML dashboard report"
+
+### Scan History (v3.0.0)
+
+1. "Show scan history for this project"
+2. "Compare the last two scans"
+3. "What's the security trend over the last 5 scans?"
+
+### SLSA Assessment (v2.8.0)
+
+1. "Assess our SLSA compliance level"
+2. "Check SLSA provenance for the CI/CD pipeline"
+3. "What SLSA level does our build process achieve?"
+
 ## Agents (trigger keywords)
 
 ### Orchestrators

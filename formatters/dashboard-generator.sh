@@ -185,18 +185,43 @@ print(json.dumps({
 inject_data() {
   local template="$1" scan_json="$2" pipeline_json="$3"
   local trend_json="$4" output="$5"
+
+  # Write JSON to temp files to avoid shell quoting/escape issues
+  local tmp_scan tmp_pipeline tmp_trend
+  tmp_scan="$(mktemp)"
+  tmp_pipeline="$(mktemp)"
+  tmp_trend="$(mktemp)"
+  printf '%s' "$scan_json" > "$tmp_scan"
+  printf '%s' "$pipeline_json" > "$tmp_pipeline"
+  printf '%s' "$trend_json" > "$tmp_trend"
+
   python3 -c "
-import re
-template_path, output_path = '$template', '$output'
-scan_json = '''$scan_json'''
-pipeline_json = '''$pipeline_json'''
-trend_json = '''$trend_json'''
+import re, sys
+
+template_path = sys.argv[1]
+output_path = sys.argv[2]
+scan_json = open(sys.argv[3]).read().strip()
+pipeline_json = open(sys.argv[4]).read().strip()
+trend_json = open(sys.argv[5]).read().strip()
+
 content = open(template_path).read()
-content = re.sub(r'/\*__SCAN_DATA__\*/\s*\{[^;]*\};', scan_json.strip() + ';', content)
-content = re.sub(r'/\*__PIPELINE__\*/\s*\{[^;]*\};', pipeline_json.strip() + ';', content)
-content = re.sub(r'/\*__TREND__\*/\s*\{[^;]*\};', trend_json.strip() + ';', content)
+
+replacements = [
+    ('__SCAN_DATA__', 'SCAN_DATA', scan_json),
+    ('__PIPELINE__', 'PIPELINE_DATA', pipeline_json),
+    ('__TREND__', 'TREND_DATA', trend_json),
+]
+for marker, var_name, data_json in replacements:
+    pattern = (r'const\s+' + var_name +
+               r'\s*=\s*/\*' + marker + r'\*/\s*\{[^;]*\};')
+    replacement = 'const ' + var_name + ' = ' + data_json + ';'
+    content = re.sub(
+        pattern, lambda m: replacement, content, flags=re.DOTALL)
+
 open(output_path, 'w').write(content)
-"
+" "$template" "$output" "$tmp_scan" "$tmp_pipeline" "$tmp_trend"
+
+  rm -f "$tmp_scan" "$tmp_pipeline" "$tmp_trend"
 }
 
 main() {

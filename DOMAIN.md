@@ -10,12 +10,12 @@
 
 **Responsibility**: เรียกใช้ security tools ผ่าน Docker containers, จัดการ custom rules, route jobs
 
-| Component                        | Role                                                |
-| -------------------------------- | --------------------------------------------------- |
-| `runner/job-dispatcher.sh`       | Routes scan requests to Docker containers           |
-| `runner/docker-compose.yml`      | Tool container definitions with profiles            |
-| `rules/*.yml`                    | Custom Semgrep rules (33 rules, 4 OWASP categories) |
-| `scripts/check-prerequisites.sh` | Validates tool availability                         |
+| Component                        | Role                                                      |
+| -------------------------------- | --------------------------------------------------------- |
+| `runner/job-dispatcher.sh`       | Routes scan requests to Docker containers                 |
+| `runner/docker-compose.yml`      | Tool container definitions with profiles                  |
+| `rules/*.yml`                    | Custom Semgrep rules (84 rules, 10 OWASP + K8s + GraphQL) |
+| `scripts/check-prerequisites.sh` | Validates tool availability                               |
 
 **Invariants**: Scan targets MUST be validated before execution. DAST targets MUST require explicit user approval (In-the-Loop).
 
@@ -38,11 +38,14 @@
 
 | Component                         | Role                                      |
 | --------------------------------- | ----------------------------------------- |
-| `mappings/cwe-to-owasp.json`      | CWE → OWASP Top 10 (105 mappings)         |
+| `mappings/cwe-to-owasp.json`      | CWE → OWASP Top 10 (122 mappings)         |
 | `mappings/cwe-to-nist.json`       | CWE → NIST 800-53 (100 mappings)          |
 | `mappings/cwe-to-mitre.json`      | CWE → MITRE ATT&CK (93 mappings)          |
 | `mappings/cwe-to-ncsa.json`       | CWE → NCSA (62 mappings)                  |
-| MCP `devsecops_compliance_status` | Aggregate compliance across frameworks    |
+| `mappings/cwe-to-pdpa.json`       | CWE → PDPA (30 mappings)                  |
+| `mappings/cwe-to-soc2.json`       | CWE → SOC 2 (40 mappings)                 |
+| `mappings/cwe-to-iso27001.json`   | CWE → ISO 27001 (41 mappings)             |
+| MCP `devsecops_compliance_status` | Aggregate compliance across 7 frameworks  |
 | `scripts/dast-ncsa-validator.sh`  | NCSA Website Security Standards validator |
 
 **Invariants**: ComplianceMapping entries MUST reference valid CWE identifiers. Compliance mappings MUST use current framework versions from `frameworks.json`.
@@ -72,8 +75,8 @@
 | `agents/specialists/`   | 7 specialist agents (tool-specific)                                        |
 | `agents/experts/`       | 4 expert agents (cross-cutting)                                            |
 | `agents/core-team/`     | 4 core team agents (QA, ops)                                               |
-| `skills/*/SKILL.md`     | 13 skill definitions                                                       |
-| `mcp/server.mjs`        | 8 MCP tools                                                                |
+| `skills/*/SKILL.md`     | 16 skill definitions                                                       |
+| `mcp/server.mjs`        | 10 MCP tools                                                               |
 
 **Invariants**: Agent.decision_loop MUST be one of: out-of-loop, on-the-loop, in-the-loop. MCP tools MUST validate input via Zod schemas before execution.
 

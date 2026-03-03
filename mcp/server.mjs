@@ -962,7 +962,7 @@ function validateInput(schema, args) {
 // ─── Server Setup ───
 
 const server = new Server(
-  { name: "devsecops-mcp-server", version: "3.0.2" },
+  { name: "devsecops-mcp-server", version: "3.0.3" },
   { capabilities: { tools: {} } },
 );
 

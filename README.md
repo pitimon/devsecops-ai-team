@@ -1,6 +1,6 @@
 <p align="center">
   <img src="https://img.shields.io/badge/Claude_Code-Plugin-blueviolet?style=for-the-badge&logo=anthropic" alt="Claude Code Plugin">
-  <img src="https://img.shields.io/badge/Version-3.0.2-brightgreen?style=for-the-badge" alt="v3.0.2">
+  <img src="https://img.shields.io/badge/Version-3.0.3-brightgreen?style=for-the-badge" alt="v3.0.3">
   <img src="https://img.shields.io/badge/Tests-1284%2B-success?style=for-the-badge" alt="Tests">
   <img src="https://img.shields.io/badge/License-MIT-yellow?style=for-the-badge" alt="MIT License">
 </p>
@@ -11,9 +11,9 @@
   <img src="https://img.shields.io/badge/Tools-11-orange?style=flat-square" alt="11 Tools">
   <img src="https://img.shields.io/badge/MCP-10_Tools-purple?style=flat-square" alt="MCP">
   <img src="https://img.shields.io/badge/OWASP_2021%2B2025-10%2F10-critical?style=flat-square" alt="OWASP 2021+2025 10/10">
-  <img src="https://img.shields.io/badge/CWE_Mappings-405-informational?style=flat-square" alt="405 CWEs">
+  <img src="https://img.shields.io/badge/CWE_Mappings-488-informational?style=flat-square" alt="488 CWEs">
   <img src="https://img.shields.io/badge/Frameworks-7-blueviolet?style=flat-square" alt="7 Compliance Frameworks">
-  <img src="https://img.shields.io/badge/QA_Rounds-8_(54%2F54)-success?style=flat-square" alt="QA 54/54">
+  <img src="https://img.shields.io/badge/QA_Rounds-13_(75%2F75)-success?style=flat-square" alt="QA 75/75">
 </p>
 
 <h1 align="center">DevSecOps AI Team</h1>
@@ -37,7 +37,7 @@
 - [Executive Summary](#executive-summary)
 - [Key Highlights](#key-highlights)
 - [OWASP Top 10 Coverage](#owasp-top-10-coverage)
-- [What's New (v3.0.2)](#whats-new)
+- [What's New (v3.0.3)](#whats-new)
 - [Use Cases](#use-cases)
 - [Quick Start](#quick-start)
 - [Architecture Overview](#architecture-overview)
@@ -73,7 +73,7 @@
 | **Security Tools**        | 11 open-source tools in Docker containers (Semgrep, ZAP, Nuclei, Grype, Trivy, Checkov, GitLeaks, Syft, TruffleHog, kube-bench, Nuclei-GraphQL) |
 | **MCP Tools**             | 10 composable tools for programmatic integration                                                                                                |
 | **Compliance Frameworks** | 7 frameworks — OWASP Top 10 (2021+2025), NIST 800-53, MITRE ATT&CK, NCSA, PDPA, SOC 2, ISO 27001                                                |
-| **CWE Mappings**          | 405 total (OWASP 120 + NIST 100 + MITRE 93 + NCSA 62 + PDPA 30)                                                                                 |
+| **CWE Mappings**          | 488 total (OWASP 122 + NIST 100 + MITRE 93 + NCSA 62 + PDPA 30 + SOC 2 40 + ISO 27001 41)                                                       |
 | **OWASP Top 10 Coverage** | 10/10 categories — dual-version 2021+2025 mapping                                                                                               |
 | **Tests**                 | 1,284+ checks across 42 suites — all passing                                                                                                    |
 | **QA Rounds**             | 13 rounds, 75/75 latest (cumulative 1,300+ checks)                                                                                              |
@@ -88,7 +88,7 @@
 - **11 Security Tools, 1 Command** — `/full-pipeline` รันทุกเครื่องมือแบบ parallel, deduplicate ผลข้าม tools, สร้าง unified report ในคำสั่งเดียว
 - **Real-Time Protection** — บล็อก commits ที่มี CRITICAL findings, ตรวจจับ secrets (AWS keys, GitHub tokens, JWT) ก่อนเขียนลง disk — ทำงานใน 500ms
 - **CVSS v4.0 Prioritization** — วิเคราะห์ business impact, exploitability (Weaponized → None), กำหนด SLA tiers (P1: 24 ชม. → P4: backlog)
-- **486 CWE Compliance Mappings** — Auto-map ผลสแกนไปยัง OWASP Top 10 (120), NIST 800-53 (100), MITRE ATT&CK (93), NCSA (62), PDPA (30), SOC 2 (~40), ISO 27001 (~41)
+- **488 CWE Compliance Mappings** — Auto-map ผลสแกนไปยัง OWASP Top 10 (122), NIST 800-53 (100), MITRE ATT&CK (93), NCSA (62), PDPA (30), SOC 2 (40), ISO 27001 (41)
 - **NCSA Web Security Standard** — รองรับมาตรฐานความมั่นคงปลอดภัยเว็บไซต์ สพธอ. (HTTP Headers, TLS, Session Management)
 - **MCP Server** — 10 composable tools สำหรับ programmatic integration กับ MCP-compatible clients (compare, compliance_status, suggest_fix, history, pipeline)
 - **Custom OWASP Rules** — 84 custom Semgrep rules for A01 (access control), A02 (crypto), A03 (injection), A04 (insecure design), A05 (misconfig), A06 (vulnerable components), A07 (auth failures), A08 (integrity failures), A09 (logging), A10 (SSRF + exception handling), K8s manifests, GraphQL endpoints
@@ -117,9 +117,9 @@
 
 ## What's New
 
-> ดู [CHANGELOG.md](CHANGELOG.md) สำหรับรายละเอียดทั้งหมด (v1.0.0 → v3.0.2)
+> ดู [CHANGELOG.md](CHANGELOG.md) สำหรับรายละเอียดทั้งหมด (v1.0.0 → v3.0.3)
 
-### v3.0.2 — Platform Release (Latest)
+### v3.0.3 — Platform Release (Latest)
 
 - **SQLite Historical Database** — `scripts/scan-db.sh` with 7 subcommands for persistent scan tracking and trend analysis
 - **DAG Pipeline Engine** — `runner/pipeline-engine.sh` with topological sort and 4 built-in pipeline definitions
@@ -142,7 +142,7 @@
 
 ### v2.7.0 — OWASP 2025, Nuclei DAST, PDPA Compliance
 
-- **OWASP Top 10 2025** — dual-version mapping (2021+2025) across all 120 CWEs, 4 new rule sets (A02/A04/A05/A10-exception)
+- **OWASP Top 10 2025** — dual-version mapping (2021+2025) across all 122 CWEs, 4 new rule sets (A02/A04/A05/A10-exception)
 - **53 Custom Semgrep Rules** — was 33, added A02 Cryptographic Failures (6), A04 Insecure Design (4), A05 Misconfiguration (6), A10 Exception Handling (4)
 - **Nuclei DAST Integration** — second DAST tool alongside ZAP with Docker, dispatcher, normalizer
 - **PDPA Compliance** — 30 CWE mappings for Thai Personal Data Protection Act
@@ -578,11 +578,11 @@ MCP server จะถูก load อัตโนมัติผ่าน `.mcp.js
 
 ## Compliance Mapping
 
-Plugin นี้ map ผลลัพธ์จาก CWE ไปยัง compliance frameworks อัตโนมัติ — **486 CWE mappings** across 7 frameworks:
+Plugin นี้ map ผลลัพธ์จาก CWE ไปยัง compliance frameworks อัตโนมัติ — **488 CWE mappings** across 7 frameworks:
 
 | Framework             | Version   | CWE Count | ใช้ทำอะไร                                             |
 | --------------------- | --------- | --------- | ----------------------------------------------------- |
-| **OWASP Top 10**      | 2021+2025 | 120       | Web application security categories (dual-version)    |
+| **OWASP Top 10**      | 2021+2025 | 122       | Web application security categories (dual-version)    |
 | **NIST SP 800-53**    | Rev. 5    | 100       | Federal security controls                             |
 | **MITRE ATT&CK**      | v16       | 93        | Adversary tactics & techniques                        |
 | **NCSA Web Security** | 1.0       | 62        | Thai national web security standard (สพธอ.)           |
@@ -889,12 +889,12 @@ bash tests/test-release.sh                 # 12 release checklist tests
 | Security Skills              | 16 (10 scanning + 6 orchestration)                                                                       |
 | Docker Tool Integrations     | 11 (Semgrep, ZAP, Nuclei, Grype, Trivy, Checkov, GitLeaks, Syft, TruffleHog, kube-bench, Nuclei-GraphQL) |
 | MCP Tools                    | 10 (scan, results, gate, compliance, status, compare, compliance_status, suggest_fix, history, pipeline) |
-| CWE Compliance Mappings      | 486 across 7 frameworks                                                                                  |
+| CWE Compliance Mappings      | 488 across 7 frameworks                                                                                  |
 | Custom Security Rules        | 84 (OWASP A01-A10 + K8s + GraphQL Semgrep rules)                                                         |
 | Automated Tests              | 1,284+ across 42 suites                                                                                  |
 | Reference Documents          | 19 domain knowledge files (~500-800 lines each)                                                          |
 | Hooks (Real-time Protection) | 3 (session-start, scan-on-write, pre-commit-gate)                                                        |
-| Output Formatters            | 7 (SARIF, JSON, Markdown, HTML, PDF, CSV, VEX)                                                           |
+| Output Formatters            | 8 (SARIF, JSON, Markdown, HTML, PDF, CSV, VEX, Dashboard)                                                |
 
 ---
 
@@ -969,7 +969,7 @@ devsecops-ai-team/
 | [FRAMEWORK-UPDATE-RUNBOOK.md](docs/FRAMEWORK-UPDATE-RUNBOOK.md) | ขั้นตอนอัพเดท framework versions                   |
 | [MANDAY-ESTIMATION.md](docs/MANDAY-ESTIMATION.md)               | ROI analysis + cost comparison (10,222% ROI)       |
 | [CLAUDE.md](CLAUDE.md)                                          | Architecture + contributing guidelines             |
-| [CHANGELOG.md](CHANGELOG.md)                                    | Version history (v1.0.0 → v3.0.2)                  |
+| [CHANGELOG.md](CHANGELOG.md)                                    | Version history (v1.0.0 → v3.0.3)                  |
 | [SECURITY.md](SECURITY.md)                                      | Vulnerability reporting policy                     |
 
 ---
@@ -1045,7 +1045,7 @@ claude-governance (base)          devsecops-ai-team (extends)
 | v2.6.x  | Released    | CI/CD           | GitHub Actions, GitLab CI, SARIF per-tool, MCP bundle, tech debt |
 | v2.7.0  | Released    | OWASP 2025      | Dual mapping, 53 rules, Nuclei, NCSA 1.0, PDPA                   |
 | v2.8.0  | Released    | Supply Chain    | SLSA, VEX, 10/10 OWASP rules, SOC 2, ISO 27001, TruffleHog       |
-| v3.0.2  | **Current** | Platform        | SQLite DB, DAG pipeline, dashboard, K8s scan, GraphQL scan       |
+| v3.0.3  | **Current** | Platform        | SQLite DB, DAG pipeline, dashboard, K8s scan, GraphQL scan       |
 
 > ดูรายละเอียด roadmap ทั้งหมดได้ที่ [docs/PRD.md](docs/PRD.md)
 
@@ -1059,7 +1059,7 @@ MIT License — see [LICENSE](LICENSE)
 
 <p align="center">
   <strong>DevSecOps AI Team</strong> — Enterprise Security Plugin for Claude Code<br>
-  <sub>18 AI Agents | 16 Skills | 11 Tools | 10 MCP Tools | 7 Output Formats | 486 CWE Mappings | OWASP 10/10</sub><br>
+  <sub>18 AI Agents | 16 Skills | 11 Tools | 10 MCP Tools | 8 Output Formats | 488 CWE Mappings | OWASP 10/10</sub><br>
   <sub>Built with <a href="https://claude.ai/claude-code">Claude Code</a> | Powered by Open Source Security Tools</sub>
 </p>
 

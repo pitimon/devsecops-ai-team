@@ -168,6 +168,98 @@ grep -qiE "trend|Trend" "$TEMPLATE" \
 echo ""
 
 # ═══════════════════════════════════════════
+# Section 6: Special Character Injection (5 tests)
+# ═══════════════════════════════════════════
+echo "--- Section 6: Special Character Injection ---"
+
+# Create fixture with single quotes, backslashes, and \u sequences (#69)
+SPECIAL_FIXTURE="$TMPDIR_TEST/special-chars.json"
+cat > "$SPECIAL_FIXTURE" << 'FIXTURE_EOF'
+{
+  "source_tool": "semgrep",
+  "findings": [
+    {
+      "id": "FINDING-20260303-001",
+      "source_tool": "semgrep",
+      "scan_type": "sast",
+      "severity": "CRITICAL",
+      "title": "Hardcoded secret with quote: sk_live_4eC39HqLyjWDarjtT1zdp7dc'",
+      "cwe_id": "CWE-798",
+      "location": {
+        "file": "config/keys.py",
+        "line_start": 42,
+        "snippet": "API_KEY = 'sk_live_4eC39HqLyjWDarjtT1zdp7dc'"
+      }
+    },
+    {
+      "id": "FINDING-20260303-002",
+      "source_tool": "semgrep",
+      "scan_type": "sast",
+      "severity": "HIGH",
+      "title": "Path with backslash: C:\\Users\\admin\\secret.key",
+      "cwe_id": "CWE-200",
+      "location": {
+        "file": "utils\\parser.js",
+        "line_start": 10,
+        "snippet": "const path = 'C:\\Users\\admin\\secret.key'"
+      }
+    }
+  ]
+}
+FIXTURE_EOF
+
+SPECIAL_DB="$TMPDIR_TEST/special-chars.db"
+SPECIAL_OUTPUT="$TMPDIR_TEST/special-dashboard.html"
+
+SCAN_DB="$SPECIAL_DB" bash "$SCAN_DB_SCRIPT" init >/dev/null 2>&1
+SCAN_DB="$SPECIAL_DB" bash "$SCAN_DB_SCRIPT" store "$SPECIAL_FIXTURE" >/dev/null 2>&1
+
+SPECIAL_RESULT=0
+bash "$GENERATOR" --db "$SPECIAL_DB" --output "$SPECIAL_OUTPUT" \
+  >/dev/null 2>&1 || SPECIAL_RESULT=$?
+
+[ "$SPECIAL_RESULT" -eq 0 ] \
+  && pass "Generator handles special characters (exit 0)" \
+  || fail "Generator failed with special characters (exit $SPECIAL_RESULT)"
+
+if [ "$SPECIAL_RESULT" -eq 0 ] && [ -f "$SPECIAL_OUTPUT" ]; then
+  # No leftover template placeholders
+  if grep -q "__SCAN_DATA__" "$SPECIAL_OUTPUT"; then
+    fail "Leftover __SCAN_DATA__ placeholder in output"
+  else
+    pass "No leftover placeholders with special char data"
+  fi
+
+  # No leftover template default values
+  if grep -q 'scan_id: "demo"' "$SPECIAL_OUTPUT"; then
+    fail "Leftover template defaults in output"
+  else
+    pass "Template defaults fully replaced"
+  fi
+
+  # Valid const assignments (not broken by quotes)
+  if grep -q "const SCAN_DATA = {" "$SPECIAL_OUTPUT"; then
+    pass "SCAN_DATA const assignment is valid"
+  else
+    fail "SCAN_DATA const assignment broken by special chars"
+  fi
+
+  # Check findings data injected
+  if grep -q "CWE-798" "$SPECIAL_OUTPUT"; then
+    pass "Finding data with special chars present in output"
+  else
+    fail "Finding data missing from output"
+  fi
+else
+  fail "No leftover placeholders (skipped)"
+  fail "Template defaults replaced (skipped)"
+  fail "SCAN_DATA const assignment (skipped)"
+  fail "Finding data present (skipped)"
+fi
+
+echo ""
+
+# ═══════════════════════════════════════════
 # Summary
 # ═══════════════════════════════════════════
 echo "================================================="

@@ -40,7 +40,7 @@ claude plugin install devsecops-ai-team@pitimon-devsecops
 3. แตกไฟล์และติดตั้ง:
 
 ```bash
-tar xzf devsecops-ai-team-v3.0.2.tar.gz
+tar xzf devsecops-ai-team-v3.0.3.tar.gz
 claude plugin marketplace add ./devsecops-ai-team
 claude plugin install devsecops-ai-team@pitimon-devsecops
 ```
@@ -56,10 +56,14 @@ docker pull aquasec/trivy:latest
 docker pull bridgecrew/checkov:latest
 docker pull ghcr.io/zaproxy/zaproxy:stable
 docker pull anchore/syft:latest
+docker pull projectdiscovery/nuclei:latest
+docker pull trufflesecurity/trufflehog:latest
+docker pull aquasec/kube-bench:latest
 
 # Save เป็นไฟล์
 docker save returntocorp/semgrep zricethezav/gitleaks anchore/grype \
   aquasec/trivy bridgecrew/checkov ghcr.io/zaproxy/zaproxy anchore/syft \
+  projectdiscovery/nuclei trufflesecurity/trufflehog aquasec/kube-bench \
   -o devsecops-tools.tar
 
 # บนเครื่อง air-gapped
@@ -192,7 +196,8 @@ docker compose -f runner/docker-compose.yml down -v
 
 # ลบ Docker images (optional — ประหยัดเนื้อที่)
 docker rmi returntocorp/semgrep anchore/grype aquasec/trivy \
-  bridgecrew/checkov zricethezav/gitleaks ghcr.io/zaproxy/zaproxy anchore/syft
+  bridgecrew/checkov zricethezav/gitleaks ghcr.io/zaproxy/zaproxy anchore/syft \
+  projectdiscovery/nuclei trufflesecurity/trufflehog aquasec/kube-bench
 
 # ลบ rules (optional)
 rm -f ~/.claude/rules/devsecops.md ~/.claude/rules/container-security.md
