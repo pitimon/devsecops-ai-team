@@ -1,7 +1,7 @@
 <p align="center">
   <img src="https://img.shields.io/badge/Claude_Code-Plugin-blueviolet?style=for-the-badge&logo=anthropic" alt="Claude Code Plugin">
   <img src="https://img.shields.io/badge/Version-3.0.2-brightgreen?style=for-the-badge" alt="v3.0.2">
-  <img src="https://img.shields.io/badge/Tests-978%2B-success?style=for-the-badge" alt="Tests">
+  <img src="https://img.shields.io/badge/Tests-1284%2B-success?style=for-the-badge" alt="Tests">
   <img src="https://img.shields.io/badge/License-MIT-yellow?style=for-the-badge" alt="MIT License">
 </p>
 
@@ -75,10 +75,10 @@
 | **Compliance Frameworks** | 7 frameworks — OWASP Top 10 (2021+2025), NIST 800-53, MITRE ATT&CK, NCSA, PDPA, SOC 2, ISO 27001                                                |
 | **CWE Mappings**          | 405 total (OWASP 120 + NIST 100 + MITRE 93 + NCSA 62 + PDPA 30)                                                                                 |
 | **OWASP Top 10 Coverage** | 10/10 categories — dual-version 2021+2025 mapping                                                                                               |
-| **Tests**                 | 978+ checks across 28 suites — all passing                                                                                                      |
-| **QA Rounds**             | 8 rounds, 54/54 latest (cumulative 950+ checks)                                                                                                 |
+| **Tests**                 | 1,284+ checks across 42 suites — all passing                                                                                                    |
+| **QA Rounds**             | 13 rounds, 75/75 latest (cumulative 1,300+ checks)                                                                                              |
 | **ROI**                   | 10,222% — 3,100 THB actual vs 320,000 THB equivalent (133x speed)                                                                               |
-| **Version**               | 3.0.0 (2026-03-03)                                                                                                                              |
+| **Version**               | 3.0.2 (2026-03-03)                                                                                                                              |
 
 ---
 
@@ -759,10 +759,10 @@ bash scripts/install-runner.sh --mode full
 
 ## Testing & Quality
 
-### Test Results (978+)
+### Test Results (1,284+)
 
 ```
-Validation:          258/258 structural checks (plugin structure, skills, agents, mappings)
+Validation:          276/276 structural checks (plugin structure, skills, agents, mappings)
 Normalizer:           41/41  severity mapping + multi-array + null safety
 MCP Server:           30/30  config + syntax + tool definitions
 MCP Handlers:         37/37  Zod validation + gate logic + compliance crosswalk + NCSA + PDPA
@@ -776,6 +776,9 @@ A02 Rules:            17/17  A02 cryptographic failures rule YAML + metadata + C
 A03 Rules:            33/33  A03 injection rule YAML + metadata + CWE + OWASP 2025
 A04 Rules:            17/17  A04 insecure design rule YAML + metadata + CWE
 A05 Rules:            18/18  A05 security misconfiguration rule YAML + metadata + CWE
+A06 Rules:            17/17  A06 vulnerable components rule YAML + metadata + CWE
+A07 Rules:            18/18  A07 authentication failures rule YAML + metadata + CWE
+A08 Rules:            16/16  A08 integrity failures rule YAML + metadata + CWE
 A09 Rules:            28/28  A09 logging rule YAML + metadata + CWE + OWASP 2025
 A10 Rules:            31/31  A10 SSRF + exception handling rules + OWASP 2025
 ZAP Modes:            34/34  mode parsing + timeout + Docker commands + fixtures
@@ -784,14 +787,25 @@ MCP Compare:          22/22  compare + compliance_status + suggest_fix tools
 DAST Live:             0/0   conditional (requires DAST_TARGET env var)
 Nuclei Integration:   22/22  Nuclei fixture + normalizer + dispatcher
 PDPA Mapping:         17/17  PDPA CWE mappings + structure + coverage
+SOC 2 Mapping:        17/17  SOC 2 Trust Service Criteria mappings
+ISO 27001 Mapping:    17/17  ISO 27001 Annex A control mappings
+SLSA Skill:           15/15  SLSA provenance assessment skill
+VEX Formatter:        20/20  CycloneDX + OpenVEX output format
+TruffleHog:           21/21  TruffleHog fixture + normalizer + dispatcher
+Secret Verifier:      18/18  secret validity checking + provider verification
 Formatters:           29/29  SARIF + JSON + Markdown + HTML + CSV + PDF formatter validation
 Runner:               28/28  job-dispatcher + result-collector + Docker orchestration
 Version Bump:         17/17  version-bump.sh script tests
 CI Adapter:           25/25  CI platform detection + adapter functions
 CI Templates:         65/65  GitHub Actions + GitLab CI template validation
 Release:              12/12  release checklist script tests
+Scan DB:              26/26  SQLite scan history database + 7 subcommands
+Pipeline Engine:      25/25  DAG pipeline engine + topological sort + cycle detection
+K8s Scan:             23/23  K8s skill + rules + kube-bench + normalizer integration
+GraphQL Scan:         34/34  GraphQL skill + rules + Nuclei templates + normalizer + metadata
+Dashboard:            21/21  dashboard generator + template + data injection
 --------------------------------------------------------------
-Total:               978+ checks passed (28 suites)
+Total:              1284+ checks passed (42 suites)
 ```
 
 ### QA History
@@ -877,7 +891,7 @@ bash tests/test-release.sh                 # 12 release checklist tests
 | MCP Tools                    | 10 (scan, results, gate, compliance, status, compare, compliance_status, suggest_fix, history, pipeline) |
 | CWE Compliance Mappings      | 486 across 7 frameworks                                                                                  |
 | Custom Security Rules        | 84 (OWASP A01-A10 + K8s + GraphQL Semgrep rules)                                                         |
-| Automated Tests              | 978+ across 34+ suites                                                                                   |
+| Automated Tests              | 1,284+ across 42 suites                                                                                  |
 | Reference Documents          | 19 domain knowledge files (~500-800 lines each)                                                          |
 | Hooks (Real-time Protection) | 3 (session-start, scan-on-write, pre-commit-gate)                                                        |
 | Output Formatters            | 7 (SARIF, JSON, Markdown, HTML, PDF, CSV, VEX)                                                           |
@@ -936,7 +950,7 @@ devsecops-ai-team/
 +-- templates/               # Report templates (HTML, Markdown, dashboard.html)
 +-- hooks/                   # 3 hooks (session-start, scan-on-write, pre-commit-gate)
 +-- scripts/                 # install-runner, install-rules, check-prerequisites, NCSA validator, scan-db.sh
-+-- tests/                   # 978+ tests across 34 suites
++-- tests/                   # 1,284+ tests across 42 suites
 +-- docs/                    # INSTALL, TROUBLESHOOTING, AGENT-CATALOG, RUNBOOK, MANDAY
 +-- examples/                # Rules, policies, DOMAIN.md, Semgrep rules
 +-- frameworks.json          # 19 tracked security frameworks with version info
