@@ -1,0 +1,191 @@
+{
+  "_meta": {
+    "description": "CWE to Thailand PDPA (Personal Data Protection Act B.E. 2562) mapping",
+    "source": "https://www.pdpc.or.th",
+    "pdpa_version": "B.E. 2562 (2019)",
+    "effective_date": "2022-06-01",
+    "last_updated": "2026-03-03"
+  },
+  "mappings": {
+    "CWE-312": {
+      "pdpa": ["Section 37(1)"],
+      "category": "Data Protection",
+      "name": "Cleartext Storage of Sensitive Information",
+      "requirement": "Appropriate security measures for personal data"
+    },
+    "CWE-311": {
+      "pdpa": ["Section 37(1)"],
+      "category": "Data Protection",
+      "name": "Missing Encryption of Sensitive Data",
+      "requirement": "Appropriate security measures for personal data"
+    },
+    "CWE-359": {
+      "pdpa": ["Section 23", "Section 26"],
+      "category": "Consent & Sensitive Data",
+      "name": "Exposure of Private Personal Information",
+      "requirement": "Consent for collection, explicit consent for sensitive data"
+    },
+    "CWE-532": {
+      "pdpa": ["Section 37(1)", "Section 37(4)"],
+      "category": "Data Protection",
+      "name": "Insertion of Sensitive Information into Log File",
+      "requirement": "Prevent unauthorized access, maintain confidentiality"
+    },
+    "CWE-200": {
+      "pdpa": ["Section 37(1)"],
+      "category": "Data Protection",
+      "name": "Exposure of Sensitive Information to Unauthorized Actor",
+      "requirement": "Appropriate security measures"
+    },
+    "CWE-209": {
+      "pdpa": ["Section 37(1)"],
+      "category": "Data Protection",
+      "name": "Generation of Error Message Containing Sensitive Information",
+      "requirement": "Prevent information leakage"
+    },
+    "CWE-256": {
+      "pdpa": ["Section 37(1)"],
+      "category": "Data Protection",
+      "name": "Plaintext Storage of Password",
+      "requirement": "Appropriate security measures for credentials"
+    },
+    "CWE-522": {
+      "pdpa": ["Section 37(1)"],
+      "category": "Data Protection",
+      "name": "Insufficiently Protected Credentials",
+      "requirement": "Appropriate security measures for credentials"
+    },
+    "CWE-862": {
+      "pdpa": ["Section 37(1)", "Section 37(3)"],
+      "category": "Access Control",
+      "name": "Missing Authorization",
+      "requirement": "Access control for personal data"
+    },
+    "CWE-863": {
+      "pdpa": ["Section 37(1)", "Section 37(3)"],
+      "category": "Access Control",
+      "name": "Incorrect Authorization",
+      "requirement": "Correct access control for personal data"
+    },
+    "CWE-284": {
+      "pdpa": ["Section 37(1)", "Section 37(3)"],
+      "category": "Access Control",
+      "name": "Improper Access Control",
+      "requirement": "Restrict access to personal data"
+    },
+    "CWE-306": {
+      "pdpa": ["Section 37(1)"],
+      "category": "Authentication",
+      "name": "Missing Authentication for Critical Function",
+      "requirement": "Authentication before accessing personal data"
+    },
+    "CWE-287": {
+      "pdpa": ["Section 37(1)"],
+      "category": "Authentication",
+      "name": "Improper Authentication",
+      "requirement": "Proper authentication for personal data systems"
+    },
+    "CWE-319": {
+      "pdpa": ["Section 37(1)", "Section 27"],
+      "category": "Transport Security",
+      "name": "Cleartext Transmission of Sensitive Information",
+      "requirement": "Encryption for data transfer, cross-border protection"
+    },
+    "CWE-523": {
+      "pdpa": ["Section 37(1)"],
+      "category": "Transport Security",
+      "name": "Unprotected Transport of Credentials",
+      "requirement": "Secure transmission of authentication data"
+    },
+    "CWE-614": {
+      "pdpa": ["Section 37(1)"],
+      "category": "Session Security",
+      "name": "Sensitive Cookie in HTTPS Session Without Secure Attribute",
+      "requirement": "Session security for personal data access"
+    },
+    "CWE-384": {
+      "pdpa": ["Section 37(1)"],
+      "category": "Session Security",
+      "name": "Session Fixation",
+      "requirement": "Secure session management"
+    },
+    "CWE-778": {
+      "pdpa": ["Section 37(4)", "Section 77"],
+      "category": "Logging & Breach Detection",
+      "name": "Insufficient Logging",
+      "requirement": "Audit trail for breach detection, 72-hour notification"
+    },
+    "CWE-117": {
+      "pdpa": ["Section 37(4)"],
+      "category": "Logging & Breach Detection",
+      "name": "Improper Output Neutralization for Logs",
+      "requirement": "Log integrity for audit and breach investigation"
+    },
+    "CWE-89": {
+      "pdpa": ["Section 37(1)"],
+      "category": "Data Protection",
+      "name": "SQL Injection",
+      "requirement": "Prevent unauthorized data access"
+    },
+    "CWE-79": {
+      "pdpa": ["Section 37(1)"],
+      "category": "Data Protection",
+      "name": "Cross-site Scripting (XSS)",
+      "requirement": "Prevent personal data theft via injection"
+    },
+    "CWE-918": {
+      "pdpa": ["Section 37(1)"],
+      "category": "Data Protection",
+      "name": "Server-Side Request Forgery (SSRF)",
+      "requirement": "Prevent unauthorized access to internal personal data"
+    },
+    "CWE-502": {
+      "pdpa": ["Section 37(1)"],
+      "category": "Data Protection",
+      "name": "Deserialization of Untrusted Data",
+      "requirement": "Prevent remote code execution accessing personal data"
+    },
+    "CWE-434": {
+      "pdpa": ["Section 37(1)"],
+      "category": "Data Protection",
+      "name": "Unrestricted Upload of File with Dangerous Type",
+      "requirement": "Prevent malicious file upload compromising data"
+    },
+    "CWE-327": {
+      "pdpa": ["Section 37(1)"],
+      "category": "Cryptography",
+      "name": "Use of a Broken or Risky Cryptographic Algorithm",
+      "requirement": "Appropriate security measures including encryption"
+    },
+    "CWE-328": {
+      "pdpa": ["Section 37(1)"],
+      "category": "Cryptography",
+      "name": "Use of Weak Hash",
+      "requirement": "Strong cryptographic algorithms for personal data"
+    },
+    "CWE-321": {
+      "pdpa": ["Section 37(1)"],
+      "category": "Cryptography",
+      "name": "Use of Hard-coded Cryptographic Key",
+      "requirement": "Proper key management for personal data encryption"
+    },
+    "CWE-338": {
+      "pdpa": ["Section 37(1)"],
+      "category": "Cryptography",
+      "name": "Use of Cryptographically Weak PRNG",
+      "requirement": "Strong randomness for security-sensitive operations"
+    },
+    "CWE-601": {
+      "pdpa": ["Section 37(1)"],
+      "category": "Data Protection",
+      "name": "URL Redirection to Untrusted Site (Open Redirect)",
+      "requirement": "Prevent phishing of personal data via redirect"
+    },
+    "CWE-352": {
+      "pdpa": ["Section 37(1)"],
+      "category": "Data Protection",
+      "name": "Cross-Site Request Forgery (CSRF)",
+      "requirement": "Prevent unauthorized actions on personal data"
+    }
+  }
+}
