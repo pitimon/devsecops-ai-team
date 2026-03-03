@@ -180,7 +180,7 @@ The pipeline runner classifies tools by resource requirements (`runner/concurren
 
 | Group  | Tools                                   | Max Parallel | Memory |
 | ------ | --------------------------------------- | ------------ | ------ |
-| Heavy  | ZAP                                     | 1            | 2GB    |
+| Heavy  | ZAP, kube-bench                         | 1            | 2GB    |
 | Medium | Trivy                                   | 2            | 1GB    |
 | Light  | Semgrep, GitLeaks, Grype, Checkov, Syft | 4            | 512MB  |
 
