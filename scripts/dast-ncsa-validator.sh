@@ -7,8 +7,9 @@ set -euo pipefail
 # Usage: dast-ncsa-validator.sh --target <url> [--zap-results <path>] [--output <path>]
 #
 # NCSA Categories validated:
-#   1.x — HTTP Security Headers (HSTS, X-Frame-Options, X-Content-Type-Options, CSP, Referrer-Policy)
-#   2.x — Transport Security (TLS version >= 1.2, certificate validity)
+#   1.x — HTTP Security Headers (HSTS, X-Frame-Options, X-Content-Type-Options, CSP,
+#          Referrer-Policy, Permissions-Policy, Cross-Origin-Opener-Policy, Cross-Origin-Embedder-Policy)
+#   2.x — Transport Security (TLS version >= 1.2, TLS 1.3 preference, certificate validity)
 #   4.x — Session Management (Cookie Secure, HttpOnly, SameSite flags)
 
 TARGET=""
@@ -119,6 +120,33 @@ else
     echo "  [WARN] Referrer-Policy header missing"
     add_check "1.x" "1.2" "Referrer-Policy" "warning" "Missing Referrer-Policy header"
   fi
+
+  # 1.3 Permissions-Policy (formerly Feature-Policy)
+  if echo "$HEADERS" | grep -qi 'Permissions-Policy'; then
+    echo "  [PASS] Permissions-Policy header present"
+    add_check "1.x" "1.3" "Permissions-Policy" "pass" "Permissions-Policy header set"
+  else
+    echo "  [WARN] Permissions-Policy header missing"
+    add_check "1.x" "1.3" "Permissions-Policy" "warning" "Missing Permissions-Policy header (formerly Feature-Policy)"
+  fi
+
+  # 1.3 Cross-Origin-Opener-Policy (COOP)
+  if echo "$HEADERS" | grep -qi 'Cross-Origin-Opener-Policy'; then
+    echo "  [PASS] Cross-Origin-Opener-Policy header present"
+    add_check "1.x" "1.3" "Cross-Origin-Opener-Policy" "pass" "COOP header set"
+  else
+    echo "  [WARN] Cross-Origin-Opener-Policy header missing"
+    add_check "1.x" "1.3" "Cross-Origin-Opener-Policy" "warning" "Missing Cross-Origin-Opener-Policy header"
+  fi
+
+  # 1.3 Cross-Origin-Embedder-Policy (COEP)
+  if echo "$HEADERS" | grep -qi 'Cross-Origin-Embedder-Policy'; then
+    echo "  [PASS] Cross-Origin-Embedder-Policy header present"
+    add_check "1.x" "1.3" "Cross-Origin-Embedder-Policy" "pass" "COEP header set"
+  else
+    echo "  [WARN] Cross-Origin-Embedder-Policy header missing"
+    add_check "1.x" "1.3" "Cross-Origin-Embedder-Policy" "warning" "Missing Cross-Origin-Embedder-Policy header"
+  fi
 fi
 
 echo ""
@@ -142,6 +170,15 @@ if [[ "$TARGET" == https://* ]]; then
     else
       echo "  [FAIL] TLS version below 1.2"
       add_check "2.x" "2.1" "TLS Version" "fail" "TLS version below 1.2"
+    fi
+
+    # 2.1 TLS 1.3 preference (recommended by NCSA, not mandatory)
+    if echo "$TLS_INFO" | grep -qi 'TLSv1\.3'; then
+      echo "  [PASS] TLS 1.3 supported"
+      add_check "2.x" "2.1" "TLS 1.3 Preference" "pass" "TLS 1.3 in use"
+    else
+      echo "  [WARN] TLS 1.3 not detected (1.2 is minimum, 1.3 recommended)"
+      add_check "2.x" "2.1" "TLS 1.3 Preference" "warning" "TLS 1.3 not detected — 1.2 meets minimum but 1.3 is recommended"
     fi
   else
     echo "  [WARN] Could not determine TLS version"
