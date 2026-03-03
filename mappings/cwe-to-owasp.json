@@ -918,6 +918,38 @@
       ],
       "category": "Exception Handling",
       "name": "Return Inside Finally Block"
+    },
+    "CWE-321": {
+      "owasp": [
+        "A02:2021",
+        "A02:2025"
+      ],
+      "category": "Cryptographic Failures",
+      "name": "Use of Hard-coded Cryptographic Key"
+    },
+    "CWE-328": {
+      "owasp": [
+        "A02:2021",
+        "A02:2025"
+      ],
+      "category": "Cryptographic Failures",
+      "name": "Use of Weak Hash"
+    },
+    "CWE-338": {
+      "owasp": [
+        "A02:2021",
+        "A02:2025"
+      ],
+      "category": "Cryptographic Failures",
+      "name": "Use of Cryptographically Weak PRNG"
+    },
+    "CWE-1021": {
+      "owasp": [
+        "A05:2021",
+        "A05:2025"
+      ],
+      "category": "Security Misconfiguration",
+      "name": "Improper Restriction of Rendered UI Layers or Frames"
     }
   }
 }
