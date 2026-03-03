@@ -13,7 +13,28 @@
       "skills/references/sast-patterns.md"
     ],
     "update_frequency": "rare",
-    "notes": "2021 edition current. Next expected ~2025-2026"
+    "notes": "2021 edition. Superseded by 2025 edition. Kept for dual-version compatibility."
+  },
+  {
+    "id": "owasp-top-10-2025",
+    "name": "OWASP Top 10 2025",
+    "version": "2025",
+    "released": "2025-06",
+    "source_url": "https://owasp.org/Top10/",
+    "last_checked": "2026-03-03",
+    "grep_patterns": ["A0[1-9]:2025", "A10:2025", "OWASP.*2025"],
+    "used_in": [
+      "mappings/cwe-to-owasp.json",
+      "rules/a01-access-control-rules.yml",
+      "rules/a02-crypto-rules.yml",
+      "rules/a03-injection-rules.yml",
+      "rules/a04-insecure-design-rules.yml",
+      "rules/a05-misconfig-rules.yml",
+      "rules/a09-logging-rules.yml",
+      "rules/a10-exception-rules.yml"
+    ],
+    "update_frequency": "rare",
+    "notes": "2025 edition. Key changes: A03 now Supply Chain (was Injection), A05 now Injection (was Misconfiguration), A10 now Exception Handling (was SSRF which merged into A01)"
   },
   {
     "id": "owasp-api-top-10",
