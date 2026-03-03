@@ -23,21 +23,21 @@ DevSecOps AI Team เป็น Claude Code plugin ที่รวม open-source
 
 ---
 
-## 2. Current State (v2.8.0)
+## 2. Current State (v3.0.0)
 
-| Metric                  | Value | Notes                                                                                       |
-| ----------------------- | ----- | ------------------------------------------------------------------------------------------- |
-| Agents                  | 18    | 4 groups: Orchestrators, Specialists, Experts, Core                                         |
-| Skills                  | 14    | 12 original + `/auto-fix` + `/slsa-assess`                                                  |
-| Docker Tools            | 9     | Semgrep, ZAP, Nuclei, Grype, Trivy, Checkov, GitLeaks, Syft, TruffleHog                     |
-| MCP Tools               | 8     | scan, normalize, results, triage, enrich, compare, compliance_status, suggest_fix           |
-| Custom Semgrep Rules    | 68    | A01 (8), A02 (6), A03 (11), A04 (4), A05 (6), A06 (5), A07 (5), A08 (5), A09 (7), A10 (7+4) |
-| OWASP Category Coverage | 10/10 | A01, A02, A03, A04, A05, A06, A07, A08, A09, A10                                            |
-| Compliance Frameworks   | 7     | OWASP (2021+2025), NIST 800-53, MITRE ATT&CK, NCSA, PDPA, SOC 2, ISO 27001                  |
-| CWE Mappings            | 486   | Across 7 mapping files                                                                      |
-| Output Formats          | 7     | JSON, SARIF, Markdown, HTML, PDF, CSV, VEX                                                  |
-| Test Suites             | 28    | 978+ individual tests                                                                       |
-| QA Rounds               | 10    | 1,070+ checks passed                                                                        |
+| Metric                  | Value | Notes                                                                                                |
+| ----------------------- | ----- | ---------------------------------------------------------------------------------------------------- |
+| Agents                  | 18    | 4 groups: Orchestrators, Specialists, Experts, Core                                                  |
+| Skills                  | 16    | 14 original + `/k8s-scan` + `/graphql-scan`                                                          |
+| Docker Tools            | 11    | Semgrep, ZAP, Nuclei, Grype, Trivy, Checkov, GitLeaks, Syft, TruffleHog, kube-bench, Nuclei-GraphQL  |
+| MCP Tools               | 10    | scan, normalize, results, triage, enrich, compare, compliance_status, suggest_fix, history, pipeline |
+| Custom Semgrep Rules    | 84    | A01-A10 (68) + K8s (8) + GraphQL (8)                                                                 |
+| OWASP Category Coverage | 10/10 | A01, A02, A03, A04, A05, A06, A07, A08, A09, A10                                                     |
+| Compliance Frameworks   | 7     | OWASP (2021+2025), NIST 800-53, MITRE ATT&CK, NCSA, PDPA, SOC 2, ISO 27001                           |
+| CWE Mappings            | 486   | Across 7 mapping files                                                                               |
+| Output Formats          | 7     | JSON, SARIF, Markdown, HTML, PDF, CSV, VEX                                                           |
+| Test Suites             | 34+   | 978+ individual tests                                                                                |
+| QA Rounds               | 10    | 1,070+ checks passed                                                                                 |
 
 ### Architecture Summary
 
@@ -147,13 +147,13 @@ User prompt → keyword match in SKILL.md frontmatter
 | Feature                     | DevSecOps AI Team | Snyk (CLI)  | GitHub Advanced Security | Semgrep App  |
 | --------------------------- | ----------------- | ----------- | ------------------------ | ------------ |
 | AI-powered remediation      | Yes (agents)      | Limited     | Copilot Autofix          | AI rules     |
-| Multi-tool orchestration    | 9 tools           | 3 tools     | CodeQL + Dependabot      | Semgrep only |
-| Custom rule authoring       | Yes (68 rules)    | No          | CodeQL QL                | Yes          |
+| Multi-tool orchestration    | 11 tools          | 3 tools     | CodeQL + Dependabot      | Semgrep only |
+| Custom rule authoring       | Yes (84 rules)    | No          | CodeQL QL                | Yes          |
 | Compliance mapping          | 7 frameworks      | 1 (OWASP)   | None                     | None         |
 | Thai regulatory (NCSA/PDPA) | Yes               | No          | No                       | No           |
 | Open-source tools           | 100%              | Proprietary | Proprietary              | Freemium     |
 | Claude Code native          | Yes               | No          | No                       | No           |
-| MCP integration             | 8 tools           | No          | No                       | No           |
+| MCP integration             | 10 tools          | No          | No                       | No           |
 
 **Differentiation**: Native Claude Code integration + Thai regulatory compliance + open-source multi-tool orchestration. ไม่มี competitor ที่ทำ 3 อย่างนี้พร้อมกัน
 
@@ -231,17 +231,17 @@ User prompt → keyword match in SKILL.md frontmatter
 
 ## 7. Success Metrics
 
-| Metric                      | Current (v2.8.0) | v2.8.0 Target | v3.0.0 Target |
-| --------------------------- | ---------------- | ------------- | ------------- |
-| OWASP custom rules coverage | 10/10            | 10/10         | 10/10         |
-| CWE mappings                | 486              | 450+          | 500+          |
-| Test count                  | 978+             | 1100+         | 1300+         |
-| MCP tools                   | 8                | 10+           | 12+           |
-| CI/CD platforms supported   | 3                | 3             | 3+            |
-| Compliance frameworks       | 7                | 7+            | 8+            |
-| Custom Semgrep rules        | 68               | 65+           | 75+           |
-| DAST tools                  | 2 (ZAP+Nuclei)   | 2+            | 3+            |
-| Output formats              | 7                | 7+ (VEX)      | 8+            |
+| Metric                      | Current (v3.0.0) | v3.0.0 Target | Next Target |
+| --------------------------- | ---------------- | ------------- | ----------- |
+| OWASP custom rules coverage | 10/10            | 10/10         | 10/10       |
+| CWE mappings                | 486              | 500+          | 500+        |
+| Test count                  | 978+             | 1300+         | 1500+       |
+| MCP tools                   | 10               | 12+           | 14+         |
+| CI/CD platforms supported   | 3                | 3+            | 4+          |
+| Compliance frameworks       | 7                | 8+            | 9+          |
+| Custom Semgrep rules        | 84               | 75+           | 100+        |
+| DAST tools                  | 2 (ZAP+Nuclei)   | 3+            | 3+          |
+| Output formats              | 7                | 8+            | 8+          |
 
 ---
 
@@ -309,4 +309,4 @@ User prompt → keyword match in SKILL.md frontmatter
 
 ---
 
-_Document generated: 2026-03-03 | Updated: v2.8.0 release | Next review: v3.0.0 release_
+_Document generated: 2026-03-03 | Updated: v3.0.0 release | Next review: v3.1.0 release_

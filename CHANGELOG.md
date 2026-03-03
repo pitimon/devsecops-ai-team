@@ -7,6 +7,34 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [3.0.0] — 2026-03-03
+
+### Added
+
+- **SQLite Historical Database** — `scripts/scan-db.sh` with 7 subcommands (init, store, query, trend, lifecycle, export, stats) for persistent scan tracking
+- **DAG Pipeline Engine** — `runner/pipeline-engine.sh` with topological sort, 4 built-in pipeline definitions (default, sast-only, secrets-only, compliance)
+- **Security Dashboard** — Alpine.js + Chart.js self-contained HTML dashboard with 6 panels (pipeline flow, severity distribution, OWASP coverage, tool results, compliance heatmap, trend)
+- **K8s Security Scanning** — `/k8s-scan` skill (15th), 8 Semgrep rules for K8s manifests, kube-bench integration for CIS Benchmark
+- **GraphQL Security Scanning** — `/graphql-scan` skill (16th), 8 Semgrep rules, 4 Nuclei templates for live scanning
+- **MCP Tools** — `devsecops_history` and `devsecops_pipeline` (10 total MCP tools)
+- **Dashboard Generator** — `formatters/dashboard-generator.sh` for SQLite → HTML conversion
+
+### Changed
+
+- `run-pipeline.sh` now supports `--pipeline` flag for DAG execution
+- Concurrency groups extended with kube-bench (heavy)
+- Job dispatcher supports kube-bench (3 modes) and graphql-scan (3 modes)
+- Normalizer supports kube-bench (10th tool)
+- CWE-400 and CWE-770 added to OWASP mappings
+
+### Metrics
+
+- Skills: 14 → 16 (+2: k8s-scan, graphql-scan)
+- References: 17 → 19 (+2)
+- MCP tools: 8 → 10 (+2)
+- Test suites: 28 → 34+ (+6)
+- Semgrep rules: 68 → 84 (+16: 8 K8s + 8 GraphQL)
+
 ## [2.8.0] — 2026-03-03
 
 ### Added
