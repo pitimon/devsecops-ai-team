@@ -100,7 +100,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Skills: 14 → 16 (+2: k8s-scan, graphql-scan)
 - References: 17 → 19 (+2)
 - MCP tools: 8 → 10 (+2)
-- Test suites: 28 → 34+ (+6)
+- Test suites: 37 → 42 (+5)
 - Semgrep rules: 68 → 84 (+16: 8 K8s + 8 GraphQL)
 
 ## [2.8.0] — 2026-03-03
@@ -114,7 +114,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - VEX output format (CycloneDX VEX + OpenVEX) — 7th output format
 - TruffleHog secret scanning (9th security tool) — git/filesystem/s3 modes
 - Secret validity checker (scripts/secret-verifier.sh) — 4 providers with In-the-Loop safety
-- 7 new test suites: test-a06, test-a07, test-a08, test-soc2-mapping, test-iso27001-mapping, test-slsa-skill, test-vex-formatter, test-trufflehog-integration, test-secret-verifier
+- 9 new test suites: test-a06, test-a07, test-a08, test-soc2-mapping, test-iso27001-mapping, test-slsa-skill, test-vex-formatter, test-trufflehog-integration, test-secret-verifier
 
 ### Changed
 
@@ -182,7 +182,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `tests/validate-plugin.sh` — replaced 6 hardcoded counts with dynamic computation (#37)
 - `.mcp.json` — now points to bundled `mcp/dist/server.js` instead of `mcp/server.mjs` (#32)
 - Validate-plugin checks expanded from 237 to 249+
-- Total test count: ~770+ (was 719)
+- Total test count: ~793 (was 719)
 
 ## [2.5.0] — 2026-03-03
 
@@ -206,13 +206,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Output formats expanded from 4 to 6 (added PDF, CSV)
 - Job dispatcher now loads A01, A03, A10 custom rules alongside A09
 - SAST patterns reference expanded with A01, A03, A10 rule documentation
-- Total test count: ~700+ (was 587)
+- Total test count: ~719+ (was 547)
 
 ### Fixed
 
 - DAST specialist agent now references NCSA validator step (QA Round 8 issue #28)
 
-## [2.4.0] - 2026-03-02
+## [2.4.0] — 2026-03-02
 
 ### Added
 
@@ -253,7 +253,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `skills/references/logging-monitoring.md` — Section 8: custom rules reference
 - **547 total tests** (was 461)
 
-## [2.3.0] - 2026-03-02
+## [2.3.0] — 2026-03-02
 
 ### Added
 
@@ -287,7 +287,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **`compliance-frameworks.md`** — expanded A08/A09 OWASP table rows with full CWE lists; NCSA Session 5→11 CWEs, Error 4→10 CWEs
 - **`sbom-generate/SKILL.md`** — loads `software-integrity.md` reference for A08 verification
 
-## [2.2.1] - 2026-03-02
+## [2.2.1] — 2026-03-02
 
 ### Added
 
@@ -301,7 +301,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - **ตัวเลขเก่าใน README** (Issue #13): test badge 334→354, CWE counts 86/78/68→96/90/83, test breakdown อัปเดตเป็น 6 suites
 
-## [2.2.0] - 2026-03-02
+## [2.2.0] — 2026-03-02
 
 ### Fixed
 
@@ -326,7 +326,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Dead `runShellCommand()` function from `mcp/server.mjs` — defined in v2.1.0 refactor but never called; also removed unused `execSync` import
 
-## [2.1.0] - 2026-03-01
+## [2.1.0] — 2026-03-01
 
 ### Security
 
@@ -350,7 +350,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **`dedup-findings.sh`** — added missing execute permission (`chmod +x`)
 - **Error suppression** — `job-dispatcher.sh` now logs tool stderr to `${RESULTS_DIR}/dispatcher.log` instead of `/dev/null`
 
-## [2.0.2] - 2026-03-01
+## [2.0.2] — 2026-03-01
 
 ### Added
 
@@ -360,7 +360,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - `cwe-to-mitre.json`: 48 → 68 CWEs (mapped to T1562, T1070, T1195, T1565, T1222 techniques)
 - Covers previously unmapped tool-reported CWEs: Security Misconfiguration, Vulnerable Components, IDOR, Session Fixation, CORS, ReDoS, Template Injection, Supply Chain, Insufficient Logging
 
-## [2.0.1] - 2026-03-01
+## [2.0.1] — 2026-03-01
 
 ### Fixed
 
@@ -375,7 +375,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - `cwe-to-nist.json`: 33 → 58 CWEs (mapped to SI-16, SC-5, SC-4 controls)
   - `cwe-to-mitre.json`: 23 → 48 CWEs (mapped to T1203, T1499, T1068 techniques)
 
-## [2.0.0] - 2026-03-01
+## [2.0.0] — 2026-03-01
 
 ### Fixed
 
@@ -401,7 +401,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **`full-pipeline/SKILL.md`** updated with agent delegation chain and dedup step
 - **`session-start.sh`** injects recommended scans and MCP tool availability
 
-## [1.0.0] - 2026-03-01
+## [1.0.0] — 2026-03-01
 
 ### Added
 
