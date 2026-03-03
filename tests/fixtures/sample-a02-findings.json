@@ -1,0 +1,72 @@
+{
+  "findings": [
+    {
+      "id": "FINDING-A02-001",
+      "source_tool": "semgrep",
+      "scan_type": "sast",
+      "rule_id": "a02-weak-hash-python",
+      "severity": "ERROR",
+      "title": "Weak hash algorithm (MD5) detected in password verification",
+      "cwe_id": "CWE-328",
+      "owasp": "A02:2021",
+      "location": {
+        "file": "auth/utils.py",
+        "line_start": 45,
+        "line_end": 45
+      },
+      "message": "Weak hash algorithm (MD5/SHA1) detected via hashlib. MD5 and SHA1 are cryptographically broken and MUST NOT be used for password hashing, integrity verification, or digital signatures.",
+      "status": "open"
+    },
+    {
+      "id": "FINDING-A02-002",
+      "source_tool": "semgrep",
+      "scan_type": "sast",
+      "rule_id": "a02-hardcoded-key",
+      "severity": "ERROR",
+      "title": "Hardcoded encryption key in configuration module",
+      "cwe_id": "CWE-321",
+      "owasp": "A02:2021",
+      "location": {
+        "file": "config/settings.py",
+        "line_start": 12,
+        "line_end": 12
+      },
+      "message": "Hardcoded encryption or secret key detected. Secrets embedded in source code can be extracted by attackers through repository access or binary analysis. Use environment variables or secret managers.",
+      "status": "open"
+    },
+    {
+      "id": "FINDING-A02-003",
+      "source_tool": "semgrep",
+      "scan_type": "sast",
+      "rule_id": "a02-insecure-random-javascript",
+      "severity": "WARNING",
+      "title": "Math.random() used for session token generation",
+      "cwe_id": "CWE-338",
+      "owasp": "A02:2021",
+      "location": {
+        "file": "src/auth/token.js",
+        "line_start": 28,
+        "line_end": 28
+      },
+      "message": "Insecure pseudo-random number generator (Math.random) detected. Math.random() is not cryptographically secure and MUST NOT be used for security-sensitive operations such as token generation.",
+      "status": "open"
+    }
+  ],
+  "summary": {
+    "total": 3,
+    "critical": 0,
+    "high": 0,
+    "medium": 0,
+    "low": 0,
+    "info": 0,
+    "warning": 1,
+    "error": 2
+  },
+  "metadata": {
+    "rules_file": "rules/a02-crypto-rules.yml",
+    "rule_count": 6,
+    "scan_type": "sast",
+    "owasp_category": "A02:2021",
+    "cwe_coverage": ["CWE-321", "CWE-327", "CWE-328", "CWE-338"]
+  }
+}
