@@ -1,0 +1,70 @@
+{
+  "findings": [
+    {
+      "id": "gql-001",
+      "rule_id": "gql-introspection-enabled",
+      "severity": "MEDIUM",
+      "source_tool": "semgrep",
+      "scan_type": "sast",
+      "title": "GraphQL introspection is enabled in production config",
+      "message": "GraphQL introspection is enabled. Introspection allows clients to query the full schema, exposing all types, fields, and relationships. Disable introspection in production to prevent information disclosure and reconnaissance attacks.",
+      "cwe_id": "CWE-200",
+      "owasp": ["A01:2021"],
+      "location": {
+        "file": "src/schema.py",
+        "line_start": 15,
+        "line_end": 15
+      },
+      "status": "open"
+    },
+    {
+      "id": "gql-002",
+      "rule_id": "gql-sql-in-resolver",
+      "severity": "HIGH",
+      "source_tool": "semgrep",
+      "scan_type": "sast",
+      "title": "SQL string concatenation in GraphQL resolver",
+      "message": "SQL query built with template literal inside GraphQL resolver 'user'. This enables SQL injection attacks through GraphQL arguments. Use parameterized queries or ORM methods.",
+      "cwe_id": "CWE-89",
+      "owasp": ["A03:2021"],
+      "location": {
+        "file": "src/resolvers/userResolver.js",
+        "line_start": 42,
+        "line_end": 44
+      },
+      "status": "open"
+    },
+    {
+      "id": "gql-003",
+      "rule_id": "gql-no-depth-limit",
+      "severity": "MEDIUM",
+      "source_tool": "semgrep",
+      "scan_type": "sast",
+      "title": "GraphQL server has no query depth limit",
+      "message": "GraphQL server instantiation detected without depth limiting configuration. Without depthLimit or maxDepth, deeply nested queries can cause exponential resource consumption and denial of service.",
+      "cwe_id": "CWE-400",
+      "owasp": ["A04:2025"],
+      "location": {
+        "file": "src/server.js",
+        "line_start": 8,
+        "line_end": 12
+      },
+      "status": "open"
+    }
+  ],
+  "summary": {
+    "total": 3,
+    "critical": 0,
+    "high": 1,
+    "medium": 2,
+    "low": 0,
+    "info": 0
+  },
+  "metadata": {
+    "rules_file": "rules/graphql-rules.yml",
+    "rule_count": 8,
+    "scan_type": "sast",
+    "owasp_category": "GraphQL Security",
+    "cwe_coverage": ["CWE-200", "CWE-89", "CWE-400"]
+  }
+}

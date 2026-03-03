@@ -1,0 +1,398 @@
+rules:
+  # ==========================================================================
+  # GraphQL Security — Custom Semgrep Rules
+  # DevSecOps AI Team v3.0.0
+  #
+  # 8 rules targeting GraphQL API anti-patterns
+  # Languages: Generic/regex (5 rules), Python (1 rule), JavaScript (2 rules)
+  # Reference: skills/references/graphql-security-reference.md
+  # ==========================================================================
+
+  # -------------------------------------------------------------------------
+  # Rule 1: Introspection Enabled (CWE-200) — Generic
+  # Detects introspection explicitly enabled in GraphQL config
+  # -------------------------------------------------------------------------
+  - id: gql-introspection-enabled
+    pattern-regex: 'introspection\s*[:=]\s*[Tt]rue'
+    message: >
+      GraphQL introspection is enabled. Introspection allows clients to query
+      the full schema, exposing all types, fields, and relationships. Disable
+      introspection in production to prevent information disclosure and
+      reconnaissance attacks per OWASP API Security guidelines (CWE-200).
+    languages:
+      - generic
+    severity: WARNING
+    metadata:
+      cwe:
+        - "CWE-200"
+      owasp:
+        - "A01:2021"
+        - "A05:2025"
+      nist:
+        - "AC-3"
+        - "SC-7"
+      confidence: HIGH
+      impact: MEDIUM
+      likelihood: HIGH
+      category: security
+      technology:
+        - graphql
+      references:
+        - https://owasp.org/API-Security/editions/2023/en/0xa7-server-side-request-forgery/
+        - https://cwe.mitre.org/data/definitions/200.html
+        - https://cheatsheetseries.owasp.org/cheatsheets/GraphQL_Cheat_Sheet.html
+      fix: |
+        Disable introspection in production:
+          # Apollo Server
+          const server = new ApolloServer({
+            introspection: false,
+            ...
+          });
+          # Strawberry (Python)
+          schema = strawberry.Schema(query=Query, extensions=[DisableIntrospection()])
+
+  # -------------------------------------------------------------------------
+  # Rule 2: No Depth Limit (CWE-400) — Generic
+  # Detects GraphQL servers configured without query depth limiting
+  # -------------------------------------------------------------------------
+  - id: gql-no-depth-limit
+    pattern-regex: '(ApolloServer|GraphQLServer|graphqlHTTP|createYoga)\s*\('
+    message: >
+      GraphQL server instantiation detected without depth limiting configuration.
+      Without depthLimit or maxDepth, deeply nested queries can cause
+      exponential resource consumption and denial of service. Configure query
+      depth limits (recommended: 7-10 levels) per OWASP API Security (CWE-400).
+    languages:
+      - generic
+    severity: WARNING
+    metadata:
+      cwe:
+        - "CWE-400"
+      owasp:
+        - "A04:2025"
+      nist:
+        - "SC-5"
+        - "SI-10"
+      confidence: MEDIUM
+      impact: HIGH
+      likelihood: MEDIUM
+      category: security
+      technology:
+        - graphql
+      references:
+        - https://cheatsheetseries.owasp.org/cheatsheets/GraphQL_Cheat_Sheet.html
+        - https://cwe.mitre.org/data/definitions/400.html
+      fix: |
+        Add depth limiting to your GraphQL server:
+          # Apollo Server with graphql-depth-limit
+          import depthLimit from 'graphql-depth-limit';
+          const server = new ApolloServer({
+            validationRules: [depthLimit(10)],
+          });
+          # graphql-yoga
+          const yoga = createYoga({
+            plugins: [useDepthLimit({ maxDepth: 10 })],
+          });
+
+  # -------------------------------------------------------------------------
+  # Rule 3: No Cost Limit (CWE-400) — Generic
+  # Detects GraphQL server without query cost/complexity analysis
+  # -------------------------------------------------------------------------
+  - id: gql-no-cost-limit
+    pattern-regex: '(ApolloServer|GraphQLServer|graphqlHTTP|createYoga)\s*\(\s*\{[^}]*\}'
+    message: >
+      GraphQL server configured without query cost analysis or complexity
+      limiting. Without cost limits, an attacker can craft queries that
+      request massive amounts of data in a single request. Implement query
+      cost analysis with a maximum budget per OWASP API Security (CWE-400).
+    languages:
+      - generic
+    severity: WARNING
+    metadata:
+      cwe:
+        - "CWE-400"
+      owasp:
+        - "A04:2025"
+      nist:
+        - "SC-5"
+        - "SI-10"
+      confidence: MEDIUM
+      impact: HIGH
+      likelihood: MEDIUM
+      category: security
+      technology:
+        - graphql
+      references:
+        - https://cheatsheetseries.owasp.org/cheatsheets/GraphQL_Cheat_Sheet.html
+        - https://cwe.mitre.org/data/definitions/400.html
+      fix: |
+        Add query cost analysis:
+          # Apollo Server with graphql-query-complexity
+          import { createComplexityLimitRule } from 'graphql-validation-complexity';
+          const server = new ApolloServer({
+            validationRules: [createComplexityLimitRule(1000)],
+          });
+          # Or use graphql-cost-analysis
+          import costAnalysis from 'graphql-cost-analysis';
+
+  # -------------------------------------------------------------------------
+  # Rule 4: Batch Queries Without Limit (CWE-400) — Generic
+  # Detects batch/array query config without request limit
+  # -------------------------------------------------------------------------
+  - id: gql-batch-no-limit
+    pattern-regex: '(allowBatchedHttpRequests|batching)\s*[:=]\s*[Tt]rue'
+    message: >
+      GraphQL batch queries enabled without a batch size limit. Allowing
+      unlimited batched queries lets attackers send thousands of operations
+      in a single HTTP request, bypassing rate limiting and causing denial
+      of service. Set a maximum batch size (recommended: 5-10) per
+      OWASP API Security (CWE-400).
+    languages:
+      - generic
+    severity: WARNING
+    metadata:
+      cwe:
+        - "CWE-400"
+      owasp:
+        - "A04:2025"
+      nist:
+        - "SC-5"
+      confidence: HIGH
+      impact: HIGH
+      likelihood: MEDIUM
+      category: security
+      technology:
+        - graphql
+      references:
+        - https://cheatsheetseries.owasp.org/cheatsheets/GraphQL_Cheat_Sheet.html
+        - https://cwe.mitre.org/data/definitions/400.html
+      fix: |
+        Limit batch query size:
+          # Apollo Server 4
+          const server = new ApolloServer({
+            allowBatchedHttpRequests: true,
+            maxBatchSize: 5,
+          });
+          # Or disable batching entirely
+          const server = new ApolloServer({
+            allowBatchedHttpRequests: false,
+          });
+
+  # -------------------------------------------------------------------------
+  # Rule 5: Resolver Without Auth Check (CWE-862) — Python
+  # Detects GraphQL resolver functions missing authentication/authorization
+  # -------------------------------------------------------------------------
+  - id: gql-resolver-no-auth
+    patterns:
+      - pattern: |
+          def resolve_$NAME(self, info, ...):
+              ...
+      - pattern-not: |
+          def resolve_$NAME(self, info, ...):
+              ...
+              $AUTH.has_permission(...)
+              ...
+      - pattern-not: |
+          @login_required
+          def resolve_$NAME(self, info, ...):
+              ...
+      - pattern-not: |
+          @permission_required(...)
+          def resolve_$NAME(self, info, ...):
+              ...
+      - pattern-not: |
+          def resolve_$NAME(self, info, ...):
+              ...
+              info.context.user
+              ...
+    message: >
+      GraphQL resolver 'resolve_$NAME' has no authentication or authorization
+      check. All resolvers handling sensitive data must verify user identity
+      and permissions before returning data. Add @login_required,
+      @permission_required, or check info.context.user per OWASP A01:2021
+      (CWE-862).
+    languages:
+      - python
+    severity: ERROR
+    metadata:
+      cwe:
+        - "CWE-862"
+      owasp:
+        - "A01:2021"
+        - "A01:2025"
+      nist:
+        - "AC-3"
+        - "AC-6"
+      confidence: MEDIUM
+      impact: HIGH
+      likelihood: HIGH
+      category: security
+      technology:
+        - python
+        - graphql
+      references:
+        - https://owasp.org/Top10/A01_2021-Broken_Access_Control/
+        - https://cwe.mitre.org/data/definitions/862.html
+        - https://cheatsheetseries.owasp.org/cheatsheets/GraphQL_Cheat_Sheet.html
+      fix: |
+        Add authentication to GraphQL resolvers:
+          # Strawberry
+          @strawberry.type
+          class Query:
+              @strawberry.field
+              @login_required
+              def resolve_users(self, info) -> List[User]:
+                  return User.objects.all()
+          # Graphene
+          class Query(graphene.ObjectType):
+              def resolve_users(self, info):
+                  if not info.context.user.is_authenticated:
+                      raise PermissionError("Authentication required")
+                  return User.objects.all()
+
+  # -------------------------------------------------------------------------
+  # Rule 6: SQL String Concatenation in Resolver (CWE-89) — JavaScript
+  # Detects raw SQL with string concatenation inside GraphQL resolvers
+  # -------------------------------------------------------------------------
+  - id: gql-sql-in-resolver
+    patterns:
+      - pattern-either:
+          - pattern: |
+              $NAME: async (parent, args, context) => {
+                ...
+                $DB.query(`...${$VAR}...`)
+                ...
+              }
+          - pattern: |
+              $NAME: async (parent, args, context) => {
+                ...
+                $DB.query("..." + $VAR + "...")
+                ...
+              }
+    message: >
+      SQL query built with template literal or concatenation inside GraphQL
+      resolver '$NAME'. This enables SQL injection attacks through GraphQL
+      arguments. Use parameterized queries or ORM methods per OWASP A03:2021
+      (CWE-89).
+    languages:
+      - javascript
+    severity: ERROR
+    metadata:
+      cwe:
+        - "CWE-89"
+      owasp:
+        - "A03:2021"
+        - "A05:2025"
+      nist:
+        - "SI-10"
+        - "SC-18"
+      confidence: HIGH
+      impact: HIGH
+      likelihood: HIGH
+      category: security
+      technology:
+        - javascript
+        - graphql
+      references:
+        - https://owasp.org/Top10/A03_2021-Injection/
+        - https://cwe.mitre.org/data/definitions/89.html
+        - https://cheatsheetseries.owasp.org/cheatsheets/GraphQL_Cheat_Sheet.html
+      fix: |
+        Use parameterized queries in resolvers:
+          // Bad
+          user: async (parent, args, context) => {
+            return db.query(`SELECT * FROM users WHERE id = ${args.id}`);
+          }
+          // Good
+          user: async (parent, args, context) => {
+            return db.query('SELECT * FROM users WHERE id = $1', [args.id]);
+          }
+
+  # -------------------------------------------------------------------------
+  # Rule 7: Verbose Error Messages (CWE-209) — Generic
+  # Detects GraphQL configs exposing detailed error information
+  # -------------------------------------------------------------------------
+  - id: gql-verbose-errors
+    pattern-regex: '(debug\s*[:=]\s*[Tt]rue|includeStacktraceInErrorResponses\s*[:=]\s*[Tt]rue|exposeErrorInfo\s*[:=]\s*[Tt]rue|showGraphiQL\s*[:=]\s*[Tt]rue)'
+    message: >
+      GraphQL server configured to expose detailed error information. Debug
+      mode, stack traces, or detailed error formatting can reveal internal
+      implementation details, database schema, and file paths to attackers.
+      Disable debug mode and use generic error messages in production per
+      OWASP A05:2025 (CWE-209).
+    languages:
+      - generic
+    severity: WARNING
+    metadata:
+      cwe:
+        - "CWE-209"
+      owasp:
+        - "A05:2021"
+        - "A05:2025"
+      nist:
+        - "SI-11"
+        - "SC-7"
+      confidence: MEDIUM
+      impact: MEDIUM
+      likelihood: HIGH
+      category: security
+      technology:
+        - graphql
+      references:
+        - https://cheatsheetseries.owasp.org/cheatsheets/GraphQL_Cheat_Sheet.html
+        - https://cwe.mitre.org/data/definitions/209.html
+      fix: |
+        Disable verbose errors in production:
+          # Apollo Server
+          const server = new ApolloServer({
+            debug: false,
+            includeStacktraceInErrorResponses: false,
+            formatError: (err) => ({
+              message: 'An error occurred',
+              code: err.extensions?.code || 'INTERNAL_ERROR',
+            }),
+          });
+
+  # -------------------------------------------------------------------------
+  # Rule 8: No Rate Limiting (CWE-770) — Generic
+  # Detects GraphQL endpoint setup without rate limiting middleware
+  # -------------------------------------------------------------------------
+  - id: gql-no-rate-limit
+    pattern-regex: '(app\.(use|post|all)\s*\(\s*[''"]\/graphql[''"]|server\.(applyMiddleware|start)\s*\()'
+    message: >
+      GraphQL endpoint configured without rate limiting. Without rate
+      limiting, attackers can send unlimited queries to exhaust server
+      resources or brute-force data extraction. Apply rate limiting
+      middleware specific to GraphQL operations per OWASP API Security
+      (CWE-770).
+    languages:
+      - generic
+    severity: WARNING
+    metadata:
+      cwe:
+        - "CWE-770"
+      owasp:
+        - "A04:2025"
+      nist:
+        - "SC-5"
+        - "SC-7"
+      confidence: MEDIUM
+      impact: HIGH
+      likelihood: MEDIUM
+      category: security
+      technology:
+        - graphql
+      references:
+        - https://cheatsheetseries.owasp.org/cheatsheets/GraphQL_Cheat_Sheet.html
+        - https://cwe.mitre.org/data/definitions/770.html
+      fix: |
+        Add rate limiting to GraphQL endpoint:
+          # Express with express-rate-limit
+          import rateLimit from 'express-rate-limit';
+          const graphqlLimiter = rateLimit({
+            windowMs: 15 * 60 * 1000,
+            max: 100,
+          });
+          app.use('/graphql', graphqlLimiter);
+          # Or use graphql-rate-limit directive
+          directive @rateLimit(max: Int, window: String) on FIELD_DEFINITION
