@@ -1,7 +1,7 @@
 # Man-Day Estimation & ROI Analysis — DevSecOps AI Team Plugin
 
 **Analysis Date**: 2026-03-01
-**Plugin Version**: v2.6.0
+**Plugin Version**: v2.6.1
 **Actual Development Method**: Claude Code (claude-opus-4-6)
 
 ---
