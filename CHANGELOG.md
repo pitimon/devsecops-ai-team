@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [3.0.2] — 2026-03-03
+
+### Fixed
+
+- **GraphQL test depth** (QA #67): Added 11 functional tests to `test-graphql-scan.sh` (23 → 34 tests) — normalizer integration, fixture field validation, rules metadata validation with OWASP dual-tag compliance check
+
 ## [3.0.1] — 2026-03-03
 
 ### Fixed
