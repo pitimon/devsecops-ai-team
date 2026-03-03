@@ -35,6 +35,10 @@ print('yes' if 'devsecops' in servers else 'no')
 " 2>/dev/null)
 [ "$MCP_SERVER" = "yes" ] && pass ".mcp.json declares 'devsecops' server" || fail ".mcp.json missing 'devsecops' server"
 
+# ─── Test 1b: Bundle exists ───
+
+[ -f "$ROOT_DIR/mcp/dist/server.js" ] && pass "mcp/dist/server.js bundle exists" || fail "mcp/dist/server.js bundle missing"
+
 # ─── Test 2: package.json valid ───
 echo ""
 echo "--- MCP Package ---"

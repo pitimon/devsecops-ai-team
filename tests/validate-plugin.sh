@@ -234,6 +234,7 @@ echo "--- Section 16: MCP Server ---"
 [ -f "$ROOT_DIR/.mcp.json" ] && pass ".mcp.json exists" || fail ".mcp.json missing"
 [ -f "$ROOT_DIR/mcp/server.mjs" ] && pass "mcp/server.mjs exists" || fail "mcp/server.mjs missing"
 [ -f "$ROOT_DIR/mcp/package.json" ] && pass "mcp/package.json exists" || fail "mcp/package.json missing"
+[ -f "$ROOT_DIR/mcp/dist/server.js" ] && pass "mcp/dist/server.js bundle exists" || fail "mcp/dist/server.js bundle missing"
 
 if [ -f "$ROOT_DIR/.mcp.json" ]; then
   python3 -c "import json; json.load(open('$ROOT_DIR/.mcp.json'))" 2>/dev/null && pass ".mcp.json is valid JSON" || fail ".mcp.json invalid"

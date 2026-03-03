@@ -28,7 +28,9 @@ import { fileURLToPath } from "node:url";
 import { z } from "zod";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
-const ROOT_DIR = resolve(__dirname, "..");
+// Support running as esbuild bundle (dist/server.js) — adjust ROOT_DIR accordingly
+const isBundled = !existsSync(resolve(__dirname, "package.json"));
+const ROOT_DIR = resolve(__dirname, isBundled ? "../.." : "..");
 const RUNNER_DIR = resolve(ROOT_DIR, "runner");
 const FORMATTER_DIR = resolve(ROOT_DIR, "formatters");
 const MAPPINGS_DIR = resolve(ROOT_DIR, "mappings");

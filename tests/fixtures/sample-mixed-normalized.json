@@ -1,0 +1,47 @@
+{
+  "scan_id": "test-mixed-001",
+  "findings": [
+    {
+      "id": "F001",
+      "rule_id": "python.lang.security.audit.eval-detected",
+      "title": "Use of eval() detected",
+      "severity": "HIGH",
+      "source_tool": "semgrep",
+      "location": { "file": "app.py", "line_start": 42 },
+      "cwe_id": "CWE-95"
+    },
+    {
+      "id": "F002",
+      "rule_id": "CVE-2023-1234",
+      "title": "Vulnerable dependency: lodash < 4.17.21",
+      "severity": "CRITICAL",
+      "source_tool": "grype",
+      "location": { "package": "lodash", "version": "4.17.20" },
+      "cwe_id": "CWE-1321"
+    },
+    {
+      "id": "F003",
+      "rule_id": "generic-api-key",
+      "title": "Generic API key detected",
+      "severity": "HIGH",
+      "source_tool": "gitleaks",
+      "location": { "file": "config.js", "line_start": 15 }
+    },
+    {
+      "id": "F004",
+      "rule_id": "python.lang.security.audit.exec-detected",
+      "title": "Use of exec() detected",
+      "severity": "MEDIUM",
+      "source_tool": "semgrep",
+      "location": { "file": "utils.py", "line_start": 88 },
+      "cwe_id": "CWE-95"
+    },
+    {
+      "id": "F005",
+      "rule_id": "no-source-tool-finding",
+      "title": "Finding without source tool",
+      "severity": "LOW",
+      "location": { "file": "unknown.py", "line_start": 1 }
+    }
+  ]
+}
