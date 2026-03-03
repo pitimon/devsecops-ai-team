@@ -7,12 +7,32 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [2.6.0] — 2026-03-03
+
 ### Added
 
-- **Product Requirements Document** (`docs/PRD.md`) — 9-section strategic blueprint covering v2.6.0 → v3.0.0 roadmap, personas, gap analysis, success metrics, risk assessment
-- **Domain Model** (`DOMAIN.md`) — 11 entities, 6 bounded contexts, 19 invariants, 7 domain events, entity relationships
+- **GitHub Actions reusable workflows** — 4 templates (SAST, SCA, container scan, full pipeline) with SARIF upload via `workflow_call` (#33)
+- **GitLab CI templates** — 4 templates producing native report artifacts (sast, dependency_scanning, container_scanning) with `resource_group` for heavy tools (#34)
+- **CI adapter layer** (`runner/ci-adapter.sh`) — platform-agnostic CI/CD functions for GitHub Actions, GitLab CI, and local execution (#38)
+- **Concurrency groups** (`runner/concurrency-groups.json`) — tool classification by resource weight (heavy/medium/light) for parallel scheduling (#38)
+- **Pipeline runner** (`runner/run-pipeline.sh`) — orchestrates multiple tools with concurrency-aware scheduling (#38)
+- **MCP server esbuild bundle** (`mcp/dist/server.js`) — zero npm install deployment, committed ~622KB bundle (#32)
+- **Per-tool SARIF output** — SARIF formatter now creates one run per source tool with proper metadata; `--combined` flag for legacy mode (#35)
+- **Version bump script** (`scripts/version-bump.sh`) — automated version bump across all 7 files with `--dry-run` support (#36)
+- **GitLab SAST converter** (`ci-templates/converters/gitlab-sast-converter.sh`) — normalized JSON to GitLab v15.0.7 schema
+- **CI integration documentation** (`docs/CI-INTEGRATION.md`) — consumer guide for both GitHub Actions and GitLab CI
+- **Product Requirements Document** (`docs/PRD.md`) — 9-section strategic blueprint covering v2.6.0 → v3.0.0 roadmap
+- **Domain Model** (`DOMAIN.md`) — 11 entities, 6 bounded contexts, 19 invariants, 7 domain events
 - GitHub milestones (v2.6.0, v2.7.0, v2.8.0, v3.0.0) and 24 roadmap issues
-- README roadmap expanded with v2.6.0 → v3.0.0 milestones and themes
+- 4 new test suites: test-version-bump.sh (17), test-ci-adapter.sh (25), test-ci-templates.sh (45), test-formatters.sh (+12)
+
+### Changed
+
+- `hooks/scan-on-write.sh` — replaced fragile grep-based JSON parsing with robust python3 parser (#37)
+- `tests/validate-plugin.sh` — replaced 6 hardcoded counts with dynamic computation (#37)
+- `.mcp.json` — now points to bundled `mcp/dist/server.js` instead of `mcp/server.mjs` (#32)
+- Validate-plugin checks expanded from 237 to 249+
+- Total test count: ~770+ (was 719)
 
 ## [2.5.0] — 2026-03-03
 

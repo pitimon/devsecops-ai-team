@@ -1,7 +1,7 @@
 <p align="center">
   <img src="https://img.shields.io/badge/Claude_Code-Plugin-blueviolet?style=for-the-badge&logo=anthropic" alt="Claude Code Plugin">
-  <img src="https://img.shields.io/badge/Version-2.5.0-brightgreen?style=for-the-badge" alt="v2.5.0">
-  <img src="https://img.shields.io/badge/Tests-700%2B-success?style=for-the-badge" alt="Tests">
+  <img src="https://img.shields.io/badge/Version-2.6.0-brightgreen?style=for-the-badge" alt="v2.6.0">
+  <img src="https://img.shields.io/badge/Tests-770%2B-success?style=for-the-badge" alt="Tests">
   <img src="https://img.shields.io/badge/License-MIT-yellow?style=for-the-badge" alt="MIT License">
 </p>
 
@@ -37,7 +37,7 @@
 - [Executive Summary](#executive-summary)
 - [Key Highlights](#key-highlights)
 - [OWASP Top 10 Coverage](#owasp-top-10-coverage)
-- [What's New (v2.5.0)](#whats-new)
+- [What's New (v2.6.0)](#whats-new)
 - [Use Cases](#use-cases)
 - [Quick Start](#quick-start)
 - [Architecture Overview](#architecture-overview)
@@ -117,9 +117,9 @@
 
 ## What's New
 
-> ดู [CHANGELOG.md](CHANGELOG.md) สำหรับรายละเอียดทั้งหมด (v1.0.0 → v2.5.0)
+> ดู [CHANGELOG.md](CHANGELOG.md) สำหรับรายละเอียดทั้งหมด (v1.0.0 → v2.6.0)
 
-### v2.5.0 — Custom OWASP Rules (A01/A03/A10), 3 New MCP Tools, PDF/CSV (Latest)
+### v2.6.0 — Custom OWASP Rules (A01/A03/A10), 3 New MCP Tools, PDF/CSV (Latest)
 
 - **A01/A03/A10 Custom Semgrep Rules** — 26 new rules ตรวจจับ access control, injection, SSRF anti-patterns
 - **3 New MCP Tools** — `devsecops_compare` (trend diff), `devsecops_compliance_status` (aggregate compliance), `devsecops_suggest_fix` (remediation)
@@ -900,7 +900,7 @@ devsecops-ai-team/
 | [FRAMEWORK-UPDATE-RUNBOOK.md](docs/FRAMEWORK-UPDATE-RUNBOOK.md) | ขั้นตอนอัพเดท framework versions                   |
 | [MANDAY-ESTIMATION.md](docs/MANDAY-ESTIMATION.md)               | ROI analysis + cost comparison (10,222% ROI)       |
 | [CLAUDE.md](CLAUDE.md)                                          | Architecture + contributing guidelines             |
-| [CHANGELOG.md](CHANGELOG.md)                                    | Version history (v1.0.0 → v2.5.0)                  |
+| [CHANGELOG.md](CHANGELOG.md)                                    | Version history (v1.0.0 → v2.6.0)                  |
 | [SECURITY.md](SECURITY.md)                                      | Vulnerability reporting policy                     |
 
 ---
@@ -964,19 +964,19 @@ claude-governance (base)          devsecops-ai-team (extends)
 
 ## Roadmap
 
-| Version | Status      | Theme           | Key Features                                        |
-| ------- | ----------- | --------------- | --------------------------------------------------- |
-| v1.0.0  | Released    | Foundation      | 18 agents, 12 skills, 7 tools, compliance mappings  |
-| v2.0.0  | Released    | MCP & Quality   | MCP server, orchestration, dedup, smart detection   |
-| v2.1.0  | Released    | Security & RBAC | 3 security fixes, RBAC gate, Zod validation         |
-| v2.2.0  | Released    | Remediation     | Framework-aware fixes (Django/React/Express/Spring) |
-| v2.3.0  | Released    | Automation      | /auto-fix skill, NCSA compliance, integration tests |
-| v2.4.0  | Released    | Detection       | A09 custom rules, ZAP multi-mode, NCSA validator    |
-| v2.5.0  | **Current** | Rules & MCP     | 33 rules (A01/A03/A09/A10), 3 MCP tools, PDF/CSV    |
-| v2.6.0  | Planned     | CI/CD           | GitHub Actions, GitLab CI, SARIF fix, tech debt     |
-| v2.7.0  | Planned     | OWASP 2025      | Mapping migration, Nuclei, NCSA 1.0, PDPA           |
-| v2.8.0  | Planned     | Supply Chain    | SLSA, VEX, 10/10 OWASP rules, SOC 2                 |
-| v3.0.0  | Planned     | Platform        | Historical DB, dashboard UI, K8s, GraphQL           |
+| Version | Status      | Theme           | Key Features                                                     |
+| ------- | ----------- | --------------- | ---------------------------------------------------------------- |
+| v1.0.0  | Released    | Foundation      | 18 agents, 12 skills, 7 tools, compliance mappings               |
+| v2.0.0  | Released    | MCP & Quality   | MCP server, orchestration, dedup, smart detection                |
+| v2.1.0  | Released    | Security & RBAC | 3 security fixes, RBAC gate, Zod validation                      |
+| v2.2.0  | Released    | Remediation     | Framework-aware fixes (Django/React/Express/Spring)              |
+| v2.3.0  | Released    | Automation      | /auto-fix skill, NCSA compliance, integration tests              |
+| v2.4.0  | Released    | Detection       | A09 custom rules, ZAP multi-mode, NCSA validator                 |
+| v2.5.0  | Released    | Rules & MCP     | 33 rules (A01/A03/A09/A10), 3 MCP tools, PDF/CSV                 |
+| v2.6.0  | **Current** | CI/CD           | GitHub Actions, GitLab CI, SARIF per-tool, MCP bundle, tech debt |
+| v2.7.0  | Planned     | OWASP 2025      | Mapping migration, Nuclei, NCSA 1.0, PDPA                        |
+| v2.8.0  | Planned     | Supply Chain    | SLSA, VEX, 10/10 OWASP rules, SOC 2                              |
+| v3.0.0  | Planned     | Platform        | Historical DB, dashboard UI, K8s, GraphQL                        |
 
 > ดูรายละเอียด roadmap ทั้งหมดได้ที่ [docs/PRD.md](docs/PRD.md)
 
