@@ -7,6 +7,30 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [2.7.0] — 2026-03-03
+
+### Added
+
+- OWASP Top 10 2025 dual-version mapping (2021+2025) across all 114 CWEs
+- OWASP 2025 framework entry in frameworks.json (17 frameworks)
+- Custom Semgrep rules: A02 Cryptographic Failures (6 rules)
+- Custom Semgrep rules: A04 Insecure Design (4 rules)
+- Custom Semgrep rules: A05 Security Misconfiguration (6 rules)
+- Custom Semgrep rules: A10 Exception Handling (4 rules, new 2025 category)
+- Nuclei DAST integration (Docker, dispatcher, normalizer, skill, tests)
+- PDPA compliance mapping (30 CWEs, mappings/cwe-to-pdpa.json)
+- PDPA support in MCP compliance_status tool (5 frameworks)
+- NCSA 1.0 validator: Permissions-Policy, COOP, COEP, TLS 1.3 checks
+- 7 new test suites (test-a02, test-a04, test-a05, test-nuclei-integration, test-pdpa-mapping, test-a10 extended)
+
+### Changed
+
+- OWASP 2025 dual-tags added to all 33 existing custom Semgrep rules
+- DAST skill extended to support Nuclei alongside ZAP
+- cwe-to-owasp.json migrated to dual-version format with 114 entries
+- MCP compliance_status now supports 5 frameworks (added PDPA)
+- frameworks.json OWASP 2021 entry marked as superseded
+
 ## [2.6.1] — 2026-03-03
 
 ### Added
