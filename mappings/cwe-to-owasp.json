@@ -133,8 +133,8 @@
       "name": "Insecure Temporary File"
     },
     "CWE-400": {
-      "owasp": ["A04:2021", "A04:2025"],
-      "category": "Insecure Design",
+      "owasp": ["A05:2021", "A04:2021", "A05:2025", "A04:2025"],
+      "category": "Security Misconfiguration",
       "name": "Uncontrolled Resource Consumption"
     },
     "CWE-434": {
@@ -323,8 +323,8 @@
       "name": "Improper Handling of Exceptional Conditions"
     },
     "CWE-770": {
-      "owasp": ["A04:2021", "A04:2025"],
-      "category": "Insecure Design",
+      "owasp": ["A05:2021", "A04:2021", "A05:2025", "A04:2025"],
+      "category": "Security Misconfiguration",
       "name": "Allocation of Resources Without Limits or Throttling"
     },
     "CWE-787": {
