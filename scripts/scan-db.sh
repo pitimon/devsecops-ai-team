@@ -168,6 +168,103 @@ db.commit()
 db.close()
 print(f'[scan-db] Stored: scan={scan_id}, new={stored}, updated={updated}, tools={\",\".join(tools)}')
 "
+  # Post-store enrichment: OWASP tags + compliance snapshots
+  enrich_owasp "$DB_PATH" "$input_file"
+  generate_compliance "$DB_PATH" "$input_file"
+}
+
+# Enrich findings with OWASP tags from CWE→OWASP mapping
+enrich_owasp() {
+  local db="$1" input_file="$2"
+  local mapping_file="$ROOT_DIR/mappings/cwe-to-owasp.json"
+  [ -f "$mapping_file" ] || return 0
+
+  python3 -c "
+import sqlite3, json, sys
+
+db = sqlite3.connect(sys.argv[1])
+mapping = json.load(open(sys.argv[2])).get('mappings', {})
+
+# Get latest scan_id
+scan_id = db.execute(
+    'SELECT scan_id FROM scans ORDER BY id DESC LIMIT 1'
+).fetchone()
+if not scan_id:
+    db.close(); sys.exit(0)
+scan_id = scan_id[0]
+
+enriched = 0
+rows = db.execute(
+    'SELECT id, cwe FROM findings WHERE scan_id = ? AND cwe IS NOT NULL',
+    (scan_id,)
+).fetchall()
+for fid, cwe in rows:
+    key = cwe if cwe.startswith('CWE-') else f'CWE-{cwe}'
+    entry = mapping.get(key)
+    if entry and entry.get('owasp'):
+        db.execute('UPDATE findings SET owasp = ? WHERE id = ?',
+                   (json.dumps(entry['owasp']), fid))
+        enriched += 1
+
+db.commit()
+db.close()
+if enriched:
+    print(f'[scan-db] Enriched: {enriched} findings with OWASP tags')
+" "$db" "$mapping_file"
+}
+
+# Generate compliance snapshots from 7 framework mappings
+generate_compliance() {
+  local db="$1" input_file="$2"
+  local mappings_dir="$ROOT_DIR/mappings"
+  [ -d "$mappings_dir" ] || return 0
+
+  python3 -c "
+import sqlite3, json, glob, os, sys
+from datetime import datetime
+
+db = sqlite3.connect(sys.argv[1])
+mappings_dir = sys.argv[2]
+
+scan_id = db.execute(
+    'SELECT scan_id FROM scans ORDER BY id DESC LIMIT 1'
+).fetchone()
+if not scan_id:
+    db.close(); sys.exit(0)
+scan_id = scan_id[0]
+now = datetime.utcnow().isoformat() + 'Z'
+
+# Collect CWEs from this scan
+scan_cwes = set()
+for row in db.execute(
+    'SELECT cwe FROM findings WHERE scan_id = ? AND cwe IS NOT NULL',
+    (scan_id,)
+).fetchall():
+    cwe = row[0]
+    scan_cwes.add(cwe if cwe.startswith('CWE-') else f'CWE-{cwe}')
+
+frameworks = 0
+for mfile in sorted(glob.glob(os.path.join(mappings_dir, 'cwe-to-*.json'))):
+    fname = os.path.basename(mfile)
+    framework = fname.replace('cwe-to-', '').replace('.json', '')
+    mapping = json.load(open(mfile)).get('mappings', {})
+    if not mapping:
+        continue
+    matched = len(scan_cwes & set(mapping.keys()))
+    coverage = round(matched / len(mapping) * 100, 1)
+    details = json.dumps({'matched': matched, 'total': len(mapping)})
+    db.execute(
+        'INSERT INTO compliance_snapshots '
+        '(scan_id, framework, coverage, details, captured_at) '
+        'VALUES (?, ?, ?, ?, ?)',
+        (scan_id, framework, coverage, details, now))
+    frameworks += 1
+
+db.commit()
+db.close()
+if frameworks:
+    print(f'[scan-db] Compliance: {frameworks} framework snapshots generated')
+" "$db" "$mappings_dir"
 }
 
 cmd_query() {

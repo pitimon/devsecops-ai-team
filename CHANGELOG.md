@@ -14,11 +14,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Dashboard injection bugs** (#69): Fixed 2 bugs in `dashboard-generator.sh` `inject_data()` that caused blank dashboards with real scan data
   - **Bug 1**: Triple-quote string injection (`'''$json'''`) broke on findings containing single quotes (e.g., `sk_live_...`). Replaced with file-based data passing via temp files
   - **Bug 2**: Multi-line placeholder regex (`[^;]*`) didn't match template's multi-line default objects, leaving leftover JavaScript that caused `SyntaxError`. Fixed with `re.DOTALL` flag + `lambda` substitution (also avoids Python 3.12+ `\u` escape deprecation)
+- **Dashboard data pipeline gaps** (#70): `scan-db.sh store` now auto-enriches OWASP tags from `cwe-to-owasp.json` and auto-generates compliance snapshots for all 7 frameworks — all 6 dashboard panels render without manual enrichment
 - **Documentation accuracy sync**: Updated 25+ stale metrics across README.md, DOMAIN.md, PRD.md, INSTALL.md — CWE 405→488, OWASP 120→122, QA 8→13, output formats 7→8
 
 ### Added
 
 - **Dashboard regression tests**: 5 new tests in `test-dashboard-generator.sh` (21 → 26) for special character injection (single quotes, backslashes, `\u` sequences)
+- **Enrichment tests**: 7 new tests in `test-scan-db.sh` (26 → 33) — OWASP tag validation (3) + compliance snapshot validation (4)
 - **Smoke test prompts**: v3.0.0 section with K8s, GraphQL, pipeline, dashboard, scan history, and SLSA assessment prompts
 - **GitHub Wiki**: Updated 4 pages (Home, Installation, Architecture, Skills) + created 2 new pages (Skills-Reference, Test-Results) for v3.0.2 accuracy
 

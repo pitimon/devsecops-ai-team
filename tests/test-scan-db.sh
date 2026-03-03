@@ -241,6 +241,112 @@ sys.exit(0 if 'by_severity' in d and isinstance(d['by_severity'], dict) else 1)
 echo ""
 
 # ═══════════════════════════════════════════
+# Section 9: OWASP Enrichment (3 tests) — #70
+# ═══════════════════════════════════════════
+echo "--- Section 9: OWASP Enrichment ---"
+
+OWASP_COUNT=$(python3 -c "
+import sqlite3
+db = sqlite3.connect('$TEST_DB')
+rows = db.execute('SELECT owasp FROM findings WHERE owasp IS NOT NULL').fetchall()
+db.close()
+print(len(rows))
+" 2>/dev/null)
+[ "$OWASP_COUNT" -gt 0 ] \
+  && pass "Findings enriched with OWASP tags ($OWASP_COUNT)" \
+  || fail "No findings have OWASP tags"
+
+OWASP_VALID=$(python3 -c "
+import sqlite3, json
+db = sqlite3.connect('$TEST_DB')
+rows = db.execute('SELECT owasp FROM findings WHERE owasp IS NOT NULL').fetchall()
+db.close()
+valid = all(isinstance(json.loads(r[0]), list) for r in rows)
+print('yes' if valid else 'no')
+" 2>/dev/null)
+[ "$OWASP_VALID" = "yes" ] \
+  && pass "OWASP tags are valid JSON arrays" \
+  || fail "OWASP tags are not valid JSON arrays"
+
+OWASP_DUAL=$(python3 -c "
+import sqlite3, json
+db = sqlite3.connect('$TEST_DB')
+rows = db.execute('SELECT owasp FROM findings WHERE owasp IS NOT NULL').fetchall()
+db.close()
+for r in rows:
+    tags = json.loads(r[0])
+    if any(':2021' in t for t in tags) and any(':2025' in t for t in tags):
+        print('yes'); exit()
+print('no')
+" 2>/dev/null)
+[ "$OWASP_DUAL" = "yes" ] \
+  && pass "OWASP tags include dual-version (2021+2025)" \
+  || fail "OWASP tags missing dual-version"
+
+echo ""
+
+# ═══════════════════════════════════════════
+# Section 10: Compliance Snapshots (4 tests) — #70
+# ═══════════════════════════════════════════
+echo "--- Section 10: Compliance Snapshots ---"
+
+# Get latest scan_id for compliance queries
+LATEST_SID=$(python3 -c "
+import sqlite3
+db = sqlite3.connect('$TEST_DB')
+r = db.execute('SELECT scan_id FROM scans ORDER BY id DESC LIMIT 1').fetchone()
+db.close()
+print(r[0] if r else '')
+" 2>/dev/null)
+
+COMP_COUNT=$(python3 -c "
+import sqlite3
+db = sqlite3.connect('$TEST_DB')
+count = db.execute('SELECT COUNT(*) FROM compliance_snapshots WHERE scan_id = ?', ('$LATEST_SID',)).fetchone()[0]
+db.close()
+print(count)
+" 2>/dev/null)
+[ "$COMP_COUNT" -eq 7 ] \
+  && pass "7 compliance framework snapshots for latest scan" \
+  || fail "Expected 7 compliance snapshots, got $COMP_COUNT"
+
+COMP_FRAMEWORKS=$(python3 -c "
+import sqlite3
+db = sqlite3.connect('$TEST_DB')
+rows = db.execute('SELECT framework FROM compliance_snapshots WHERE scan_id = ? ORDER BY framework', ('$LATEST_SID',)).fetchall()
+db.close()
+print(','.join(r[0] for r in rows))
+" 2>/dev/null)
+[ "$COMP_FRAMEWORKS" = "iso27001,mitre,ncsa,nist,owasp,pdpa,soc2" ] \
+  && pass "All 7 frameworks present: $COMP_FRAMEWORKS" \
+  || fail "Framework list mismatch: $COMP_FRAMEWORKS"
+
+COMP_COVERAGE=$(python3 -c "
+import sqlite3
+db = sqlite3.connect('$TEST_DB')
+rows = db.execute('SELECT coverage FROM compliance_snapshots WHERE scan_id = ? AND coverage > 0', ('$LATEST_SID',)).fetchall()
+db.close()
+print(len(rows))
+" 2>/dev/null)
+[ "$COMP_COVERAGE" -gt 0 ] \
+  && pass "At least one framework has non-zero coverage" \
+  || fail "All frameworks have zero coverage"
+
+COMP_DETAILS=$(python3 -c "
+import sqlite3, json
+db = sqlite3.connect('$TEST_DB')
+rows = db.execute('SELECT details FROM compliance_snapshots WHERE scan_id = ? AND details IS NOT NULL', ('$LATEST_SID',)).fetchall()
+db.close()
+valid = all('matched' in json.loads(r[0]) and 'total' in json.loads(r[0]) for r in rows)
+print('yes' if valid and rows else 'no')
+" 2>/dev/null)
+[ "$COMP_DETAILS" = "yes" ] \
+  && pass "Compliance details have matched/total fields" \
+  || fail "Compliance details malformed"
+
+echo ""
+
+# ═══════════════════════════════════════════
 # Summary
 # ═══════════════════════════════════════════
 echo ""
