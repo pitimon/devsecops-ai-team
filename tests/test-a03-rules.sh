@@ -154,6 +154,22 @@ for rule in data['rules']:
 sys.exit(0)
 " && pass "All 11 rules tagged with A03:2021" || fail "Not all rules have A03:2021 tag"
 
+# Check OWASP 2025 dual-tagging
+HAS_2025=$(python3 -c "
+import yaml
+with open('$RULES_FILE') as f:
+    data = yaml.safe_load(f)
+count = 0
+for r in data['rules']:
+    owasp = r.get('metadata', {}).get('owasp', [])
+    if any('2025' in t for t in owasp):
+        count += 1
+print(count)
+")
+[ "$HAS_2025" -eq "$RULE_COUNT" ] \
+  && pass "All $RULE_COUNT rules have OWASP 2025 tags" \
+  || fail "Only $HAS_2025/$RULE_COUNT rules have OWASP 2025 tags"
+
 echo ""
 
 # ═══════════════════════════════════════════
