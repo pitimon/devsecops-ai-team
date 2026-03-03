@@ -8,7 +8,7 @@ set -euo pipefail
 #        ZAP options: [--mode baseline|full|api] [--auth-token <token>] [--api-spec <path>]
 #        Nuclei options: env NUCLEI_MODE=cve|full|custom [CUSTOM_TEMPLATES=<path>]
 #
-# Tools: semgrep, gitleaks, grype, trivy, checkov, zap, syft, nuclei
+# Tools: semgrep, gitleaks, grype, trivy, checkov, zap, syft, nuclei, trufflehog
 
 TOOL=""
 TARGET=""
@@ -29,7 +29,7 @@ usage() {
   echo "Usage: $0 --tool <tool> --target <path> [--rules <rules>] [--format <format>] [--image <image>]"
   echo "       ZAP: [--mode baseline|full|api] [--auth-token <token>] [--api-spec <path>]"
   echo ""
-  echo "Tools: semgrep, gitleaks, grype, trivy, checkov, zap, syft, nuclei"
+  echo "Tools: semgrep, gitleaks, grype, trivy, checkov, zap, syft, nuclei, trufflehog"
   echo "Formats: json (default), sarif, text"
   echo "ZAP modes: baseline (default, 120s), full (1800s), api (600s)"
   echo "Nuclei modes: cve (default, 120s), full (600s), custom (300s)"
@@ -288,6 +288,42 @@ run_nuclei() {
   fi
 }
 
+# ─── Secret Scanning: TruffleHog ───
+run_trufflehog() {
+  local TRUFFLEHOG_MODE="${TRUFFLEHOG_MODE:-git}"
+  local TRUFFLEHOG_TIMEOUT=300
+  local TRUFFLEHOG_CMD=""
+
+  case "$TRUFFLEHOG_MODE" in
+    git)
+      TRUFFLEHOG_CMD="trufflehog git file:///workspace --json"
+      ;;
+    filesystem)
+      TRUFFLEHOG_CMD="trufflehog filesystem /workspace --json"
+      ;;
+    s3)
+      TRUFFLEHOG_CMD="trufflehog s3 --bucket=${S3_BUCKET:-} --json"
+      ;;
+    *)
+      echo "[dispatcher] ERROR: Unknown TruffleHog mode: $TRUFFLEHOG_MODE (use git|filesystem|s3)"
+      exit 1
+      ;;
+  esac
+
+  echo "[dispatcher] TruffleHog mode: $TRUFFLEHOG_MODE (timeout: ${TRUFFLEHOG_TIMEOUT}s)" >>"$LOG"
+
+  if [ "$RUNNER_MODE" = "full" ]; then
+    timeout "$TRUFFLEHOG_TIMEOUT" docker exec devsecops-trufflehog \
+      sh -c "$TRUFFLEHOG_CMD > /results/${JOB_ID}/trufflehog-results.json" 2>>"$LOG"
+  else
+    timeout "$TRUFFLEHOG_TIMEOUT" docker run --rm \
+      -v "$(pwd):/workspace:ro" -v "${RESULTS_DIR}:/results" \
+      trufflesecurity/trufflehog:latest \
+      ${TRUFFLEHOG_MODE} $([ "$TRUFFLEHOG_MODE" = "git" ] && echo "file:///workspace" || ([ "$TRUFFLEHOG_MODE" = "filesystem" ] && echo "/workspace" || echo "--bucket=${S3_BUCKET:-}")) \
+      --json > "${RESULTS_DIR}/trufflehog-results.json" 2>>"$LOG"
+  fi
+}
+
 run_tool() {
   case "$TOOL" in
     semgrep)  run_semgrep ;;
@@ -297,7 +333,8 @@ run_tool() {
     checkov)  run_checkov ;;
     zap)      run_zap ;;
     syft)     run_syft ;;
-    nuclei)   run_nuclei ;;
+    nuclei)      run_nuclei ;;
+    trufflehog)  run_trufflehog ;;
     *)
       echo "[dispatcher] ERROR: Unknown tool: $TOOL"
       exit 1
