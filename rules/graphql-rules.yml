@@ -69,6 +69,7 @@ rules:
       cwe:
         - "CWE-400"
       owasp:
+        - "A04:2021"
         - "A04:2025"
       nist:
         - "SC-5"
@@ -112,6 +113,7 @@ rules:
       cwe:
         - "CWE-400"
       owasp:
+        - "A04:2021"
         - "A04:2025"
       nist:
         - "SC-5"
@@ -136,7 +138,7 @@ rules:
           import costAnalysis from 'graphql-cost-analysis';
 
   # -------------------------------------------------------------------------
-  # Rule 4: Batch Queries Without Limit (CWE-400) — Generic
+  # Rule 4: Batch Queries Without Limit (CWE-770) — Generic
   # Detects batch/array query config without request limit
   # -------------------------------------------------------------------------
   - id: gql-batch-no-limit
@@ -152,8 +154,9 @@ rules:
     severity: WARNING
     metadata:
       cwe:
-        - "CWE-400"
+        - "CWE-770"
       owasp:
+        - "A04:2021"
         - "A04:2025"
       nist:
         - "SC-5"
@@ -165,7 +168,7 @@ rules:
         - graphql
       references:
         - https://cheatsheetseries.owasp.org/cheatsheets/GraphQL_Cheat_Sheet.html
-        - https://cwe.mitre.org/data/definitions/400.html
+        - https://cwe.mitre.org/data/definitions/770.html
       fix: |
         Limit batch query size:
           # Apollo Server 4
@@ -372,6 +375,7 @@ rules:
       cwe:
         - "CWE-770"
       owasp:
+        - "A04:2021"
         - "A04:2025"
       nist:
         - "SC-5"
