@@ -7,6 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [3.0.1] — 2026-03-03
+
+### Fixed
+
+- **GraphQL OWASP dual-tags**: 4 rules (`gql-no-depth-limit`, `gql-no-cost-limit`, `gql-batch-no-limit`, `gql-no-rate-limit`) now carry `A04:2021` + `A04:2025` dual-tags — consistent with K8s rules pattern
+- **CWE discrepancy**: `gql-batch-no-limit` corrected from CWE-400 to CWE-770 (Allocation of Resources Without Limits)
+
 ## [3.0.0] — 2026-03-03
 
 ### Added
