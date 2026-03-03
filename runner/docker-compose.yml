@@ -1,6 +1,6 @@
 # DevSecOps AI Team — Full Stack Docker Compose
 # Usage: docker compose --profile <tool> up -d
-# Profiles: sast, dast, nuclei, sca, container, iac, secret, sbom
+# Profiles: sast, dast, nuclei, sca, container, iac, secret, trufflehog, sbom
 
 x-common: &common
   restart: unless-stopped
@@ -119,6 +119,17 @@ services:
       - workspace:/workspace:ro
       - results:/results
     <<: *common
+
+  # ─── Secret Scanning: TruffleHog ───
+  trufflehog:
+    image: trufflesecurity/trufflehog:latest
+    container_name: devsecops-trufflehog
+    entrypoint: ["sleep", "infinity"]
+    profiles: ["trufflehog", "secrets", "all"]
+    volumes:
+      - workspace:/workspace:ro
+      - results:/results
+    mem_limit: 1g
 
   # ─── SBOM: Syft ───
   syft:
