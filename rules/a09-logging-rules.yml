@@ -1,7 +1,7 @@
 rules:
   # ==========================================================================
   # A09:2021 Security Logging & Monitoring Failures — Custom Semgrep Rules
-  # DevSecOps AI Team v2.4.0
+  # DevSecOps AI Team v2.7.0
   #
   # 7 rules (5 categories) targeting A09 anti-patterns
   # Languages: Python (5 rules), JavaScript/TypeScript (2 rules)
@@ -47,6 +47,7 @@ rules:
         - "CWE-778"
       owasp:
         - "A09:2021"
+        - "A09:2025"
       nist:
         - "AU-2"
         - "AU-3"
@@ -96,6 +97,7 @@ rules:
         - "CWE-223"
       owasp:
         - "A09:2021"
+        - "A09:2025"
       nist:
         - "AU-6"
         - "SI-4"
@@ -130,6 +132,7 @@ rules:
         - "CWE-223"
       owasp:
         - "A09:2021"
+        - "A09:2025"
       nist:
         - "AU-6"
         - "SI-4"
@@ -175,6 +178,7 @@ rules:
         - "CWE-532"
       owasp:
         - "A09:2021"
+        - "A09:2025"
       nist:
         - "AU-3"
         - "SI-4"
@@ -214,6 +218,7 @@ rules:
         - "CWE-532"
       owasp:
         - "A09:2021"
+        - "A09:2025"
       nist:
         - "AU-3"
         - "SI-4"
@@ -249,6 +254,7 @@ rules:
         - "CWE-117"
       owasp:
         - "A09:2021"
+        - "A09:2025"
       nist:
         - "AU-9"
         - "SI-10"
@@ -293,6 +299,7 @@ rules:
         - "CWE-778"
       owasp:
         - "A09:2021"
+        - "A09:2025"
       nist:
         - "AU-2"
         - "SI-4"

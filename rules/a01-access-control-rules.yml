@@ -1,7 +1,7 @@
 rules:
   # ==========================================================================
   # A01:2021 Broken Access Control — Custom Semgrep Rules
-  # DevSecOps AI Team v2.5.0
+  # DevSecOps AI Team v2.7.0
   #
   # 8 rules (8 categories) targeting A01 anti-patterns
   # Languages: Python (4 rules), JavaScript/TypeScript (3 rules), Java (1 rule)
@@ -49,6 +49,7 @@ rules:
         - "CWE-862"
       owasp:
         - "A01:2021"
+        - "A01:2025"
       nist:
         - "AC-3"
         - "AC-6"
@@ -93,6 +94,7 @@ rules:
         - "CWE-862"
       owasp:
         - "A01:2021"
+        - "A01:2025"
       nist:
         - "AC-3"
         - "AC-6"
@@ -148,6 +150,7 @@ rules:
         - "CWE-862"
       owasp:
         - "A01:2021"
+        - "A01:2025"
       nist:
         - "AC-3"
         - "AC-6"
@@ -189,6 +192,7 @@ rules:
         - "CWE-639"
       owasp:
         - "A01:2021"
+        - "A01:2025"
       nist:
         - "AC-3"
         - "AC-4"
@@ -231,6 +235,7 @@ rules:
         - "CWE-639"
       owasp:
         - "A01:2021"
+        - "A01:2025"
       nist:
         - "AC-3"
         - "AC-4"
@@ -269,6 +274,7 @@ rules:
         - "CWE-22"
       owasp:
         - "A01:2021"
+        - "A01:2025"
       nist:
         - "AC-3"
         - "SI-10"
@@ -311,6 +317,7 @@ rules:
         - "CWE-942"
       owasp:
         - "A01:2021"
+        - "A01:2025"
       nist:
         - "AC-3"
         - "SC-23"
@@ -361,6 +368,7 @@ rules:
         - "CWE-269"
       owasp:
         - "A01:2021"
+        - "A01:2025"
       nist:
         - "AC-6"
         - "AC-2"
