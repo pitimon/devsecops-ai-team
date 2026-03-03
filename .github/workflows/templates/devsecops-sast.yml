@@ -1,0 +1,91 @@
+# DevSecOps AI Team — Reusable SAST Workflow
+# Runs Semgrep via Docker container and uploads SARIF results
+#
+# Usage:
+#   jobs:
+#     sast:
+#       uses: pitimon/devsecops-ai-team/.github/workflows/templates/devsecops-sast.yml@main
+#       with:
+#         target: ./src
+
+name: DevSecOps SAST Scan
+
+on:
+  workflow_call:
+    inputs:
+      target:
+        description: "Path to scan (relative to workspace)"
+        required: false
+        default: "."
+        type: string
+      rules:
+        description: "Custom Semgrep rules path"
+        required: false
+        default: ""
+        type: string
+      sarif-upload:
+        description: "Upload SARIF to GitHub Security tab"
+        required: false
+        default: true
+        type: boolean
+      fail-on-findings:
+        description: "Fail the job if findings are detected"
+        required: false
+        default: false
+        type: boolean
+
+permissions:
+  contents: read
+  security-events: write
+
+jobs:
+  sast-scan:
+    name: Semgrep SAST
+    runs-on: ubuntu-latest
+    container:
+      image: returntocorp/semgrep:latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Run Semgrep scan
+        id: scan
+        run: |
+          echo "::group::Semgrep SAST Scan"
+          ARGS="--json --output /tmp/semgrep-results.json"
+          if [ -n "${{ inputs.rules }}" ]; then
+            ARGS="$ARGS --config ${{ inputs.rules }}"
+          else
+            ARGS="$ARGS --config auto"
+          fi
+          semgrep scan $ARGS ${{ inputs.target }} || echo "exit_code=$?" >> "$GITHUB_OUTPUT"
+          echo "::endgroup::"
+
+      - name: Convert to SARIF
+        if: inputs.sarif-upload
+        run: |
+          semgrep scan --sarif --output /tmp/semgrep-results.sarif \
+            ${{ inputs.rules && format('--config {0}', inputs.rules) || '--config auto' }} \
+            ${{ inputs.target }} || true
+
+      - name: Upload SARIF
+        if: inputs.sarif-upload
+        uses: github/codeql-action/upload-sarif@v3
+        with:
+          sarif_file: /tmp/semgrep-results.sarif
+          category: devsecops-sast
+
+      - name: Upload results artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: sast-results
+          path: /tmp/semgrep-results.json
+
+      - name: Check findings
+        if: inputs.fail-on-findings
+        run: |
+          COUNT=$(python3 -c "import json; print(len(json.load(open('/tmp/semgrep-results.json')).get('results',[])))" 2>/dev/null || echo 0)
+          if [ "$COUNT" -gt 0 ]; then
+            echo "::error::SAST scan found $COUNT findings"
+            exit 1
+          fi

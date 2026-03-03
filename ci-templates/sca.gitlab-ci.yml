@@ -1,0 +1,62 @@
+# DevSecOps AI Team — GitLab CI SCA Template
+# Runs Grype and produces GitLab Dependency Scanning-compatible report
+
+grype-sca:
+  stage: sca
+  image: docker:latest
+  services:
+    - docker:dind
+  variables:
+    DOCKER_HOST: tcp://docker:2375
+  script:
+    - echo "Running Grype SCA scan..."
+    - docker run --rm -v "$CI_PROJECT_DIR:/workspace:ro" anchore/grype:latest dir:/workspace --output json > grype-results.json || true
+    - |
+      apk add --no-cache python3 2>/dev/null || true
+      python3 -c "
+      import json
+      data = json.load(open('grype-results.json'))
+      matches = data.get('matches', [])
+      severity_map = {'Critical': 'Critical', 'High': 'High', 'Medium': 'Medium', 'Low': 'Low', 'Negligible': 'Info'}
+      gl_report = {
+          'version': '15.0.7',
+          'vulnerabilities': [],
+          'dependency_files': [],
+          'scan': {
+              'analyzer': {'id': 'devsecops-grype', 'name': 'DevSecOps Grype', 'vendor': {'name': 'DevSecOps AI Team'}},
+              'scanner': {'id': 'grype', 'name': 'Grype', 'vendor': {'name': 'Anchore'}},
+              'type': 'dependency_scanning',
+              'status': 'success'
+          }
+      }
+      for m in matches:
+          vuln_data = m.get('vulnerability', {})
+          artifact = m.get('artifact', {})
+          vuln = {
+              'id': vuln_data.get('id', ''),
+              'name': f\"{vuln_data.get('id', '')} in {artifact.get('name', '')}\",
+              'description': vuln_data.get('description', ''),
+              'severity': severity_map.get(vuln_data.get('severity', 'Medium'), 'Medium'),
+              'location': {
+                  'file': artifact.get('locations', [{}])[0].get('path', '') if artifact.get('locations') else '',
+                  'dependency': {
+                      'package': {'name': artifact.get('name', '')},
+                      'version': artifact.get('version', '')
+                  }
+              }
+          }
+          gl_report['vulnerabilities'].append(vuln)
+      json.dump(gl_report, open('gl-dependency-scanning-report.json', 'w'), indent=2)
+      print(f'Converted {len(matches)} findings to GitLab Dependency Scanning format')
+      "
+  artifacts:
+    reports:
+      dependency_scanning: gl-dependency-scanning-report.json
+    paths:
+      - grype-results.json
+      - gl-dependency-scanning-report.json
+    when: always
+  allow_failure: true
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
+    - if: "$CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH"

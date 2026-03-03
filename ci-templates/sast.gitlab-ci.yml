@@ -1,0 +1,56 @@
+# DevSecOps AI Team — GitLab CI SAST Template
+# Runs Semgrep and produces GitLab SAST-compatible report
+
+semgrep-sast:
+  stage: sast
+  image:
+    name: returntocorp/semgrep:latest
+    entrypoint: [""]
+  variables:
+    SEMGREP_RULES: "auto"
+  script:
+    - echo "Running Semgrep SAST scan..."
+    - semgrep scan --config "$SEMGREP_RULES" --json --output semgrep-results.json "${DEVSECOPS_TARGET:-.}" || true
+    - |
+      python3 -c "
+      import json
+      data = json.load(open('semgrep-results.json'))
+      results = data.get('results', [])
+      severity_map = {'ERROR': 'Critical', 'WARNING': 'High', 'INFO': 'Medium'}
+      gl_report = {
+          'version': '15.0.7',
+          'vulnerabilities': [],
+          'scan': {
+              'analyzer': {'id': 'devsecops-semgrep', 'name': 'DevSecOps Semgrep', 'vendor': {'name': 'DevSecOps AI Team'}},
+              'scanner': {'id': 'semgrep', 'name': 'Semgrep', 'vendor': {'name': 'Semgrep'}},
+              'type': 'sast',
+              'status': 'success'
+          }
+      }
+      for r in results:
+          vuln = {
+              'id': r.get('check_id', ''),
+              'name': r.get('check_id', '').split('.')[-1],
+              'description': r.get('extra', {}).get('message', ''),
+              'severity': severity_map.get(r.get('extra', {}).get('severity', 'INFO'), 'Medium'),
+              'location': {
+                  'file': r.get('path', ''),
+                  'start_line': r.get('start', {}).get('line', 0),
+                  'end_line': r.get('end', {}).get('line', 0)
+              }
+          }
+          gl_report['vulnerabilities'].append(vuln)
+      json.dump(gl_report, open('gl-sast-report.json', 'w'), indent=2)
+      print(f'Converted {len(results)} findings to GitLab SAST format')
+      "
+  artifacts:
+    reports:
+      sast: gl-sast-report.json
+    paths:
+      - semgrep-results.json
+      - gl-sast-report.json
+    when: always
+  allow_failure: true
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
+    - if: "$CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH"

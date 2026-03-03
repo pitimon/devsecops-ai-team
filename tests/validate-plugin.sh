@@ -227,6 +227,22 @@ for f in .github/workflows/validate.yml .github/workflows/security-scan.yml .git
   [ -f "$ROOT_DIR/$f" ] && pass "$f exists" || fail "$f missing"
 done
 
+# Reusable workflow templates
+for f in .github/workflows/templates/devsecops-sast.yml .github/workflows/templates/devsecops-sca.yml .github/workflows/templates/devsecops-container-scan.yml .github/workflows/templates/devsecops-full-pipeline.yml; do
+  [ -f "$ROOT_DIR/$f" ] && pass "$f exists" || fail "$f missing"
+done
+
+# GitLab CI templates
+for f in ci-templates/devsecops.gitlab-ci.yml ci-templates/sast.gitlab-ci.yml ci-templates/sca.gitlab-ci.yml ci-templates/container-scan.gitlab-ci.yml; do
+  [ -f "$ROOT_DIR/$f" ] && pass "$f exists" || fail "$f missing"
+done
+
+# CI adapter and pipeline runner
+[ -f "$ROOT_DIR/runner/ci-adapter.sh" ] && pass "ci-adapter.sh exists" || fail "ci-adapter.sh missing"
+[ -f "$ROOT_DIR/runner/run-pipeline.sh" ] && pass "run-pipeline.sh exists" || fail "run-pipeline.sh missing"
+[ -f "$ROOT_DIR/runner/concurrency-groups.json" ] && pass "concurrency-groups.json exists" || fail "concurrency-groups.json missing"
+[ -f "$ROOT_DIR/docs/CI-INTEGRATION.md" ] && pass "CI-INTEGRATION.md exists" || fail "CI-INTEGRATION.md missing"
+
 # ─── Section 16: MCP Server ───
 echo ""
 echo "--- Section 16: MCP Server ---"

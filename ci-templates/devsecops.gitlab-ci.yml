@@ -1,0 +1,65 @@
+# DevSecOps AI Team — GitLab CI Main Include Template
+# Includes all security scan stages for comprehensive pipeline coverage
+#
+# Usage in .gitlab-ci.yml:
+#   include:
+#     - remote: 'https://raw.githubusercontent.com/pitimon/devsecops-ai-team/main/ci-templates/devsecops.gitlab-ci.yml'
+#
+#   variables:
+#     DEVSECOPS_TARGET: "."
+#     DEVSECOPS_FAIL_ON_FINDINGS: "false"
+
+stages:
+  - test
+  - sast
+  - sca
+  - container-scan
+  - security-report
+
+include:
+  - local: "ci-templates/sast.gitlab-ci.yml"
+  - local: "ci-templates/sca.gitlab-ci.yml"
+  - local: "ci-templates/container-scan.gitlab-ci.yml"
+
+variables:
+  DEVSECOPS_TARGET:
+    value: "."
+    description: "Path to scan"
+  DEVSECOPS_FAIL_ON_FINDINGS:
+    value: "false"
+    description: "Fail pipeline if findings are detected"
+
+security-summary:
+  stage: security-report
+  image: python:3.11-slim
+  needs:
+    - job: semgrep-sast
+      optional: true
+    - job: grype-sca
+      optional: true
+    - job: trivy-container
+      optional: true
+  script:
+    - echo "=== DevSecOps Security Summary ==="
+    - |
+      python3 -c "
+      import json, glob, os
+      total = 0
+      for f in glob.glob('*.json'):
+          try:
+              data = json.load(open(f))
+              if isinstance(data, dict) and 'findings' in data:
+                  count = len(data['findings'])
+                  total += count
+                  print(f'  {f}: {count} findings')
+          except Exception:
+              pass
+      print(f'Total findings: {total}')
+      if total > 0 and os.getenv('DEVSECOPS_FAIL_ON_FINDINGS') == 'true':
+          exit(1)
+      "
+  artifacts:
+    paths:
+      - devsecops-summary.md
+    when: always
+  allow_failure: true

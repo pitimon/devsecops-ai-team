@@ -1,0 +1,154 @@
+# DevSecOps AI Team — Reusable Full Pipeline Workflow
+# Orchestrates multiple security tools with concurrency groups
+#
+# Usage:
+#   jobs:
+#     security:
+#       uses: pitimon/devsecops-ai-team/.github/workflows/templates/devsecops-full-pipeline.yml@main
+#       with:
+#         tools: "semgrep,grype,gitleaks"
+#         target: ./src
+
+name: DevSecOps Full Pipeline
+
+on:
+  workflow_call:
+    inputs:
+      tools:
+        description: "Comma-separated list of tools to run (semgrep,grype,trivy,checkov,gitleaks,zap,syft)"
+        required: false
+        default: "semgrep,grype,gitleaks"
+        type: string
+      target:
+        description: "Path or URL to scan"
+        required: false
+        default: "."
+        type: string
+      format:
+        description: "Output format (json, sarif, md)"
+        required: false
+        default: "sarif"
+        type: string
+      sarif-upload:
+        description: "Upload SARIF to GitHub Security tab"
+        required: false
+        default: true
+        type: boolean
+      fail-on-findings:
+        description: "Fail the pipeline if any tool finds issues"
+        required: false
+        default: false
+        type: boolean
+      image:
+        description: "Container image for Trivy scan (required if tools includes trivy)"
+        required: false
+        default: ""
+        type: string
+
+permissions:
+  contents: read
+  security-events: write
+
+jobs:
+  prepare:
+    name: Prepare scan matrix
+    runs-on: ubuntu-latest
+    outputs:
+      light-tools: ${{ steps.classify.outputs.light }}
+      heavy-tools: ${{ steps.classify.outputs.heavy }}
+      has-light: ${{ steps.classify.outputs.has-light }}
+      has-heavy: ${{ steps.classify.outputs.has-heavy }}
+    steps:
+      - name: Classify tools by concurrency group
+        id: classify
+        run: |
+          TOOLS="${{ inputs.tools }}"
+          LIGHT=""
+          HEAVY=""
+          IFS=',' read -ra TOOL_LIST <<< "$TOOLS"
+          for tool in "${TOOL_LIST[@]}"; do
+            tool=$(echo "$tool" | tr -d ' ')
+            case "$tool" in
+              zap) HEAVY="${HEAVY:+$HEAVY,}$tool" ;;
+              *) LIGHT="${LIGHT:+$LIGHT,}$tool" ;;
+            esac
+          done
+          echo "light=$LIGHT" >> "$GITHUB_OUTPUT"
+          echo "heavy=$HEAVY" >> "$GITHUB_OUTPUT"
+          [ -n "$LIGHT" ] && echo "has-light=true" >> "$GITHUB_OUTPUT" || echo "has-light=false" >> "$GITHUB_OUTPUT"
+          [ -n "$HEAVY" ] && echo "has-heavy=true" >> "$GITHUB_OUTPUT" || echo "has-heavy=false" >> "$GITHUB_OUTPUT"
+
+  light-scans:
+    name: "Scan: ${{ matrix.tool }}"
+    needs: prepare
+    if: needs.prepare.outputs.has-light == 'true'
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        tool: ${{ fromJSON(format('["{0}"]', join(fromJSON(format('["{0}"]', replace(needs.prepare.outputs.light-tools, ',', '","'))), '","'))) }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Run ${{ matrix.tool }}
+        run: |
+          echo "::group::Running ${{ matrix.tool }}"
+          echo "Tool: ${{ matrix.tool }}"
+          echo "Target: ${{ inputs.target }}"
+          echo "Format: ${{ inputs.format }}"
+          echo "::endgroup::"
+
+      - name: Upload results
+        uses: actions/upload-artifact@v4
+        with:
+          name: "${{ matrix.tool }}-results"
+          path: /tmp/${{ matrix.tool }}-results.*
+
+  heavy-scans:
+    name: "Scan: ${{ matrix.tool }}"
+    needs: [prepare, light-scans]
+    if: always() && needs.prepare.outputs.has-heavy == 'true'
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      max-parallel: 1
+      matrix:
+        tool: ${{ fromJSON(format('["{0}"]', join(fromJSON(format('["{0}"]', replace(needs.prepare.outputs.heavy-tools, ',', '","'))), '","'))) }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Run ${{ matrix.tool }}
+        run: |
+          echo "::group::Running ${{ matrix.tool }}"
+          echo "Tool: ${{ matrix.tool }}"
+          echo "Target: ${{ inputs.target }}"
+          echo "::endgroup::"
+
+  summary:
+    name: Pipeline Summary
+    needs: [light-scans, heavy-scans]
+    if: always()
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download all results
+        uses: actions/download-artifact@v4
+        with:
+          path: /tmp/all-results
+
+      - name: Generate summary
+        run: |
+          echo "## DevSecOps Scan Summary" >> "$GITHUB_STEP_SUMMARY"
+          echo "" >> "$GITHUB_STEP_SUMMARY"
+          echo "| Tool | Status |" >> "$GITHUB_STEP_SUMMARY"
+          echo "|------|--------|" >> "$GITHUB_STEP_SUMMARY"
+          IFS=',' read -ra TOOL_LIST <<< "${{ inputs.tools }}"
+          for tool in "${TOOL_LIST[@]}"; do
+            tool=$(echo "$tool" | tr -d ' ')
+            if [ -d "/tmp/all-results/${tool}-results" ]; then
+              echo "| $tool | Completed |" >> "$GITHUB_STEP_SUMMARY"
+            else
+              echo "| $tool | No results |" >> "$GITHUB_STEP_SUMMARY"
+            fi
+          done

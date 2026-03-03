@@ -1,0 +1,65 @@
+# DevSecOps AI Team — GitLab CI Container Scan Template
+# Runs Trivy and produces GitLab Container Scanning-compatible report
+
+trivy-container:
+  stage: container-scan
+  image: docker:latest
+  services:
+    - docker:dind
+  variables:
+    DOCKER_HOST: tcp://docker:2375
+    TRIVY_IMAGE: "${CI_REGISTRY_IMAGE}:${CI_COMMIT_SHA}"
+  script:
+    - echo "Running Trivy container scan..."
+    - docker run --rm -v /var/run/docker.sock:/var/run/docker.sock aquasec/trivy:latest image --format json --output /tmp/trivy-results.json "$TRIVY_IMAGE" || true
+    - docker cp $(docker ps -lq):/tmp/trivy-results.json trivy-results.json 2>/dev/null || echo '{"Results":[]}' > trivy-results.json
+    - |
+      apk add --no-cache python3 2>/dev/null || true
+      python3 -c "
+      import json
+      data = json.load(open('trivy-results.json'))
+      results = data.get('Results', [])
+      severity_map = {'CRITICAL': 'Critical', 'HIGH': 'High', 'MEDIUM': 'Medium', 'LOW': 'Low', 'UNKNOWN': 'Info'}
+      gl_report = {
+          'version': '15.0.7',
+          'vulnerabilities': [],
+          'scan': {
+              'analyzer': {'id': 'devsecops-trivy', 'name': 'DevSecOps Trivy', 'vendor': {'name': 'DevSecOps AI Team'}},
+              'scanner': {'id': 'trivy', 'name': 'Trivy', 'vendor': {'name': 'Aqua Security'}},
+              'type': 'container_scanning',
+              'status': 'success'
+          }
+      }
+      for result in results:
+          for vuln in result.get('Vulnerabilities', []):
+              entry = {
+                  'id': vuln.get('VulnerabilityID', ''),
+                  'name': f\"{vuln.get('VulnerabilityID', '')} in {vuln.get('PkgName', '')}\",
+                  'description': vuln.get('Description', ''),
+                  'severity': severity_map.get(vuln.get('Severity', 'UNKNOWN'), 'Info'),
+                  'location': {
+                      'image': '${TRIVY_IMAGE}',
+                      'dependency': {
+                          'package': {'name': vuln.get('PkgName', '')},
+                          'version': vuln.get('InstalledVersion', '')
+                      }
+                  }
+              }
+              if vuln.get('FixedVersion'):
+                  entry['solution'] = f\"Upgrade to {vuln['FixedVersion']}\"
+              gl_report['vulnerabilities'].append(entry)
+      json.dump(gl_report, open('gl-container-scanning-report.json', 'w'), indent=2)
+      print(f'Converted {len(gl_report[\"vulnerabilities\"])} findings to GitLab Container Scanning format')
+      "
+  artifacts:
+    reports:
+      container_scanning: gl-container-scanning-report.json
+    paths:
+      - trivy-results.json
+      - gl-container-scanning-report.json
+    when: always
+  allow_failure: true
+  resource_group: container-scan
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
+    - if: "$CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH"

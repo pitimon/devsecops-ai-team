@@ -1,0 +1,101 @@
+# DevSecOps AI Team — Reusable Container Scan Workflow
+# Runs Trivy via Docker container and uploads SARIF results
+#
+# Usage:
+#   jobs:
+#     container:
+#       uses: pitimon/devsecops-ai-team/.github/workflows/templates/devsecops-container-scan.yml@main
+#       with:
+#         image: myapp:latest
+
+name: DevSecOps Container Scan
+
+on:
+  workflow_call:
+    inputs:
+      image:
+        description: "Container image to scan"
+        required: true
+        type: string
+      sarif-upload:
+        description: "Upload SARIF to GitHub Security tab"
+        required: false
+        default: true
+        type: boolean
+      fail-on-severity:
+        description: "Fail on findings at or above this severity (LOW, MEDIUM, HIGH, CRITICAL)"
+        required: false
+        default: ""
+        type: string
+      skip-dirs:
+        description: "Comma-separated directories to skip"
+        required: false
+        default: ""
+        type: string
+
+permissions:
+  contents: read
+  security-events: write
+
+jobs:
+  container-scan:
+    name: Trivy Container Scan
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Run Trivy scan
+        id: scan
+        run: |
+          echo "::group::Trivy Container Scan"
+          EXTRA_ARGS=""
+          if [ -n "${{ inputs.skip-dirs }}" ]; then
+            EXTRA_ARGS="--skip-dirs ${{ inputs.skip-dirs }}"
+          fi
+          docker run --rm \
+            -v /var/run/docker.sock:/var/run/docker.sock \
+            -v "${{ github.workspace }}:/workspace:ro" \
+            aquasec/trivy:latest image \
+            --format json --output /workspace/trivy-results.json \
+            $EXTRA_ARGS \
+            ${{ inputs.image }} || true
+          cp "${{ github.workspace }}/trivy-results.json" /tmp/trivy-results.json 2>/dev/null || true
+          echo "::endgroup::"
+
+      - name: Generate SARIF
+        if: inputs.sarif-upload
+        run: |
+          docker run --rm \
+            -v /var/run/docker.sock:/var/run/docker.sock \
+            -v "${{ github.workspace }}:/workspace:ro" \
+            aquasec/trivy:latest image \
+            --format sarif --output /workspace/trivy-results.sarif \
+            ${{ inputs.image }} || true
+          cp "${{ github.workspace }}/trivy-results.sarif" /tmp/trivy-results.sarif 2>/dev/null || true
+
+      - name: Upload SARIF
+        if: inputs.sarif-upload
+        uses: github/codeql-action/upload-sarif@v3
+        with:
+          sarif_file: /tmp/trivy-results.sarif
+          category: devsecops-container
+
+      - name: Upload results artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: container-scan-results
+          path: /tmp/trivy-results.json
+
+      - name: Check severity gate
+        if: inputs.fail-on-severity != ''
+        run: |
+          docker run --rm \
+            -v /var/run/docker.sock:/var/run/docker.sock \
+            aquasec/trivy:latest image \
+            --exit-code 1 \
+            --severity ${{ inputs.fail-on-severity }} \
+            ${{ inputs.image }} || {
+              echo "::error::Container scan found vulnerabilities at ${{ inputs.fail-on-severity }} or above"
+              exit 1
+            }
