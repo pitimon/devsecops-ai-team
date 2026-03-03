@@ -1,0 +1,23 @@
+{
+  "_comment": "Concurrency groups for parallel tool execution in CI pipelines",
+  "groups": {
+    "heavy": {
+      "tools": ["zap"],
+      "max_parallel": 1,
+      "mem_limit": "2g",
+      "description": "Memory-intensive tools that should run serially"
+    },
+    "medium": {
+      "tools": ["trivy"],
+      "max_parallel": 2,
+      "mem_limit": "1g",
+      "description": "Medium-weight tools with moderate parallelism"
+    },
+    "light": {
+      "tools": ["semgrep", "gitleaks", "grype", "checkov", "syft"],
+      "max_parallel": 4,
+      "mem_limit": "512m",
+      "description": "Lightweight tools that can run highly parallel"
+    }
+  }
+}
