@@ -7,6 +7,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [2.6.1] — 2026-03-03
+
+### Added
+
+- **GitHub Actions copy-paste templates** (`ci-templates/github/`) — 4 workflow files mirroring `.github/workflows/templates/` for copy-paste consumption parity with GitLab templates (#57)
+- CI-INTEGRATION.md updated with copy-paste template documentation
+- validate-plugin.sh Section 15 checks for `ci-templates/github/` files (+4 checks)
+- test-ci-templates.sh Section 2 with 20 GitHub copy-paste template tests (existence, triggers, inputs, headers, content parity)
+
 ## [2.6.0] — 2026-03-03
 
 ### Added

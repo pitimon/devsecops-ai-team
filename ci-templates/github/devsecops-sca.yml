@@ -1,0 +1,93 @@
+# DevSecOps AI Team — Reusable SCA Workflow
+# Runs Grype via Docker container and uploads SARIF results
+#
+# Consumption patterns:
+#   1. Direct call (recommended — always uses latest version):
+#      uses: pitimon/devsecops-ai-team/.github/workflows/templates/devsecops-sca.yml@main
+#
+#   2. Copy-paste (for customization):
+#      Copy this file to your repo's .github/workflows/ directory
+#      and modify as needed.
+#
+# Usage:
+#   jobs:
+#     sca:
+#       uses: pitimon/devsecops-ai-team/.github/workflows/templates/devsecops-sca.yml@main
+#       with:
+#         target: .
+
+name: DevSecOps SCA Scan
+
+on:
+  workflow_call:
+    inputs:
+      target:
+        description: "Path or image to scan"
+        required: false
+        default: "dir:."
+        type: string
+      sarif-upload:
+        description: "Upload SARIF to GitHub Security tab"
+        required: false
+        default: true
+        type: boolean
+      fail-on-severity:
+        description: "Fail on findings at or above this severity (negligible, low, medium, high, critical)"
+        required: false
+        default: ""
+        type: string
+
+permissions:
+  contents: read
+  security-events: write
+
+jobs:
+  sca-scan:
+    name: Grype SCA
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Run Grype scan
+        id: scan
+        run: |
+          echo "::group::Grype SCA Scan"
+          docker run --rm -v "${{ github.workspace }}:/workspace:ro" \
+            anchore/grype:latest \
+            ${{ inputs.target }} \
+            --output json > /tmp/grype-results.json || true
+          echo "::endgroup::"
+
+      - name: Generate SARIF
+        if: inputs.sarif-upload
+        run: |
+          docker run --rm -v "${{ github.workspace }}:/workspace:ro" \
+            anchore/grype:latest \
+            ${{ inputs.target }} \
+            --output sarif > /tmp/grype-results.sarif || true
+
+      - name: Upload SARIF
+        if: inputs.sarif-upload
+        uses: github/codeql-action/upload-sarif@v3
+        with:
+          sarif_file: /tmp/grype-results.sarif
+          category: devsecops-sca
+
+      - name: Upload results artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: sca-results
+          path: /tmp/grype-results.json
+
+      - name: Check severity gate
+        if: inputs.fail-on-severity != ''
+        run: |
+          FAIL_LEVEL="${{ inputs.fail-on-severity }}"
+          docker run --rm -v "${{ github.workspace }}:/workspace:ro" \
+            anchore/grype:latest \
+            ${{ inputs.target }} \
+            --fail-on "$FAIL_LEVEL" || {
+              echo "::error::SCA scan found vulnerabilities at or above $FAIL_LEVEL severity"
+              exit 1
+            }

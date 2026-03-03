@@ -58,9 +58,54 @@ if [ -f "$FULL" ]; then
   grep -q "max-parallel" "$FULL" && pass "full-pipeline has max-parallel for heavy tools" || fail "full-pipeline missing max-parallel"
 fi
 
-# ─── Section 2: GitLab CI Templates ───
+# ─── Section 2: GitHub Copy-Paste Templates ───
 echo ""
-echo "--- Section 2: GitLab CI Templates ---"
+echo "--- Section 2: GitHub Copy-Paste Templates (ci-templates/github/) ---"
+
+GH_COPY_TEMPLATES="devsecops-sast.yml devsecops-sca.yml devsecops-container-scan.yml devsecops-full-pipeline.yml"
+for tmpl in $GH_COPY_TEMPLATES; do
+  [ -f "$ROOT_DIR/ci-templates/github/$tmpl" ] && pass "ci-templates/github/$tmpl exists" || fail "ci-templates/github/$tmpl missing"
+done
+
+# Validate workflow_call trigger
+for tmpl in $GH_COPY_TEMPLATES; do
+  FILE="$ROOT_DIR/ci-templates/github/$tmpl"
+  if [ -f "$FILE" ]; then
+    grep -q "workflow_call" "$FILE" && pass "ci-templates/github/$tmpl has workflow_call trigger" || fail "ci-templates/github/$tmpl missing workflow_call"
+  fi
+done
+
+# Validate inputs section
+for tmpl in $GH_COPY_TEMPLATES; do
+  FILE="$ROOT_DIR/ci-templates/github/$tmpl"
+  if [ -f "$FILE" ]; then
+    grep -q "inputs:" "$FILE" && pass "ci-templates/github/$tmpl has inputs" || fail "ci-templates/github/$tmpl missing inputs"
+  fi
+done
+
+# Validate consumption pattern header
+for tmpl in $GH_COPY_TEMPLATES; do
+  FILE="$ROOT_DIR/ci-templates/github/$tmpl"
+  if [ -f "$FILE" ]; then
+    grep -q "Copy-paste" "$FILE" && pass "ci-templates/github/$tmpl has copy-paste usage header" || fail "ci-templates/github/$tmpl missing usage header"
+  fi
+done
+
+# Content parity with source templates
+for tmpl in $GH_COPY_TEMPLATES; do
+  SRC="$ROOT_DIR/.github/workflows/templates/$tmpl"
+  DST="$ROOT_DIR/ci-templates/github/$tmpl"
+  if [ -f "$SRC" ] && [ -f "$DST" ]; then
+    # Compare from the 'name:' line onward (skip header comments)
+    SRC_BODY=$(sed -n '/^name:/,$p' "$SRC")
+    DST_BODY=$(sed -n '/^name:/,$p' "$DST")
+    [ "$SRC_BODY" = "$DST_BODY" ] && pass "ci-templates/github/$tmpl content matches source" || fail "ci-templates/github/$tmpl content diverged from source"
+  fi
+done
+
+# ─── Section 3: GitLab CI Templates ───
+echo ""
+echo "--- Section 3: GitLab CI Templates ---"
 
 GL_TEMPLATES="devsecops.gitlab-ci.yml sast.gitlab-ci.yml sca.gitlab-ci.yml container-scan.gitlab-ci.yml"
 for tmpl in $GL_TEMPLATES; do
@@ -83,9 +128,9 @@ grep -q "container_scanning:" "$ROOT_DIR/ci-templates/container-scan.gitlab-ci.y
 # Resource group for heavy tools
 grep -q "resource_group" "$ROOT_DIR/ci-templates/container-scan.gitlab-ci.yml" && pass "container template uses resource_group" || fail "container template missing resource_group"
 
-# ─── Section 3: Converter Script ───
+# ─── Section 4: Converter Script ───
 echo ""
-echo "--- Section 3: Converter Script ---"
+echo "--- Section 4: Converter Script ---"
 
 CONVERTER="$ROOT_DIR/ci-templates/converters/gitlab-sast-converter.sh"
 [ -f "$CONVERTER" ] && pass "gitlab-sast-converter.sh exists" || fail "converter missing"
@@ -101,9 +146,9 @@ if [ -f "$CONVERTER" ] && [ -f "$ROOT_DIR/tests/fixtures/sample-mixed-normalized
   rm -f "$TMPOUT"
 fi
 
-# ─── Section 4: Documentation ───
+# ─── Section 5: Documentation ───
 echo ""
-echo "--- Section 4: CI Documentation ---"
+echo "--- Section 5: CI Documentation ---"
 
 [ -f "$ROOT_DIR/docs/CI-INTEGRATION.md" ] && pass "CI-INTEGRATION.md exists" || fail "CI-INTEGRATION.md missing"
 if [ -f "$ROOT_DIR/docs/CI-INTEGRATION.md" ]; then

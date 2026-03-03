@@ -72,6 +72,25 @@ jobs:
       security-events: write
 ```
 
+### Copy-Paste Templates (GitHub)
+
+For teams that prefer to own and customize workflow files, copy-paste versions are available in `ci-templates/github/`:
+
+| Template                       | Tool     | Purpose                               |
+| ------------------------------ | -------- | ------------------------------------- |
+| `devsecops-sast.yml`           | Semgrep  | Static Application Security Testing   |
+| `devsecops-sca.yml`            | Grype    | Software Composition Analysis         |
+| `devsecops-container-scan.yml` | Trivy    | Container image vulnerability scan    |
+| `devsecops-full-pipeline.yml`  | Multiple | Full pipeline with concurrency groups |
+
+Copy to your `.github/workflows/` and modify as needed:
+
+```bash
+cp ci-templates/github/devsecops-sast.yml .github/workflows/security-sast.yml
+```
+
+These are identical to the reusable workflows in `.github/workflows/templates/` but designed for the copy-paste consumption pattern, matching the GitLab templates in `ci-templates/`.
+
 ### SARIF Integration
 
 All GitHub workflows support uploading SARIF results to the Security tab via `github/codeql-action/upload-sarif@v3`. Set `sarif-upload: true` (default) to enable.

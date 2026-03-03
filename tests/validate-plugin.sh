@@ -237,6 +237,11 @@ for f in ci-templates/devsecops.gitlab-ci.yml ci-templates/sast.gitlab-ci.yml ci
   [ -f "$ROOT_DIR/$f" ] && pass "$f exists" || fail "$f missing"
 done
 
+# GitHub Actions copy-paste templates (ci-templates/github/)
+for f in ci-templates/github/devsecops-sast.yml ci-templates/github/devsecops-sca.yml ci-templates/github/devsecops-container-scan.yml ci-templates/github/devsecops-full-pipeline.yml; do
+  [ -f "$ROOT_DIR/$f" ] && pass "$f exists" || fail "$f missing"
+done
+
 # CI adapter and pipeline runner
 [ -f "$ROOT_DIR/runner/ci-adapter.sh" ] && pass "ci-adapter.sh exists" || fail "ci-adapter.sh missing"
 [ -f "$ROOT_DIR/runner/run-pipeline.sh" ] && pass "run-pipeline.sh exists" || fail "run-pipeline.sh missing"
