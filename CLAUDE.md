@@ -41,6 +41,7 @@ User prompt → keyword match in SKILL.md frontmatter
 | `formatters/`                     | Output formatters (SARIF, JSON, MD, HTML, PDF, CSV) |
 | `mappings/`                       | Compliance mappings (CWE to OWASP/NIST/MITRE/NCSA)  |
 | `frameworks.json`                 | Framework version tracking (16 frameworks)          |
+| `ci-templates/`                   | CI templates for GitHub Actions and GitLab CI       |
 
 ### Agent Groups
 

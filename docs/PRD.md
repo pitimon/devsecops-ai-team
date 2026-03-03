@@ -23,7 +23,7 @@ DevSecOps AI Team เป็น Claude Code plugin ที่รวม open-source
 
 ---
 
-## 2. Current State (v2.5.0)
+## 2. Current State (v2.6.1)
 
 | Metric                  | Value | Notes                                                                             |
 | ----------------------- | ----- | --------------------------------------------------------------------------------- |
@@ -36,8 +36,8 @@ DevSecOps AI Team เป็น Claude Code plugin ที่รวม open-source
 | Compliance Frameworks   | 4     | OWASP, NIST 800-53, MITRE ATT&CK, NCSA                                            |
 | CWE Mappings            | 360   | Across 4 mapping files                                                            |
 | Output Formats          | 6     | JSON, SARIF, Markdown, HTML, PDF, CSV                                             |
-| Test Suites             | 19    | 719+ individual tests                                                             |
-| QA Rounds               | 9     | 1,000+ checks passed                                                              |
+| Test Suites             | 22    | 793+ individual tests                                                             |
+| QA Rounds               | 10    | 1,070+ checks passed                                                              |
 
 ### Architecture Summary
 
@@ -231,13 +231,13 @@ User prompt → keyword match in SKILL.md frontmatter
 
 ## 7. Success Metrics
 
-| Metric                      | Current (v2.5.0) | v2.8.0 Target  | v3.0.0 Target |
+| Metric                      | Current (v2.6.1) | v2.8.0 Target  | v3.0.0 Target |
 | --------------------------- | ---------------- | -------------- | ------------- |
 | OWASP custom rules coverage | 4/10             | 10/10          | 10/10         |
 | CWE mappings                | 360              | 400+           | 450+          |
-| Test count                  | 719+             | 900+           | 1000+         |
+| Test count                  | 793+             | 900+           | 1000+         |
 | MCP tools                   | 8                | 10+            | 12+           |
-| CI/CD platforms supported   | 0                | 3              | 3+            |
+| CI/CD platforms supported   | 3                | 3              | 3+            |
 | Compliance frameworks       | 4                | 6+             | 7+            |
 | Custom Semgrep rules        | 33               | 60+            | 70+           |
 | DAST tools                  | 1 (ZAP)          | 2 (ZAP+Nuclei) | 2+            |
@@ -309,4 +309,4 @@ User prompt → keyword match in SKILL.md frontmatter
 
 ---
 
-_Document generated: 2026-03-03 | Next review: v2.6.0 release_
+_Document generated: 2026-03-03 | Next review: v2.7.0 release_

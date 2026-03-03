@@ -194,6 +194,36 @@ echo "--- Section 7: Documentation ---"
   && pass "DOMAIN.md exists" \
   || warn "DOMAIN.md missing"
 
+# ─── Section 8: Content Accuracy ───
+echo ""
+echo "--- Section 8: Content Accuracy ---"
+
+# Skill count consistency
+ACTUAL_SKILLS=$(find "$ROOT_DIR/skills" -name 'SKILL.md' -type f | wc -l | tr -d ' ')
+
+# Check plugin.json description
+grep -q "$ACTUAL_SKILLS skills" "$ROOT_DIR/.claude-plugin/plugin.json" \
+  && pass "plugin.json description matches $ACTUAL_SKILLS skills" \
+  || fail "plugin.json description has wrong skill count (expected $ACTUAL_SKILLS)"
+
+# Check marketplace.json descriptions (2 occurrences)
+MKT_COUNT=$(grep -c "$ACTUAL_SKILLS skills" "$ROOT_DIR/.claude-plugin/marketplace.json" 2>/dev/null || echo 0)
+[ "$MKT_COUNT" -ge 2 ] \
+  && pass "marketplace.json descriptions match $ACTUAL_SKILLS skills ($MKT_COUNT occurrences)" \
+  || fail "marketplace.json has wrong skill count (found $MKT_COUNT matches for '$ACTUAL_SKILLS skills')"
+
+# Check README project structure test count
+README_STRUCT_TESTS=$(grep -oE '[0-9]+\+ tests across [0-9]+ suites' "$ROOT_DIR/README.md" | head -1 || echo "")
+[ -n "$README_STRUCT_TESTS" ] \
+  && pass "README project structure has test info ($README_STRUCT_TESTS)" \
+  || warn "README project structure missing test count"
+
+# Check PRD current state references release version (not older)
+PRD_STATE=$(grep -oE 'Current State \(v[0-9.]+\)' "$ROOT_DIR/docs/PRD.md" 2>/dev/null | head -1 || echo "")
+[ -n "$PRD_STATE" ] \
+  && pass "PRD has current state section ($PRD_STATE)" \
+  || warn "PRD missing current state section"
+
 # ─── Summary ───
 echo ""
 echo "============================================"

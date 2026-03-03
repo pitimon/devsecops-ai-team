@@ -864,6 +864,7 @@ devsecops-ai-team/
 +-- .claude-plugin/          # Plugin metadata (plugin.json, marketplace.json)
 +-- .mcp.json                # MCP server declaration
 +-- .github/workflows/       # CI/CD (validate, security-scan, framework-review, release)
++-- ci-templates/            # CI templates (GitHub Actions + GitLab CI copy-paste)
 +-- agents/                  # 18 AI agents (4 subdirectories)
 |   +-- orchestrators/       #   3 orchestrator agents
 |   +-- specialists/         #   7 specialist agents
@@ -881,7 +882,7 @@ devsecops-ai-team/
 +-- templates/               # Report templates (HTML, Markdown)
 +-- hooks/                   # 3 hooks (session-start, scan-on-write, pre-commit-gate)
 +-- scripts/                 # install-runner, install-rules, check-prerequisites, NCSA validator
-+-- tests/                   # 700+ tests across 19 suites
++-- tests/                   # 793+ tests across 22 suites
 +-- docs/                    # INSTALL, TROUBLESHOOTING, AGENT-CATALOG, RUNBOOK, MANDAY
 +-- examples/                # Rules, policies, DOMAIN.md, Semgrep rules
 +-- frameworks.json          # 16 tracked security frameworks with version info
