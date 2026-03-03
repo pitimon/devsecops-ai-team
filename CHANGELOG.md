@@ -7,6 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- **Product Requirements Document** (`docs/PRD.md`) — 9-section strategic blueprint covering v2.6.0 → v3.0.0 roadmap, personas, gap analysis, success metrics, risk assessment
+- **Domain Model** (`DOMAIN.md`) — 11 entities, 6 bounded contexts, 19 invariants, 7 domain events, entity relationships
+- GitHub milestones (v2.6.0, v2.7.0, v2.8.0, v3.0.0) and 24 roadmap issues
+- README roadmap expanded with v2.6.0 → v3.0.0 milestones and themes
+
 ## [2.5.0] — 2026-03-03
 
 ### Added

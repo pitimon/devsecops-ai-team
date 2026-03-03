@@ -964,16 +964,21 @@ claude-governance (base)          devsecops-ai-team (extends)
 
 ## Roadmap
 
-| Version | Status      | Key Features                                                         |
-| ------- | ----------- | -------------------------------------------------------------------- |
-| v1.0.0  | Released    | 18 agents, 12 skills, 7 tools, compliance mappings                   |
-| v2.0.0  | Released    | MCP server, agent orchestration, cross-tool dedup, smart detection   |
-| v2.1.0  | Released    | Security fixes, RBAC gate, Zod validation, 15 CWEs added             |
-| v2.2.0  | Released    | Framework remediation (Django/React/Express/Spring), Syft normalizer |
-| v2.3.0  | Released    | NCSA compliance (62 CWEs), auto-fix skill, session/error coverage    |
-| v2.4.0  | Released    | A09 detection (7 rules), ZAP multi-mode (3 modes), NCSA validator    |
-| v2.5.0  | **Current** | A01/A03/A10 rules (26 new), 3 MCP tools, PDF/CSV formatters          |
-| v3.0.0  | Planned     | Multi-language custom rules, cloud-native scanning, dashboard UI     |
+| Version | Status      | Theme           | Key Features                                        |
+| ------- | ----------- | --------------- | --------------------------------------------------- |
+| v1.0.0  | Released    | Foundation      | 18 agents, 12 skills, 7 tools, compliance mappings  |
+| v2.0.0  | Released    | MCP & Quality   | MCP server, orchestration, dedup, smart detection   |
+| v2.1.0  | Released    | Security & RBAC | 3 security fixes, RBAC gate, Zod validation         |
+| v2.2.0  | Released    | Remediation     | Framework-aware fixes (Django/React/Express/Spring) |
+| v2.3.0  | Released    | Automation      | /auto-fix skill, NCSA compliance, integration tests |
+| v2.4.0  | Released    | Detection       | A09 custom rules, ZAP multi-mode, NCSA validator    |
+| v2.5.0  | **Current** | Rules & MCP     | 33 rules (A01/A03/A09/A10), 3 MCP tools, PDF/CSV    |
+| v2.6.0  | Planned     | CI/CD           | GitHub Actions, GitLab CI, SARIF fix, tech debt     |
+| v2.7.0  | Planned     | OWASP 2025      | Mapping migration, Nuclei, NCSA 1.0, PDPA           |
+| v2.8.0  | Planned     | Supply Chain    | SLSA, VEX, 10/10 OWASP rules, SOC 2                 |
+| v3.0.0  | Planned     | Platform        | Historical DB, dashboard UI, K8s, GraphQL           |
+
+> ดูรายละเอียด roadmap ทั้งหมดได้ที่ [docs/PRD.md](docs/PRD.md)
 
 ---
 
