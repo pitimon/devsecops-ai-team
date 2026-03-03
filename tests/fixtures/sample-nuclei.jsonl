@@ -1,0 +1,4 @@
+{"template-id":"CVE-2021-44228","info":{"name":"Apache Log4j RCE","severity":"critical","tags":["cve","rce"],"classification":{"cwe-id":["CWE-502"],"cvss-score":10.0}},"matched-at":"http://target:8080/api","timestamp":"2026-03-03T10:00:00Z"}
+{"template-id":"CVE-2023-44487","info":{"name":"HTTP/2 Rapid Reset","severity":"high","tags":["cve","dos"],"classification":{"cwe-id":["CWE-400"],"cvss-score":7.5}},"matched-at":"http://target:8080","timestamp":"2026-03-03T10:01:00Z"}
+{"template-id":"missing-hsts","info":{"name":"Missing HSTS Header","severity":"medium","tags":["misconfiguration"],"classification":{"cwe-id":["CWE-523"]}},"matched-at":"http://target:8080","timestamp":"2026-03-03T10:02:00Z"}
+{"template-id":"open-redirect","info":{"name":"Open Redirect Detected","severity":"low","tags":["redirect"],"classification":{"cwe-id":["CWE-601"]}},"matched-at":"http://target:8080/redirect?url=evil.com","timestamp":"2026-03-03T10:03:00Z"}
