@@ -1,6 +1,6 @@
 # DevSecOps AI Team — Full Stack Docker Compose
 # Usage: docker compose --profile <tool> up -d
-# Profiles: sast, dast, nuclei, sca, container, iac, secret, trufflehog, sbom
+# Profiles: sast, dast, nuclei, sca, container, iac, secret, trufflehog, sbom, kube-bench
 
 x-common: &common
   restart: unless-stopped
@@ -130,6 +130,18 @@ services:
       - workspace:/workspace:ro
       - results:/results
     mem_limit: 1g
+
+  # ─── Kubernetes Security: kube-bench ───
+  kube-bench:
+    image: aquasec/kube-bench:latest
+    container_name: devsecops-kube-bench
+    entrypoint: ["sleep", "infinity"]
+    profiles: ["kube-bench", "all"]
+    volumes:
+      - results:/results
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    mem_limit: 512m
+    network_mode: "host"
 
   # ─── SBOM: Syft ───
   syft:

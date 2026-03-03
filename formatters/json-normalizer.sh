@@ -3,7 +3,7 @@ set -euo pipefail
 
 # DevSecOps AI Team — JSON Normalizer
 # Converts tool-specific JSON output to Unified Finding Schema
-# Supports 9 tools: semgrep, gitleaks, grype, trivy, checkov, zap, syft, nuclei, trufflehog
+# Supports 10 tools: semgrep, gitleaks, grype, trivy, checkov, zap, syft, nuclei, trufflehog, kube-bench
 #
 # Usage: json-normalizer.sh --tool <tool> --input <file> --output <file>
 
@@ -415,6 +415,46 @@ with open('$INPUT') as f:
             'verified': verified,
             'status': 'open'
         })
+
+summary = {'total': len(findings), 'critical': 0, 'high': 0, 'medium': 0, 'low': 0, 'info': 0}
+for f in findings:
+    key = f['severity'].lower()
+    if key in summary:
+        summary[key] += 1
+
+json.dump({'findings': findings, 'summary': summary}, open('$OUTPUT', 'w'), indent=2)
+" 2>/dev/null
+    ;;
+
+  kube-bench)
+    python3 -c "
+import json, sys
+
+data = json.load(open('$INPUT'))
+if not isinstance(data, list): data = []
+findings = []
+status_severity = {'FAIL': 'HIGH', 'WARN': 'MEDIUM', 'PASS': 'LOW', 'INFO': 'INFO'}
+
+for i, test in enumerate(data, 1):
+    status = test.get('status', 'INFO').upper()
+    severity = status_severity.get(status, 'INFO')
+    findings.append({
+        'id': f'FINDING-${DATE_PREFIX}-{i:03d}',
+        'source_tool': 'kube-bench',
+        'scan_type': 'kubernetes',
+        'severity': severity,
+        'confidence': 'HIGH',
+        'title': test.get('test_desc', ''),
+        'cwe_id': None,
+        'location': {
+            'benchmark': test.get('test_number', ''),
+            'audit': test.get('audit', '')
+        },
+        'rule_id': test.get('test_number', ''),
+        'message': f\"CIS Benchmark {test.get('test_number', '')}: {test.get('test_desc', '')} [{status}]\",
+        'remediation': test.get('remediation', ''),
+        'status': 'open'
+    })
 
 summary = {'total': len(findings), 'critical': 0, 'high': 0, 'medium': 0, 'low': 0, 'info': 0}
 for f in findings:

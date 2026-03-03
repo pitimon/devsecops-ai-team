@@ -7,8 +7,9 @@ set -euo pipefail
 # Usage: job-dispatcher.sh --tool <tool> --target <path> [--rules <rules>] [--format <format>] [--image <image>]
 #        ZAP options: [--mode baseline|full|api] [--auth-token <token>] [--api-spec <path>]
 #        Nuclei options: env NUCLEI_MODE=cve|full|custom [CUSTOM_TEMPLATES=<path>]
+#        GraphQL options: [--mode static|live|both] [--endpoint <url>] (or env GRAPHQL_TARGET)
 #
-# Tools: semgrep, gitleaks, grype, trivy, checkov, zap, syft, nuclei, trufflehog
+# Tools: semgrep, gitleaks, grype, trivy, checkov, zap, syft, nuclei, trufflehog, kube-bench, graphql
 
 TOOL=""
 TARGET=""
@@ -18,6 +19,8 @@ IMAGE=""
 ZAP_MODE="baseline"
 NUCLEI_MODE="${NUCLEI_MODE:-cve}"
 CUSTOM_TEMPLATES="${CUSTOM_TEMPLATES:-}"
+GRAPHQL_MODE="static"
+GRAPHQL_ENDPOINT="${GRAPHQL_TARGET:-}"
 AUTH_TOKEN=""
 API_SPEC=""
 JOB_ID="job-$(date +%Y%m%d-%H%M%S)-$$"
@@ -28,11 +31,14 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 usage() {
   echo "Usage: $0 --tool <tool> --target <path> [--rules <rules>] [--format <format>] [--image <image>]"
   echo "       ZAP: [--mode baseline|full|api] [--auth-token <token>] [--api-spec <path>]"
+  echo "       GraphQL: [--mode static|live|both] [--endpoint <url>]"
   echo ""
-  echo "Tools: semgrep, gitleaks, grype, trivy, checkov, zap, syft, nuclei, trufflehog"
+  echo "Tools: semgrep, gitleaks, grype, trivy, checkov, zap, syft, nuclei, trufflehog, kube-bench, graphql"
   echo "Formats: json (default), sarif, text"
   echo "ZAP modes: baseline (default, 120s), full (1800s), api (600s)"
   echo "Nuclei modes: cve (default, 120s), full (600s), custom (300s)"
+  echo "kube-bench modes: cis (default, 300s), node (300s), policies (300s)"
+  echo "GraphQL modes: static (default, 120s), live (300s), both (static+live)"
   exit 1
 }
 
@@ -43,9 +49,10 @@ while [[ $# -gt 0 ]]; do
     --rules) RULES="$2"; shift 2 ;;
     --format) FORMAT="$2"; shift 2 ;;
     --image) IMAGE="$2"; shift 2 ;;
-    --mode) ZAP_MODE="$2"; shift 2 ;;
+    --mode) ZAP_MODE="$2"; GRAPHQL_MODE="$2"; shift 2 ;;
     --auth-token) AUTH_TOKEN="$2"; shift 2 ;;
     --api-spec) API_SPEC="$2"; shift 2 ;;
+    --endpoint) GRAPHQL_ENDPOINT="$2"; shift 2 ;;
     *) usage ;;
   esac
 done
@@ -324,6 +331,137 @@ run_trufflehog() {
   fi
 }
 
+# ─── Kubernetes Security: kube-bench ───
+run_kube_bench() {
+  local KUBE_BENCH_MODE="${KUBE_BENCH_MODE:-cis}"
+  local KUBE_BENCH_TIMEOUT=300
+  local KUBE_BENCH_CMD=""
+
+  case "$KUBE_BENCH_MODE" in
+    cis)
+      KUBE_BENCH_CMD="kube-bench run --json"
+      ;;
+    node)
+      KUBE_BENCH_CMD="kube-bench run --targets node --json"
+      ;;
+    policies)
+      KUBE_BENCH_CMD="kube-bench run --targets policies --json"
+      ;;
+    *)
+      echo "[dispatcher] ERROR: Unknown kube-bench mode: $KUBE_BENCH_MODE (use cis|node|policies)"
+      exit 1
+      ;;
+  esac
+
+  echo "[dispatcher] kube-bench mode: $KUBE_BENCH_MODE (timeout: ${KUBE_BENCH_TIMEOUT}s)" >>"$LOG"
+
+  if [ "$RUNNER_MODE" = "full" ]; then
+    timeout "$KUBE_BENCH_TIMEOUT" docker exec devsecops-kube-bench \
+      sh -c "$KUBE_BENCH_CMD > /results/${JOB_ID}/kube-bench-results.json" 2>>"$LOG"
+  else
+    timeout "$KUBE_BENCH_TIMEOUT" docker run --rm \
+      -v "${RESULTS_DIR}:/results" \
+      -v /var/run/docker.sock:/var/run/docker.sock:ro \
+      --network host \
+      aquasec/kube-bench:latest \
+      sh -c "$KUBE_BENCH_CMD > /results/kube-bench-results.json" 2>>"$LOG"
+  fi
+}
+
+# ─── GraphQL Security Scan ───
+run_graphql_static() {
+  local GRAPHQL_RULES="${SCRIPT_DIR}/../rules/graphql-rules.yml"
+  local GRAPHQL_TIMEOUT=120
+
+  if [ ! -f "$GRAPHQL_RULES" ]; then
+    echo "[dispatcher] WARNING: graphql-rules.yml not found, using p/security-audit" >>"$LOG"
+    GRAPHQL_RULES="p/security-audit"
+  fi
+
+  echo "[dispatcher] GraphQL static scan (timeout: ${GRAPHQL_TIMEOUT}s)" >>"$LOG"
+
+  if [ "$RUNNER_MODE" = "full" ]; then
+    timeout "$GRAPHQL_TIMEOUT" docker exec devsecops-semgrep semgrep \
+      --config "$GRAPHQL_RULES" --json \
+      --output "/results/${JOB_ID}/graphql-static-results.json" \
+      "$TARGET" 2>>"$LOG"
+  else
+    timeout "$GRAPHQL_TIMEOUT" docker run --rm \
+      -v "$(pwd):/workspace:ro" -v "${RESULTS_DIR}:/results" \
+      -v "$(cd "$SCRIPT_DIR/.." && pwd)/rules:/rules:ro" \
+      returntocorp/semgrep:latest \
+      semgrep --config "/rules/graphql-rules.yml" --json \
+      --output /results/graphql-static-results.json /workspace 2>>"$LOG"
+  fi
+}
+
+run_graphql_live() {
+  local GQL_ENDPOINT="${GRAPHQL_ENDPOINT:-${GRAPHQL_TARGET:-}}"
+  local GRAPHQL_TIMEOUT=300
+
+  if [ -z "$GQL_ENDPOINT" ]; then
+    echo "[dispatcher] ERROR: GraphQL live scan requires --endpoint URL or GRAPHQL_TARGET env"
+    exit 1
+  fi
+
+  echo "[dispatcher] GraphQL live scan: $GQL_ENDPOINT (timeout: ${GRAPHQL_TIMEOUT}s)" >>"$LOG"
+
+  # Nuclei scan with GraphQL templates
+  timeout "$GRAPHQL_TIMEOUT" docker run --rm \
+    -v "${SCRIPT_DIR}/nuclei-templates:/templates:ro" \
+    -v "${RESULTS_DIR}:/results" --network host \
+    projectdiscovery/nuclei:latest \
+    -t /templates/graphql/ -u "$GQL_ENDPOINT" -j \
+    -rate-limit 10 -o /results/graphql-nuclei-results.json 2>>"$LOG" || true
+
+  # Introspection probe
+  curl -s -X POST "$GQL_ENDPOINT" \
+    -H "Content-Type: application/json" \
+    -d '{"query":"{__schema{types{name}}}"}' \
+    -o "${RESULTS_DIR}/graphql-introspection.json" \
+    --connect-timeout 10 --max-time 30 2>>"$LOG" || true
+
+  echo "[dispatcher] Introspection probe saved to graphql-introspection.json" >>"$LOG"
+}
+
+run_graphql_scan() {
+  echo "[dispatcher] GraphQL scan mode: $GRAPHQL_MODE" >>"$LOG"
+
+  case "$GRAPHQL_MODE" in
+    static)
+      run_graphql_static
+      cp "${RESULTS_DIR}/graphql-static-results.json" \
+         "${RESULTS_DIR}/graphql-scan-results.json" 2>/dev/null || true
+      ;;
+    live)
+      run_graphql_live
+      cp "${RESULTS_DIR}/graphql-nuclei-results.json" \
+         "${RESULTS_DIR}/graphql-scan-results.json" 2>/dev/null || true
+      ;;
+    both)
+      run_graphql_static || true
+      run_graphql_live || true
+      # Merge static + live into combined output
+      python3 -c "
+import json, os
+results = {'mode': 'both', 'static': None, 'live': None, 'introspection': None}
+for key, fname in [('static','graphql-static-results.json'),('live','graphql-nuclei-results.json'),('introspection','graphql-introspection.json')]:
+    path = os.path.join('${RESULTS_DIR}', fname)
+    if os.path.exists(path):
+        try: results[key] = json.load(open(path))
+        except Exception: results[key] = open(path).read()
+json.dump(results, open(os.path.join('${RESULTS_DIR}', 'graphql-scan-results.json'), 'w'), indent=2)
+" 2>>"$LOG"
+      ;;
+    *)
+      echo "[dispatcher] ERROR: Unknown GraphQL mode: $GRAPHQL_MODE (use static|live|both)"
+      exit 1
+      ;;
+  esac
+
+  echo "[dispatcher] GraphQL scan results: ${RESULTS_DIR}/graphql-scan-results.json" >>"$LOG"
+}
+
 run_tool() {
   case "$TOOL" in
     semgrep)  run_semgrep ;;
@@ -335,6 +473,8 @@ run_tool() {
     syft)     run_syft ;;
     nuclei)      run_nuclei ;;
     trufflehog)  run_trufflehog ;;
+    kube-bench)  run_kube_bench ;;
+    graphql|graphql-scan) run_graphql_scan "$@" ;;
     *)
       echo "[dispatcher] ERROR: Unknown tool: $TOOL"
       exit 1
