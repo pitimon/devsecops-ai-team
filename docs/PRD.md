@@ -23,7 +23,7 @@ DevSecOps AI Team เป็น Claude Code plugin ที่รวม open-source
 
 ---
 
-## 2. Current State (v3.0.2)
+## 2. Current State (v3.0.3)
 
 | Metric                  | Value | Notes                                                                                                |
 | ----------------------- | ----- | ---------------------------------------------------------------------------------------------------- |
@@ -36,7 +36,7 @@ DevSecOps AI Team เป็น Claude Code plugin ที่รวม open-source
 | Compliance Frameworks   | 7     | OWASP (2021+2025), NIST 800-53, MITRE ATT&CK, NCSA, PDPA, SOC 2, ISO 27001                           |
 | CWE Mappings            | 488   | Across 7 mapping files                                                                               |
 | Output Formats          | 8     | JSON, SARIF, Markdown, HTML, PDF, CSV, VEX, Dashboard                                                |
-| Test Suites             | 42    | 1,284+ individual tests                                                                              |
+| Test Suites             | 42    | 1,296+ individual tests                                                                              |
 | QA Rounds               | 13    | 1,300+ checks passed                                                                                 |
 
 ### Architecture Summary
@@ -231,11 +231,11 @@ User prompt → keyword match in SKILL.md frontmatter
 
 ## 7. Success Metrics
 
-| Metric                      | Current (v3.0.2) | v3.0.0 Target | Next Target |
+| Metric                      | Current (v3.0.3) | v3.0.0 Target | Next Target |
 | --------------------------- | ---------------- | ------------- | ----------- |
 | OWASP custom rules coverage | 10/10            | 10/10         | 10/10       |
 | CWE mappings                | 488              | 500+          | 500+        |
-| Test count                  | 1,284+           | 1300+         | 1500+       |
+| Test count                  | 1,296+           | 1300+         | 1500+       |
 | MCP tools                   | 10               | 12+           | 14+         |
 | CI/CD platforms supported   | 3                | 3+            | 4+          |
 | Compliance frameworks       | 7                | 8+            | 9+          |
@@ -309,4 +309,4 @@ User prompt → keyword match in SKILL.md frontmatter
 
 ---
 
-_Document generated: 2026-03-03 | Updated: v3.0.2 release | Next review: v3.1.0 release_
+_Document generated: 2026-03-03 | Updated: v3.0.3 release | Next review: v3.1.0 release_

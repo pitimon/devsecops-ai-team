@@ -344,6 +344,133 @@ print('yes' if valid and rows else 'no')
   && pass "Compliance details have matched/total fields" \
   || fail "Compliance details malformed"
 
+# ═══════════════════════════════════════════
+# Section 11: Multi-Tool Lifecycle Scoping (5 tests) — #71
+# ═══════════════════════════════════════════
+echo "--- Section 11: Multi-Tool Lifecycle Scoping ---"
+
+# Fresh DB for multi-tool tests
+MULTI_DIR=$(mktemp -d)
+MULTI_DB="$MULTI_DIR/multi.db"
+trap "rm -rf $TEST_DIR $MULTI_DIR" EXIT
+
+SCAN_DB="$MULTI_DB" "$SCAN_DB_SCRIPT" init >/dev/null 2>&1
+
+# Create a grype fixture (different tool, different findings)
+GRYPE_FIXTURE="$MULTI_DIR/grype-findings.json"
+cat > "$GRYPE_FIXTURE" <<'GRYPE_EOF'
+{
+  "findings": [
+    {
+      "source_tool": "grype",
+      "rule_id": "CVE-2023-1234",
+      "severity": "HIGH",
+      "cwe_id": "CWE-502",
+      "location": { "file": "package-lock.json", "line_start": 100 },
+      "message": "Vulnerable dependency detected"
+    },
+    {
+      "source_tool": "grype",
+      "rule_id": "CVE-2023-5678",
+      "severity": "MEDIUM",
+      "location": { "file": "package-lock.json", "line_start": 200 },
+      "message": "Outdated dependency"
+    }
+  ]
+}
+GRYPE_EOF
+
+# Store semgrep findings first (3 findings from fixture)
+SCAN_DB="$MULTI_DB" "$SCAN_DB_SCRIPT" store "$FIXTURE" >/dev/null 2>&1
+
+# Store grype findings second (2 findings)
+SCAN_DB="$MULTI_DB" "$SCAN_DB_SCRIPT" store "$GRYPE_FIXTURE" >/dev/null 2>&1
+
+# Test: semgrep findings should still be open after grype store
+SEMGREP_OPEN=$(python3 -c "
+import sqlite3
+db = sqlite3.connect('$MULTI_DB')
+count = db.execute(\"SELECT COUNT(*) FROM findings WHERE source_tool = 'semgrep' AND fixed_at IS NULL\").fetchone()[0]
+db.close()
+print(count)
+" 2>/dev/null)
+[ "$SEMGREP_OPEN" -eq 3 ] \
+  && pass "Semgrep findings stay open after grype store (3)" \
+  || fail "Semgrep findings incorrectly marked fixed: expected 3 open, got $SEMGREP_OPEN"
+
+# Test: grype findings should be open
+GRYPE_OPEN=$(python3 -c "
+import sqlite3
+db = sqlite3.connect('$MULTI_DB')
+count = db.execute(\"SELECT COUNT(*) FROM findings WHERE source_tool = 'grype' AND fixed_at IS NULL\").fetchone()[0]
+db.close()
+print(count)
+" 2>/dev/null)
+[ "$GRYPE_OPEN" -eq 2 ] \
+  && pass "Grype findings are open (2)" \
+  || fail "Grype findings wrong count: expected 2, got $GRYPE_OPEN"
+
+# Test: total open should be 5 (3 semgrep + 2 grype)
+TOTAL_OPEN=$(python3 -c "
+import sqlite3
+db = sqlite3.connect('$MULTI_DB')
+count = db.execute('SELECT COUNT(*) FROM findings WHERE fixed_at IS NULL').fetchone()[0]
+db.close()
+print(count)
+" 2>/dev/null)
+[ "$TOTAL_OPEN" -eq 5 ] \
+  && pass "Total open findings correct (5 = 3 semgrep + 2 grype)" \
+  || fail "Total open expected 5, got $TOTAL_OPEN"
+
+# Now store a reduced semgrep scan (only 2 of 3 findings) — should fix the missing one
+REDUCED_FIXTURE="$MULTI_DIR/semgrep-reduced.json"
+cat > "$REDUCED_FIXTURE" <<'REDUCED_EOF'
+{
+  "findings": [
+    {
+      "source_tool": "semgrep",
+      "rule_id": "a06-unpinned-pip",
+      "severity": "WARNING",
+      "cwe_id": "CWE-1104",
+      "location": { "file": "requirements.txt", "line_start": 3 }
+    },
+    {
+      "source_tool": "semgrep",
+      "rule_id": "a06-known-vulnerable-pyyaml",
+      "severity": "ERROR",
+      "cwe_id": "CWE-829",
+      "location": { "file": "app/config/loader.py", "line_start": 15 }
+    }
+  ]
+}
+REDUCED_EOF
+
+SCAN_DB="$MULTI_DB" "$SCAN_DB_SCRIPT" store "$REDUCED_FIXTURE" >/dev/null 2>&1
+
+# Test: only 1 semgrep finding should be fixed (the missing a06-untrusted-source)
+SEMGREP_FIXED=$(python3 -c "
+import sqlite3
+db = sqlite3.connect('$MULTI_DB')
+count = db.execute(\"SELECT COUNT(*) FROM findings WHERE source_tool = 'semgrep' AND fixed_at IS NOT NULL\").fetchone()[0]
+db.close()
+print(count)
+" 2>/dev/null)
+[ "$SEMGREP_FIXED" -eq 1 ] \
+  && pass "1 semgrep finding correctly marked fixed after reduced scan" \
+  || fail "Expected 1 semgrep fixed, got $SEMGREP_FIXED"
+
+# Test: grype findings should STILL be open (unaffected by semgrep rescan)
+GRYPE_STILL_OPEN=$(python3 -c "
+import sqlite3
+db = sqlite3.connect('$MULTI_DB')
+count = db.execute(\"SELECT COUNT(*) FROM findings WHERE source_tool = 'grype' AND fixed_at IS NULL\").fetchone()[0]
+db.close()
+print(count)
+" 2>/dev/null)
+[ "$GRYPE_STILL_OPEN" -eq 2 ] \
+  && pass "Grype findings unaffected by semgrep rescan (still 2 open)" \
+  || fail "Grype findings incorrectly affected: expected 2, got $GRYPE_STILL_OPEN"
+
 echo ""
 
 # ═══════════════════════════════════════════

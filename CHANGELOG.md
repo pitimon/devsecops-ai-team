@@ -7,6 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- **Multi-tool lifecycle scoping** (#71): `scan-db.sh store` no longer marks findings from other tools as "fixed" when storing results per-tool. Lifecycle comparison now scoped by `source_tool` — storing grype results won't affect semgrep findings
+
+### Added
+
+- **Multi-tool lifecycle tests**: 5 new tests in `test-scan-db.sh` (33 → 38) — cross-tool isolation, reduced scan fix detection, grype independence
+
 ## [3.0.3] — 2026-03-03
 
 ### Fixed

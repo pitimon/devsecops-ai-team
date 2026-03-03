@@ -1,7 +1,7 @@
 <p align="center">
   <img src="https://img.shields.io/badge/Claude_Code-Plugin-blueviolet?style=for-the-badge&logo=anthropic" alt="Claude Code Plugin">
   <img src="https://img.shields.io/badge/Version-3.0.3-brightgreen?style=for-the-badge" alt="v3.0.3">
-  <img src="https://img.shields.io/badge/Tests-1284%2B-success?style=for-the-badge" alt="Tests">
+  <img src="https://img.shields.io/badge/Tests-1296%2B-success?style=for-the-badge" alt="Tests">
   <img src="https://img.shields.io/badge/License-MIT-yellow?style=for-the-badge" alt="MIT License">
 </p>
 
@@ -75,10 +75,10 @@
 | **Compliance Frameworks** | 7 frameworks — OWASP Top 10 (2021+2025), NIST 800-53, MITRE ATT&CK, NCSA, PDPA, SOC 2, ISO 27001                                                |
 | **CWE Mappings**          | 488 total (OWASP 122 + NIST 100 + MITRE 93 + NCSA 62 + PDPA 30 + SOC 2 40 + ISO 27001 41)                                                       |
 | **OWASP Top 10 Coverage** | 10/10 categories — dual-version 2021+2025 mapping                                                                                               |
-| **Tests**                 | 1,284+ checks across 42 suites — all passing                                                                                                    |
+| **Tests**                 | 1,296+ checks across 42 suites — all passing                                                                                                    |
 | **QA Rounds**             | 13 rounds, 75/75 latest (cumulative 1,300+ checks)                                                                                              |
 | **ROI**                   | 10,222% — 3,100 THB actual vs 320,000 THB equivalent (133x speed)                                                                               |
-| **Version**               | 3.0.2 (2026-03-03)                                                                                                                              |
+| **Version**               | 3.0.3 (2026-03-03)                                                                                                                              |
 
 ---
 
@@ -92,7 +92,7 @@
 - **NCSA Web Security Standard** — รองรับมาตรฐานความมั่นคงปลอดภัยเว็บไซต์ สพธอ. (HTTP Headers, TLS, Session Management)
 - **MCP Server** — 10 composable tools สำหรับ programmatic integration กับ MCP-compatible clients (compare, compliance_status, suggest_fix, history, pipeline)
 - **Custom OWASP Rules** — 84 custom Semgrep rules for A01 (access control), A02 (crypto), A03 (injection), A04 (insecure design), A05 (misconfig), A06 (vulnerable components), A07 (auth failures), A08 (integrity failures), A09 (logging), A10 (SSRF + exception handling), K8s manifests, GraphQL endpoints
-- **7 Output Formats** — SARIF, JSON, Markdown, HTML, PDF, CSV, VEX
+- **8 Output Formats** — SARIF, JSON, Markdown, HTML, PDF, CSV, VEX, Dashboard
 
 ---
 
@@ -759,7 +759,7 @@ bash scripts/install-runner.sh --mode full
 
 ## Testing & Quality
 
-### Test Results (1,284+)
+### Test Results (1,296+)
 
 ```
 Validation:          276/276 structural checks (plugin structure, skills, agents, mappings)
@@ -799,13 +799,13 @@ Version Bump:         17/17  version-bump.sh script tests
 CI Adapter:           25/25  CI platform detection + adapter functions
 CI Templates:         65/65  GitHub Actions + GitLab CI template validation
 Release:              12/12  release checklist script tests
-Scan DB:              26/26  SQLite scan history database + 7 subcommands
+Scan DB:              33/33  SQLite scan history database + 7 subcommands + OWASP enrichment + compliance
 Pipeline Engine:      25/25  DAG pipeline engine + topological sort + cycle detection
 K8s Scan:             23/23  K8s skill + rules + kube-bench + normalizer integration
 GraphQL Scan:         34/34  GraphQL skill + rules + Nuclei templates + normalizer + metadata
-Dashboard:            21/21  dashboard generator + template + data injection
+Dashboard:            26/26  dashboard generator + template + data injection + special character regression
 --------------------------------------------------------------
-Total:              1284+ checks passed (42 suites)
+Total:              1296+ checks passed (42 suites)
 ```
 
 ### QA History
@@ -891,7 +891,7 @@ bash tests/test-release.sh                 # 12 release checklist tests
 | MCP Tools                    | 10 (scan, results, gate, compliance, status, compare, compliance_status, suggest_fix, history, pipeline) |
 | CWE Compliance Mappings      | 488 across 7 frameworks                                                                                  |
 | Custom Security Rules        | 84 (OWASP A01-A10 + K8s + GraphQL Semgrep rules)                                                         |
-| Automated Tests              | 1,284+ across 42 suites                                                                                  |
+| Automated Tests              | 1,296+ across 42 suites                                                                                  |
 | Reference Documents          | 19 domain knowledge files (~500-800 lines each)                                                          |
 | Hooks (Real-time Protection) | 3 (session-start, scan-on-write, pre-commit-gate)                                                        |
 | Output Formatters            | 8 (SARIF, JSON, Markdown, HTML, PDF, CSV, VEX, Dashboard)                                                |
@@ -950,7 +950,7 @@ devsecops-ai-team/
 +-- templates/               # Report templates (HTML, Markdown, dashboard.html)
 +-- hooks/                   # 3 hooks (session-start, scan-on-write, pre-commit-gate)
 +-- scripts/                 # install-runner, install-rules, check-prerequisites, NCSA validator, scan-db.sh
-+-- tests/                   # 1,284+ tests across 42 suites
++-- tests/                   # 1,296+ tests across 42 suites
 +-- docs/                    # INSTALL, TROUBLESHOOTING, AGENT-CATALOG, RUNBOOK, MANDAY
 +-- examples/                # Rules, policies, DOMAIN.md, Semgrep rules
 +-- frameworks.json          # 19 tracked security frameworks with version info

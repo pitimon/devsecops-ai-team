@@ -153,13 +153,15 @@ for f in findings:
                    json.dumps(f), now, now))
         stored += 1
 
-# Mark findings not in this scan as fixed
+# Mark findings not in this scan as fixed — scoped by source_tool (#71)
 all_fps = set()
 for f in findings:
     fp = f'{f.get(\"rule_id\",\"\")}:{f.get(\"location\",{}).get(\"file\",\"\")}:{f.get(\"location\",{}).get(\"line_start\",0)}'
     all_fps.add(fp)
 
-c.execute('SELECT id, fingerprint FROM findings WHERE fixed_at IS NULL AND scan_id != ?', (scan_id,))
+# Only compare against findings from the same tool(s) in this scan
+tool_placeholders = ','.join('?' for _ in tools)
+c.execute(f'SELECT id, fingerprint FROM findings WHERE fixed_at IS NULL AND scan_id != ? AND source_tool IN ({tool_placeholders})', (scan_id, *tools))
 for row in c.fetchall():
     if row[1] not in all_fps:
         c.execute('UPDATE findings SET fixed_at = ?, triage = ? WHERE id = ?', (now, 'fixed', row[0]))
