@@ -292,6 +292,40 @@ assert has_vulns and has_misconf
 " 2>/dev/null && pass "trivy-misconfig fixture has both Vulnerabilities and Misconfigurations" || fail "trivy-misconfig fixture incomplete"
 fi
 
+# ─── Section 18: Release Documentation ───
+echo ""
+echo "--- Section 18: Release Documentation ---"
+
+PLUGIN_VERSION=$(python3 -c "import json; print(json.load(open('$ROOT_DIR/.claude-plugin/plugin.json'))['version'])" 2>/dev/null || echo "unknown")
+
+# CHANGELOG latest version matches plugin.json
+CHANGELOG_VERSION=$(grep -m1 -oE '\[([0-9]+\.[0-9]+\.[0-9]+)\]' "$ROOT_DIR/CHANGELOG.md" | tr -d '[]' || echo "none")
+[ "$CHANGELOG_VERSION" = "$PLUGIN_VERSION" ] \
+  && pass "CHANGELOG latest version ($CHANGELOG_VERSION) matches plugin.json ($PLUGIN_VERSION)" \
+  || fail "CHANGELOG latest version ($CHANGELOG_VERSION) != plugin.json ($PLUGIN_VERSION)"
+
+# README badge matches plugin.json
+grep -q "Version-$PLUGIN_VERSION" "$ROOT_DIR/README.md" \
+  && pass "README badge matches plugin.json version ($PLUGIN_VERSION)" \
+  || fail "README badge does not match plugin.json version ($PLUGIN_VERSION)"
+
+# MCP bundle version matches plugin.json
+if [ -f "$ROOT_DIR/mcp/dist/server.js" ]; then
+  grep -q "$PLUGIN_VERSION" "$ROOT_DIR/mcp/dist/server.js" \
+    && pass "MCP bundle contains plugin.json version ($PLUGIN_VERSION)" \
+    || warn "MCP bundle does not contain version $PLUGIN_VERSION"
+fi
+
+# release.sh exists and is executable
+[ -f "$ROOT_DIR/scripts/release.sh" ] && [ -x "$ROOT_DIR/scripts/release.sh" ] \
+  && pass "scripts/release.sh exists and is executable" \
+  || fail "scripts/release.sh missing or not executable"
+
+# release-checklist.sh exists and is executable
+[ -f "$ROOT_DIR/scripts/release-checklist.sh" ] && [ -x "$ROOT_DIR/scripts/release-checklist.sh" ] \
+  && pass "scripts/release-checklist.sh exists and is executable" \
+  || fail "scripts/release-checklist.sh missing or not executable"
+
 # ─── Summary ───
 echo ""
 echo "============================================"
