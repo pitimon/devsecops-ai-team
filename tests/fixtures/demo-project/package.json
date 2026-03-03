@@ -1,0 +1,28 @@
+{
+  "name": "demo-vulnerable-app",
+  "version": "1.0.0",
+  "description": "Demo project with intentional vulnerable dependencies for DevSecOps scanning demos. DO NOT use in production.",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js"
+  },
+  "dependencies": {
+    "lodash": "4.17.15",
+    "express": "4.16.0",
+    "jsonwebtoken": "8.5.0",
+    "minimist": "1.2.0",
+    "node-fetch": "2.6.0",
+    "serialize-javascript": "2.1.0",
+    "ejs": "3.1.5"
+  },
+  "devDependencies": {
+    "mocha": "8.0.0"
+  },
+  "keywords": [
+    "demo",
+    "vulnerable",
+    "devsecops-testing"
+  ],
+  "license": "MIT",
+  "private": true
+}
