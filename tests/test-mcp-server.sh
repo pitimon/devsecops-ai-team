@@ -97,7 +97,7 @@ for n in unique:
 " 2>/dev/null)
 
 TOOL_NUM=$(echo "$TOOL_NAMES" | head -1)
-[ "$TOOL_NUM" = "8" ] && pass "Exactly 8 MCP tools defined" || fail "Expected 8 tools, found $TOOL_NUM"
+[ "$TOOL_NUM" = "10" ] && pass "Exactly 10 MCP tools defined" || fail "Expected 10 tools, found $TOOL_NUM"
 
 # Verify each required tool
 for TOOL_NAME in devsecops_scan devsecops_results devsecops_gate devsecops_compliance devsecops_status devsecops_compare devsecops_compliance_status devsecops_suggest_fix; do
