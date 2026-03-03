@@ -115,6 +115,94 @@ else
   [ -f "$ROOT_DIR/formatters/pdf-formatter.sh" ] && pass "PDF formatter script exists" || fail "PDF formatter script missing"
 fi
 
+# ─── SARIF Per-Tool Output ───
+echo ""
+echo "--- SARIF Per-Tool Output ---"
+
+MIXED_FIXTURE="$ROOT_DIR/tests/fixtures/sample-mixed-normalized.json"
+SARIF_MULTI="$TMPDIR/results-multi.sarif"
+
+if bash "$ROOT_DIR/formatters/sarif-formatter.sh" --input "$MIXED_FIXTURE" --output "$SARIF_MULTI" 2>/dev/null; then
+  pass "SARIF per-tool formatter executed"
+
+  # Verify multiple runs
+  MULTI_RUN_COUNT=$(python3 -c "import json; d=json.load(open('$SARIF_MULTI')); print(len(d['runs']))" 2>/dev/null)
+  [ "$MULTI_RUN_COUNT" -gt 1 ] && pass "SARIF has multiple runs ($MULTI_RUN_COUNT)" || fail "SARIF should have multiple runs, got $MULTI_RUN_COUNT"
+
+  # Verify Semgrep run has 2 results
+  SEMGREP_COUNT=$(python3 -c "
+import json
+d = json.load(open('$SARIF_MULTI'))
+for run in d['runs']:
+    if run['tool']['driver']['name'] == 'Semgrep':
+        print(len(run['results']))
+        break
+else:
+    print(0)
+" 2>/dev/null)
+  [ "$SEMGREP_COUNT" = "2" ] && pass "Semgrep run has 2 results" || fail "Semgrep run expected 2 results, got $SEMGREP_COUNT"
+
+  # Verify Grype run has 1 result
+  GRYPE_COUNT=$(python3 -c "
+import json
+d = json.load(open('$SARIF_MULTI'))
+for run in d['runs']:
+    if run['tool']['driver']['name'] == 'Grype':
+        print(len(run['results']))
+        break
+else:
+    print(0)
+" 2>/dev/null)
+  [ "$GRYPE_COUNT" = "1" ] && pass "Grype run has 1 result" || fail "Grype run expected 1 result, got $GRYPE_COUNT"
+
+  # Verify default "DevSecOps AI Team" run has 1 result (finding without source_tool)
+  DEFAULT_COUNT=$(python3 -c "
+import json
+d = json.load(open('$SARIF_MULTI'))
+for run in d['runs']:
+    if run['tool']['driver']['name'] == 'DevSecOps AI Team':
+        print(len(run['results']))
+        break
+else:
+    print(0)
+" 2>/dev/null)
+  [ "$DEFAULT_COUNT" = "1" ] && pass "Default run has 1 result (no source_tool)" || fail "Default run expected 1 result, got $DEFAULT_COUNT"
+
+  # Verify tool names are proper (not raw tool IDs)
+  TOOL_NAMES=$(python3 -c "
+import json
+d = json.load(open('$SARIF_MULTI'))
+names = [run['tool']['driver']['name'] for run in d['runs']]
+print(' '.join(names))
+" 2>/dev/null)
+  echo "$TOOL_NAMES" | grep -q "Semgrep" && pass "Tool name 'Semgrep' is proper (not 'semgrep')" || fail "Tool name not proper: expected 'Semgrep'"
+  echo "$TOOL_NAMES" | grep -q "Grype" && pass "Tool name 'Grype' is proper (not 'grype')" || fail "Tool name not proper: expected 'Grype'"
+  echo "$TOOL_NAMES" | grep -q "GitLeaks" && pass "Tool name 'GitLeaks' is proper (not 'gitleaks')" || fail "Tool name not proper: expected 'GitLeaks'"
+else
+  fail "SARIF per-tool formatter failed"
+fi
+
+# ─── SARIF --combined flag (backwards compatible) ───
+echo ""
+echo "--- SARIF Combined Mode ---"
+
+SARIF_COMBINED="$TMPDIR/results-combined.sarif"
+
+if bash "$ROOT_DIR/formatters/sarif-formatter.sh" --input "$MIXED_FIXTURE" --output "$SARIF_COMBINED" --combined 2>/dev/null; then
+  pass "SARIF --combined formatter executed"
+
+  COMBINED_RUN_COUNT=$(python3 -c "import json; d=json.load(open('$SARIF_COMBINED')); print(len(d['runs']))" 2>/dev/null)
+  [ "$COMBINED_RUN_COUNT" = "1" ] && pass "SARIF --combined produces single run" || fail "SARIF --combined expected 1 run, got $COMBINED_RUN_COUNT"
+
+  COMBINED_RESULT_COUNT=$(python3 -c "import json; d=json.load(open('$SARIF_COMBINED')); print(len(d['runs'][0]['results']))" 2>/dev/null)
+  [ "$COMBINED_RESULT_COUNT" = "5" ] && pass "SARIF --combined has all 5 results" || fail "SARIF --combined expected 5 results, got $COMBINED_RESULT_COUNT"
+
+  COMBINED_TOOL_NAME=$(python3 -c "import json; d=json.load(open('$SARIF_COMBINED')); print(d['runs'][0]['tool']['driver']['name'])" 2>/dev/null)
+  [ "$COMBINED_TOOL_NAME" = "DevSecOps AI Team" ] && pass "SARIF --combined uses 'DevSecOps AI Team' name" || fail "SARIF --combined wrong tool name: $COMBINED_TOOL_NAME"
+else
+  fail "SARIF --combined formatter failed"
+fi
+
 echo ""
 echo "============================================"
 echo "Results: $PASS passed / $FAIL failed"
