@@ -1,6 +1,6 @@
 {
   "name": "devsecops-ai-team",
-  "version": "3.0.3",
+  "version": "3.0.4",
   "description": "Enterprise DevSecOps AI Team — 18 specialized agents + 16 skills for full-pipeline security scanning (SAST, DAST, SCA, Container, IaC, Secrets, SBOM, Compliance, IR, SLSA, K8s, GraphQL) using open-source tools in Docker containers. Bilingual Thai+English output.",
   "author": {
     "name": "P.Itarun",

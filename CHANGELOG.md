@@ -7,13 +7,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [3.0.4] — 2026-03-03
+
 ### Fixed
 
 - **Multi-tool lifecycle scoping** (#71): `scan-db.sh store` no longer marks findings from other tools as "fixed" when storing results per-tool. Lifecycle comparison now scoped by `source_tool` — storing grype results won't affect semgrep findings
+- **Compliance coverage double-multiplication** (#71): `generate_compliance()` stored coverage as percentage (7.3) but dashboard template multiplied by 100 again (730%). Changed to store ratio (0.0–1.0) matching `Math.round(fw.coverage * 100)` in template
 
 ### Added
 
-- **Multi-tool lifecycle tests**: 5 new tests in `test-scan-db.sh` (33 → 38) — cross-tool isolation, reduced scan fix detection, grype independence
+- **Multi-tool lifecycle tests**: 5 new tests in `test-scan-db.sh` (33 → 39) — cross-tool isolation, reduced scan fix detection, grype independence, coverage range validation
 
 ## [3.0.3] — 2026-03-03
 

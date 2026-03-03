@@ -253,7 +253,7 @@ for mfile in sorted(glob.glob(os.path.join(mappings_dir, 'cwe-to-*.json'))):
     if not mapping:
         continue
     matched = len(scan_cwes & set(mapping.keys()))
-    coverage = round(matched / len(mapping) * 100, 1)
+    coverage = round(matched / len(mapping), 4)
     details = json.dumps({'matched': matched, 'total': len(mapping)})
     db.execute(
         'INSERT INTO compliance_snapshots '

@@ -332,6 +332,18 @@ print(len(rows))
   && pass "At least one framework has non-zero coverage" \
   || fail "All frameworks have zero coverage"
 
+COMP_RANGE=$(python3 -c "
+import sqlite3
+db = sqlite3.connect('$TEST_DB')
+rows = db.execute('SELECT coverage FROM compliance_snapshots WHERE scan_id = ?', ('$LATEST_SID',)).fetchall()
+db.close()
+valid = all(0.0 <= r[0] <= 1.0 for r in rows)
+print('yes' if valid else 'no')
+" 2>/dev/null)
+[ "$COMP_RANGE" = "yes" ] \
+  && pass "Coverage values in 0.0-1.0 ratio range (not percentage)" \
+  || fail "Coverage values out of 0.0-1.0 range"
+
 COMP_DETAILS=$(python3 -c "
 import sqlite3, json
 db = sqlite3.connect('$TEST_DB')

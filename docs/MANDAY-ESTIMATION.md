@@ -1,7 +1,7 @@
 # Man-Day Estimation & ROI Analysis — DevSecOps AI Team Plugin
 
 **Analysis Date**: 2026-03-01
-**Plugin Version**: v3.0.3
+**Plugin Version**: v3.0.4
 **Actual Development Method**: Claude Code (claude-opus-4-6)
 
 ---
@@ -12,7 +12,7 @@
 | -------------------------- | ------------------------------ |
 | **ROI**                    | 10,222% (base case)            |
 | **Actual cost**            | 3,100 THB (Claude Code)        |
-| **Equivalent manual cost** | 3.0.300 THB (40 man-days)      |
+| **Equivalent manual cost** | 3.0.400 THB (40 man-days)      |
 | **Speed multiplier**       | 133x                           |
 | **3-Year TCO savings**     | 1,210,300 THB (92.8%)          |
 | **Break-even**             | 3.1 hours of manual work saved |
@@ -69,7 +69,7 @@ Developer time was spent on: prompting, reviewing output, steering architecture 
 | **12. CI/CD**              | 4 GitHub Actions workflows, ShellCheck, JSON validation                                                          | 2               | 16,000          |
 | **13. Documentation**      | README, INSTALL, TROUBLESHOOTING, AGENT-CATALOG, CHANGELOG, SECURITY, MANDAY, FRAMEWORK-RUNBOOK                  | 3               | 24,000          |
 | **14. QA & Release**       | Bug investigation, 5 bug fixes, regression testing, release tagging, issue management                            | 3               | 24,000          |
-| **Total**                  |                                                                                                                  | **40 man-days** | **3.0.300 THB** |
+| **Total**                  |                                                                                                                  | **40 man-days** | **3.0.400 THB** |
 
 ### Assumptions
 
@@ -89,7 +89,7 @@ Developer time was spent on: prompting, reviewing output, steering architecture 
 ROI = (Cost Saved - Investment) / Investment x 100
 
 Base case:
-  Cost saved  = 3.0.300 - 3,100 = 316,900 THB
+  Cost saved  = 3.0.400 - 3,100 = 316,900 THB
   Investment  = 3,100 THB
   ROI         = 316,900 / 3,100 x 100 = 10,222%
 ```
@@ -109,7 +109,7 @@ Even in the worst case (API 3x more expensive, 3x more developer time, manual ef
 | Development Approach     | Man-Days | Cost (THB)            | vs Claude Code |
 | ------------------------ | -------- | --------------------- | -------------- |
 | **Claude Code (actual)** | 0.3      | 3,100                 | baseline       |
-| Senior engineer (solo)   | 40       | 3.0.300               | 103x more      |
+| Senior engineer (solo)   | 40       | 3.0.400               | 103x more      |
 | Junior team (2 people)   | 80       | 480,000               | 155x more      |
 | DevSecOps consultancy    | 30       | 480,000 (@16,000/day) | 155x more      |
 | Offshore team            | 50       | 200,000 (@4,000/day)  | 65x more       |
@@ -175,7 +175,7 @@ Even in the worst case (API 3x more expensive, 3x more developer time, manual ef
 
 | Item                | Manual            | Claude Code               |
 | ------------------- | ----------------- | ------------------------- |
-| Initial development | 3.0.300           | 3,100                     |
+| Initial development | 3.0.400           | 3,100                     |
 | Year 1 maintenance  | 328,000           | 30,200                    |
 | Year 2 maintenance  | 328,000           | 30,200                    |
 | Year 3 maintenance  | 328,000           | 30,200                    |
@@ -202,10 +202,10 @@ The same pattern (agents + skills + runner + formatters) can be replicated:
 
 | Domain                          | Claude Code | Manual     | Savings             |
 | ------------------------------- | ----------- | ---------- | ------------------- |
-| Data Engineering AI Team        | 3-4 hours   | 35-45 days | 280,000-3.0.300 THB |
+| Data Engineering AI Team        | 3-4 hours   | 35-45 days | 280,000-3.0.400 THB |
 | Cloud Cost Optimization AI Team | 2-3 hours   | 25-35 days | 200,000-280,000 THB |
-| Observability AI Team           | 3-4 hours   | 30-40 days | 240,000-3.0.300 THB |
-| MLOps AI Team                   | 3-4 hours   | 35-45 days | 280,000-3.0.300 THB |
+| Observability AI Team           | 3-4 hours   | 30-40 days | 240,000-3.0.400 THB |
+| MLOps AI Team                   | 3-4 hours   | 35-45 days | 280,000-3.0.400 THB |
 
 ---
 

@@ -18696,7 +18696,7 @@ ${issues.join("\n")}`
   return { valid: true, data: result.data };
 }
 var server = new Server(
-  { name: "devsecops-mcp-server", version: "3.0.3" },
+  { name: "devsecops-mcp-server", version: "3.0.4" },
   { capabilities: { tools: {} } }
 );
 server.setRequestHandler(ListToolsRequestSchema, async () => ({
