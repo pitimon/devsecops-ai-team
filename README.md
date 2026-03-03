@@ -565,7 +565,7 @@ DevSecOps AI Team พร้อมให้บริการ consulting, impleme
 | [FEATURES.md](docs/FEATURES.md)                                 | Skills, agents, MCP, compliance, output formats    |
 | [PROJECT-STRUCTURE.md](docs/PROJECT-STRUCTURE.md)               | Directory tree + file descriptions                 |
 | [AGENT-CATALOG.md](docs/AGENT-CATALOG.md)                       | รายละเอียด 18 agents พร้อม routing cues + triggers |
-| [TROUBLESHOOTING.md](docs/TROUBLESHOOTING.md)                   | แก้ปัญหาที่พบบ่อย (8 scenarios)                    |
+| [TROUBLESHOOTING.md](docs/TROUBLESHOOTING.md)                   | แก้ปัญหาที่พบบ่อย (14 scenarios)                   |
 | [FRAMEWORK-UPDATE-RUNBOOK.md](docs/FRAMEWORK-UPDATE-RUNBOOK.md) | ขั้นตอนอัพเดท framework versions                   |
 | [MANDAY-ESTIMATION.md](docs/MANDAY-ESTIMATION.md)               | ROI analysis + cost comparison (10,222% ROI)       |
 | [CLAUDE.md](CLAUDE.md)                                          | Architecture + contributing guidelines             |

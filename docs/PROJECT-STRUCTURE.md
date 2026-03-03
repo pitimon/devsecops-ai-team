@@ -52,7 +52,7 @@ devsecops-ai-team/
 | [ARCHITECTURE.md](ARCHITECTURE.md)                            | Pipeline delegation, decision loop, system design      |
 | [AGENT-CATALOG.md](AGENT-CATALOG.md)                          | 18 agents with routing cues + triggers                 |
 | [CI-INTEGRATION.md](CI-INTEGRATION.md)                        | CI/CD templates for GitHub Actions and GitLab CI       |
-| [TROUBLESHOOTING.md](TROUBLESHOOTING.md)                      | Common issues (8 scenarios)                            |
+| [TROUBLESHOOTING.md](TROUBLESHOOTING.md)                      | Common issues (14 scenarios)                           |
 | [FRAMEWORK-UPDATE-RUNBOOK.md](FRAMEWORK-UPDATE-RUNBOOK.md)    | Framework version update procedure                     |
 | [MANDAY-ESTIMATION.md](MANDAY-ESTIMATION.md)                  | ROI analysis + cost comparison (10,222% ROI)           |
 | [PRD.md](PRD.md)                                              | Product Requirements Document (vision through v3.1.0)  |

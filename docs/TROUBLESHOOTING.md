@@ -93,8 +93,9 @@ docker compose -f runner/docker-compose.yml restart devsecops-runner
 claude doctor
 claude plugin list
 # Reinstall if needed
-claude plugin remove devsecops-ai-team
-claude plugin add pitimon/devsecops-ai-team
+claude plugin uninstall devsecops-ai-team@pitimon-devsecops
+claude plugin marketplace add pitimon/devsecops-ai-team
+claude plugin install devsecops-ai-team@pitimon-devsecops
 ```
 
 ### ZAP container killed (OOM)
