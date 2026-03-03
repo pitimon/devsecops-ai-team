@@ -1,0 +1,226 @@
+rules:
+  # ==========================================================================
+  # A06:2025 Vulnerable and Outdated Components — Custom Semgrep Rules
+  # DevSecOps AI Team v2.8.0
+  #
+  # 5 rules targeting A06 anti-patterns
+  # Languages: Python (1 rule), Generic/regex (4 rules)
+  # Reference: skills/references/sast-patterns.md
+  # ==========================================================================
+
+  # -------------------------------------------------------------------------
+  # Rule 1: Unpinned pip Dependency (CWE-1104) — Generic
+  # Detects dependencies in requirements.txt without == pinning
+  # -------------------------------------------------------------------------
+  - id: a06-unpinned-pip
+    pattern-regex: '^[a-zA-Z][a-zA-Z0-9_-]*\s*(>=|<=|~=|!=|>|<|$)'
+    message: >
+      Unpinned dependency detected in requirements.txt. Dependencies without
+      exact version pinning (==) may resolve to different versions across
+      environments, including versions with known vulnerabilities. Pin all
+      dependencies with == and use pip-compile or pip-audit for version
+      management per OWASP A06:2025.
+    languages:
+      - generic
+    severity: WARNING
+    metadata:
+      cwe:
+        - "CWE-1104"
+      owasp:
+        - "A06:2021"
+        - "A06:2025"
+      nist:
+        - "SA-12"
+        - "SI-2"
+      confidence: HIGH
+      impact: MEDIUM
+      likelihood: HIGH
+      category: security
+      technology:
+        - python
+      references:
+        - https://owasp.org/Top10/A06_2021-Vulnerable_and_Outdated_Components/
+        - https://cwe.mitre.org/data/definitions/1104.html
+      fix: |
+        Pin dependencies with exact versions:
+          # Bad
+          requests>=2.28
+          flask
+          # Good
+          requests==2.31.0
+          flask==3.0.0
+        Use pip-compile to generate pinned requirements:
+          pip-compile requirements.in -o requirements.txt
+
+  # -------------------------------------------------------------------------
+  # Rule 2: Unpinned npm Dependency (CWE-1104) — Generic
+  # Detects "*" or "latest" version specifiers in package.json
+  # -------------------------------------------------------------------------
+  - id: a06-unpinned-npm
+    pattern-regex: '"[^"]+"\s*:\s*"(\*|latest)"'
+    message: >
+      Unpinned npm dependency detected using "*" or "latest" as version
+      specifier. This allows any version to be installed, including versions
+      with known vulnerabilities or breaking changes. Pin dependencies to
+      exact versions or use a lockfile (package-lock.json) per OWASP A06:2025.
+    languages:
+      - generic
+    severity: WARNING
+    metadata:
+      cwe:
+        - "CWE-1104"
+      owasp:
+        - "A06:2021"
+        - "A06:2025"
+      nist:
+        - "SA-12"
+        - "SI-2"
+      confidence: HIGH
+      impact: MEDIUM
+      likelihood: HIGH
+      category: security
+      technology:
+        - javascript
+      references:
+        - https://owasp.org/Top10/A06_2021-Vulnerable_and_Outdated_Components/
+        - https://cwe.mitre.org/data/definitions/1104.html
+      fix: |
+        Pin npm dependencies to exact versions:
+          {
+            "dependencies": {
+              "express": "4.18.2",
+              "lodash": "4.17.21"
+            }
+          }
+        Use npm shrinkwrap or commit package-lock.json.
+
+  # -------------------------------------------------------------------------
+  # Rule 3: Unsafe yaml.load() Without SafeLoader (CWE-829) — Python
+  # Detects yaml.load() calls missing Loader=SafeLoader or FullLoader
+  # -------------------------------------------------------------------------
+  - id: a06-known-vulnerable-pyyaml
+    patterns:
+      - pattern: yaml.load(...)
+      - pattern-not: yaml.load(..., Loader=yaml.SafeLoader)
+      - pattern-not: yaml.load(..., Loader=yaml.FullLoader)
+    message: >
+      Unsafe yaml.load() call detected without SafeLoader or FullLoader.
+      The default Loader in older PyYAML versions allows arbitrary Python
+      object deserialization, enabling remote code execution. This is a
+      known vulnerability (CVE-2017-18342) in PyYAML < 6.0. Always specify
+      Loader=yaml.SafeLoader per OWASP A06:2025.
+    languages:
+      - python
+    severity: ERROR
+    metadata:
+      cwe:
+        - "CWE-829"
+      owasp:
+        - "A06:2021"
+        - "A06:2025"
+      nist:
+        - "SI-10"
+        - "SC-18"
+      confidence: HIGH
+      impact: HIGH
+      likelihood: HIGH
+      category: security
+      technology:
+        - python
+      references:
+        - https://owasp.org/Top10/A06_2021-Vulnerable_and_Outdated_Components/
+        - https://cwe.mitre.org/data/definitions/829.html
+      fix: |
+        Use SafeLoader for YAML parsing:
+          import yaml
+          # Bad
+          data = yaml.load(content)
+          # Good
+          data = yaml.load(content, Loader=yaml.SafeLoader)
+          # Or use safe_load shorthand
+          data = yaml.safe_load(content)
+
+  # -------------------------------------------------------------------------
+  # Rule 4: pip install Without Hash Verification (CWE-829) — Generic
+  # Detects pip install -r requirements without --require-hashes
+  # -------------------------------------------------------------------------
+  - id: a06-no-lockfile-check
+    pattern-regex: 'pip\s+install\s+(?!.*--require-hashes).*-r\s+requirements'
+    message: >
+      pip install from requirements file without --require-hashes flag.
+      Without hash verification, pip cannot detect if packages have been
+      tampered with on the index server or during transit. Use
+      --require-hashes to enforce integrity verification of all downloaded
+      packages per OWASP A06:2025.
+    languages:
+      - generic
+    severity: WARNING
+    metadata:
+      cwe:
+        - "CWE-829"
+      owasp:
+        - "A06:2021"
+        - "A06:2025"
+      nist:
+        - "SI-7"
+        - "SA-12"
+      confidence: MEDIUM
+      impact: MEDIUM
+      likelihood: MEDIUM
+      category: security
+      technology:
+        - python
+      references:
+        - https://owasp.org/Top10/A06_2021-Vulnerable_and_Outdated_Components/
+        - https://cwe.mitre.org/data/definitions/829.html
+      fix: |
+        Use --require-hashes with pip install:
+          pip install --require-hashes -r requirements.txt
+        Generate hashes with pip-compile:
+          pip-compile --generate-hashes requirements.in
+        Or use pip-audit to check for known vulnerabilities:
+          pip-audit -r requirements.txt
+
+  # -------------------------------------------------------------------------
+  # Rule 5: Untrusted Package Source (CWE-829) — Generic
+  # Detects pip install with non-PyPI index URLs
+  # -------------------------------------------------------------------------
+  - id: a06-untrusted-source
+    pattern-regex: 'pip\s+install\s+.*--(index-url|extra-index-url)\s+(?!https://pypi\.org)'
+    message: >
+      pip install using a non-PyPI package index detected. Custom or
+      third-party package indexes may serve malicious packages through
+      dependency confusion or typosquatting attacks. Only use trusted
+      package sources and verify the index URL points to an authorized
+      internal or official repository per OWASP A06:2025.
+    languages:
+      - generic
+    severity: ERROR
+    metadata:
+      cwe:
+        - "CWE-829"
+      owasp:
+        - "A06:2021"
+        - "A06:2025"
+      nist:
+        - "SA-12"
+        - "SC-8"
+      confidence: HIGH
+      impact: HIGH
+      likelihood: MEDIUM
+      category: security
+      technology:
+        - python
+      references:
+        - https://owasp.org/Top10/A06_2021-Vulnerable_and_Outdated_Components/
+        - https://cwe.mitre.org/data/definitions/829.html
+      fix: |
+        Use only trusted package sources:
+          # Use official PyPI
+          pip install --index-url https://pypi.org/simple/ package-name
+          # For internal packages, use a verified private index
+          pip install --extra-index-url https://internal.example.com/pypi/ package-name
+        Configure trusted hosts in pip.conf:
+          [global]
+          index-url = https://pypi.org/simple/
+          trusted-host = pypi.org
