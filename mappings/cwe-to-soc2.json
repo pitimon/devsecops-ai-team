@@ -1,0 +1,250 @@
+{
+  "_meta": {
+    "description": "CWE to SOC 2 Trust Service Criteria mapping",
+    "source": "https://www.aicpa.org/soc2",
+    "soc2_version": "2017 (with 2022 updates)",
+    "last_updated": "2026-03-03"
+  },
+  "mappings": {
+    "CWE-89": {
+      "soc2": ["CC6.1"],
+      "category": "Logical and Physical Access Controls",
+      "name": "SQL Injection",
+      "requirement": "Logical access security over information assets"
+    },
+    "CWE-78": {
+      "soc2": ["CC6.1"],
+      "category": "Logical and Physical Access Controls",
+      "name": "OS Command Injection",
+      "requirement": "Logical access security over information assets"
+    },
+    "CWE-22": {
+      "soc2": ["CC6.1"],
+      "category": "Logical and Physical Access Controls",
+      "name": "Path Traversal",
+      "requirement": "Logical access security over information assets"
+    },
+    "CWE-862": {
+      "soc2": ["CC6.1", "CC6.3"],
+      "category": "Logical and Physical Access Controls",
+      "name": "Missing Authorization",
+      "requirement": "Logical access security and role-based access enforcement"
+    },
+    "CWE-863": {
+      "soc2": ["CC6.1", "CC6.3"],
+      "category": "Logical and Physical Access Controls",
+      "name": "Incorrect Authorization",
+      "requirement": "Logical access security and role-based access enforcement"
+    },
+    "CWE-639": {
+      "soc2": ["CC6.1"],
+      "category": "Logical and Physical Access Controls",
+      "name": "Authorization Bypass Through User-Controlled Key (IDOR)",
+      "requirement": "Logical access security over information assets"
+    },
+    "CWE-269": {
+      "soc2": ["CC6.1", "CC6.3"],
+      "category": "Logical and Physical Access Controls",
+      "name": "Improper Privilege Management",
+      "requirement": "Least privilege and role-based access enforcement"
+    },
+    "CWE-287": {
+      "soc2": ["CC6.1", "CC6.6"],
+      "category": "Logical and Physical Access Controls",
+      "name": "Improper Authentication",
+      "requirement": "Authentication mechanisms and boundary protection"
+    },
+    "CWE-798": {
+      "soc2": ["CC6.1"],
+      "category": "Logical and Physical Access Controls",
+      "name": "Use of Hard-coded Credentials",
+      "requirement": "Logical access security over information assets"
+    },
+    "CWE-521": {
+      "soc2": ["CC6.1", "CC6.6"],
+      "category": "Logical and Physical Access Controls",
+      "name": "Weak Password Requirements",
+      "requirement": "Authentication strength and boundary protection"
+    },
+    "CWE-308": {
+      "soc2": ["CC6.1", "CC6.6"],
+      "category": "Logical and Physical Access Controls",
+      "name": "Use of Single-factor Authentication",
+      "requirement": "Authentication strength and boundary protection"
+    },
+    "CWE-613": {
+      "soc2": ["CC6.1"],
+      "category": "Logical and Physical Access Controls",
+      "name": "Insufficient Session Expiration",
+      "requirement": "Logical access security over information assets"
+    },
+    "CWE-942": {
+      "soc2": ["CC6.1", "CC6.6"],
+      "category": "Logical and Physical Access Controls",
+      "name": "Permissive Cross-domain Policy (CORS Misconfiguration)",
+      "requirement": "Logical access security and boundary protection"
+    },
+    "CWE-117": {
+      "soc2": ["CC7.1", "CC7.2"],
+      "category": "System Operations",
+      "name": "Improper Output Neutralization for Logs",
+      "requirement": "Monitoring of system components and anomaly detection"
+    },
+    "CWE-778": {
+      "soc2": ["CC7.1", "CC7.2"],
+      "category": "System Operations",
+      "name": "Insufficient Logging",
+      "requirement": "Monitoring of system components and anomaly detection"
+    },
+    "CWE-390": {
+      "soc2": ["CC7.1"],
+      "category": "System Operations",
+      "name": "Detection of Error Condition Without Action (Silent Catch)",
+      "requirement": "Monitoring of system components for anomalies"
+    },
+    "CWE-532": {
+      "soc2": ["CC7.1", "C1.1"],
+      "category": "System Operations",
+      "name": "Insertion of Sensitive Information into Log File",
+      "requirement": "Monitoring integrity and confidentiality of logged data"
+    },
+    "CWE-209": {
+      "soc2": ["CC7.1"],
+      "category": "System Operations",
+      "name": "Generation of Error Message Containing Sensitive Information",
+      "requirement": "Monitoring of system components for information leakage"
+    },
+    "CWE-829": {
+      "soc2": ["CC8.1"],
+      "category": "Change Management",
+      "name": "Inclusion of Functionality from Untrusted Control Sphere",
+      "requirement": "Authorization and management of infrastructure and software changes"
+    },
+    "CWE-494": {
+      "soc2": ["CC8.1"],
+      "category": "Change Management",
+      "name": "Download of Code Without Integrity Check",
+      "requirement": "Authorization and management of infrastructure and software changes"
+    },
+    "CWE-1104": {
+      "soc2": ["CC8.1"],
+      "category": "Change Management",
+      "name": "Use of Unmaintained Third-Party Components",
+      "requirement": "Authorization and management of infrastructure and software changes"
+    },
+    "CWE-502": {
+      "soc2": ["CC8.1", "PI1.1"],
+      "category": "Change Management",
+      "name": "Deserialization of Untrusted Data",
+      "requirement": "Change management controls and processing integrity"
+    },
+    "CWE-918": {
+      "soc2": ["CC9.1"],
+      "category": "Risk Mitigation",
+      "name": "Server-Side Request Forgery (SSRF)",
+      "requirement": "Risk mitigation through system design and controls"
+    },
+    "CWE-79": {
+      "soc2": ["CC9.1"],
+      "category": "Risk Mitigation",
+      "name": "Cross-site Scripting (XSS)",
+      "requirement": "Risk mitigation through system design and controls"
+    },
+    "CWE-770": {
+      "soc2": ["CC9.1", "A1.1"],
+      "category": "Risk Mitigation",
+      "name": "Allocation of Resources Without Limits or Throttling",
+      "requirement": "Risk mitigation and system availability controls"
+    },
+    "CWE-400": {
+      "soc2": ["CC9.1", "A1.1"],
+      "category": "Risk Mitigation",
+      "name": "Uncontrolled Resource Consumption",
+      "requirement": "Risk mitigation and system availability controls"
+    },
+    "CWE-312": {
+      "soc2": ["C1.1", "C1.2"],
+      "category": "Confidentiality",
+      "name": "Cleartext Storage of Sensitive Information",
+      "requirement": "Confidentiality of information designated as confidential"
+    },
+    "CWE-311": {
+      "soc2": ["C1.1", "C1.2"],
+      "category": "Confidentiality",
+      "name": "Missing Encryption of Sensitive Data",
+      "requirement": "Confidentiality of information designated as confidential"
+    },
+    "CWE-319": {
+      "soc2": ["C1.1"],
+      "category": "Confidentiality",
+      "name": "Cleartext Transmission of Sensitive Information",
+      "requirement": "Confidentiality of information during transmission"
+    },
+    "CWE-200": {
+      "soc2": ["C1.1"],
+      "category": "Confidentiality",
+      "name": "Exposure of Sensitive Information to Unauthorized Actor",
+      "requirement": "Confidentiality of information designated as confidential"
+    },
+    "CWE-359": {
+      "soc2": ["C1.1", "C1.2"],
+      "category": "Confidentiality",
+      "name": "Exposure of Private Personal Information",
+      "requirement": "Confidentiality and disposal of confidential information"
+    },
+    "CWE-256": {
+      "soc2": ["C1.1"],
+      "category": "Confidentiality",
+      "name": "Plaintext Storage of Password",
+      "requirement": "Confidentiality of credential information"
+    },
+    "CWE-327": {
+      "soc2": ["C1.1"],
+      "category": "Confidentiality",
+      "name": "Use of a Broken or Risky Cryptographic Algorithm",
+      "requirement": "Confidentiality through appropriate cryptographic controls"
+    },
+    "CWE-328": {
+      "soc2": ["C1.1"],
+      "category": "Confidentiality",
+      "name": "Use of Weak Hash",
+      "requirement": "Confidentiality through appropriate cryptographic controls"
+    },
+    "CWE-306": {
+      "soc2": ["CC6.1", "CC6.6"],
+      "category": "Logical and Physical Access Controls",
+      "name": "Missing Authentication for Critical Function",
+      "requirement": "Authentication mechanisms and boundary protection"
+    },
+    "CWE-352": {
+      "soc2": ["CC9.1"],
+      "category": "Risk Mitigation",
+      "name": "Cross-Site Request Forgery (CSRF)",
+      "requirement": "Risk mitigation through system design and controls"
+    },
+    "CWE-601": {
+      "soc2": ["CC9.1"],
+      "category": "Risk Mitigation",
+      "name": "URL Redirection to Untrusted Site (Open Redirect)",
+      "requirement": "Risk mitigation through system design and controls"
+    },
+    "CWE-20": {
+      "soc2": ["PI1.1"],
+      "category": "Processing Integrity",
+      "name": "Improper Input Validation",
+      "requirement": "System processing is complete, valid, accurate, and timely"
+    },
+    "CWE-434": {
+      "soc2": ["PI1.1"],
+      "category": "Processing Integrity",
+      "name": "Unrestricted Upload of File with Dangerous Type",
+      "requirement": "System processing is complete, valid, accurate, and timely"
+    },
+    "CWE-640": {
+      "soc2": ["PI1.1"],
+      "category": "Processing Integrity",
+      "name": "Weak Password Recovery Mechanism for Forgotten Password",
+      "requirement": "System processing is complete, valid, accurate, and timely"
+    }
+  }
+}
